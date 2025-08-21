@@ -1071,6 +1071,9 @@ export default function EnhancedRichTextEditor({
                       handleColorChange(e.target.value);
                     }}
                     onClick={(e) => e.stopPropagation()}
+                    onPointerDown={(e) => e.stopPropagation()}
+                    onFocus={() => setIsInteractingWithColorPicker(true)}
+                    onBlur={() => setIsInteractingWithColorPicker(false)}
                     className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:border-blue-500 focus:outline-none"
                     placeholder="#000000"
                   />
@@ -1089,9 +1092,14 @@ export default function EnhancedRichTextEditor({
                     <button
                       key={presetColor}
                       onClick={(e) => {
-                      e.stopPropagation();
-                      handleColorChange(presetColor);
-                    }}
+                        e.stopPropagation();
+                        e.preventDefault();
+                        handleColorChange(presetColor);
+                      }}
+                      onPointerDown={(e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                      }}
                       className="w-6 h-6 rounded border border-gray-300 hover:scale-110 transition-transform"
                       style={{ backgroundColor: presetColor }}
                       title={presetColor}
@@ -1100,7 +1108,12 @@ export default function EnhancedRichTextEditor({
                 </div>
                 <div className="mt-3 pt-3 border-t border-gray-200">
                   <Button
-                    onClick={closeColorPicker}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      closeColorPicker();
+                    }}
+                    onPointerDown={(e) => e.stopPropagation()}
                     size="sm"
                     variant="outline"
                     className="w-full text-xs"
