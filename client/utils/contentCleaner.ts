@@ -16,8 +16,9 @@ export function cleanContentForDisplay(content: string): string {
     .replace(/\s+>/g, ">");
 
   // Remove delete buttons (trash icon buttons) from content when displaying
+  // This regex catches various forms of delete buttons with trash icons
   cleanedContent = cleanedContent.replace(
-    /<button[^>]*title="Excluir [^"]*"[^>]*>🗑️<\/button>/g,
+    /<button[^>]*(?:title="Excluir [^"]*"|onclick="[^"]*")[^>]*>[\s]*🗑️[\s]*<\/button>/g,
     ""
   );
 
