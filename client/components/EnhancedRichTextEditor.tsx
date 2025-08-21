@@ -1199,16 +1199,17 @@ export default function EnhancedRichTextEditor({
       <style>{`
         /* Color picker styles */
         .color-picker-container {
-          padding: 12px;
+          padding: 8px;
           background: white;
           border-radius: 8px;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
           width: fit-content;
+          max-width: 200px;
         }
 
         .react-colorful {
-          width: 180px !important;
-          height: 120px !important;
+          width: 160px !important;
+          height: 100px !important;
         }
 
         .react-colorful__saturation {
