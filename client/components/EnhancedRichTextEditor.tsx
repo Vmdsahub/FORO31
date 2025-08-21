@@ -229,6 +229,25 @@ export default function EnhancedRichTextEditor({
     if (editorRef.current) {
       const content = editorRef.current.innerHTML;
       onChange(content);
+
+      // Aplicar cor atual ao texto sendo digitado se uma cor está selecionada
+      if (currentColor && currentColor !== '#000000') {
+        applyCurrentColorToSelection();
+      }
+    }
+  };
+
+  // Função para aplicar cor atual à seleção/cursor
+  const applyCurrentColorToSelection = () => {
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return;
+
+    const range = selection.getRangeAt(0);
+    if (range.collapsed) {
+      // Cursor está posicionado, mas sem seleção
+      // Aplicar cor ao próximo texto que for digitado
+      document.execCommand('styleWithCSS', false, 'true');
+      document.execCommand('foreColor', false, currentColor);
     }
   };
 
@@ -241,12 +260,25 @@ export default function EnhancedRichTextEditor({
 
   const handleEditorClick = () => {
     // Salvar seleção automaticamente quando usuário clica no editor
-    setTimeout(saveCurrentSelection, 10);
+    setTimeout(() => {
+      saveCurrentSelection();
+      // Aplicar cor atual se necess��rio
+      if (currentColor && currentColor !== '#000000') {
+        applyCurrentColorToSelection();
+      }
+    }, 10);
   };
 
-  const handleEditorKeyUp = () => {
+  const handleEditorKeyUp = (e: React.KeyboardEvent) => {
     // Salvar seleção após navegação com teclado
-    setTimeout(saveCurrentSelection, 10);
+    setTimeout(() => {
+      saveCurrentSelection();
+
+      // Se foi uma tecla de caractere, aplicar cor atual
+      if (e.key.length === 1 && currentColor && currentColor !== '#000000') {
+        applyCurrentColorToSelection();
+      }
+    }, 10);
   };
 
   const execCommand = (command: string, value?: string) => {
@@ -1113,16 +1145,16 @@ export default function EnhancedRichTextEditor({
       <style>{`
         /* Color picker styles */
         .color-picker-container {
-          padding: 16px;
+          padding: 12px;
           background: white;
           border-radius: 8px;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-          min-width: 220px;
+          width: fit-content;
         }
 
         .react-colorful {
-          width: 200px !important;
-          height: 150px !important;
+          width: 180px !important;
+          height: 120px !important;
         }
 
         .react-colorful__saturation {
