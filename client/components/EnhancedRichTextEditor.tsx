@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import ImageModal from "@/components/ImageModal";
-import { SketchPicker } from "react-color";
+import { HexColorPicker } from "react-colorful";
 import {
   Popover,
   PopoverContent,
