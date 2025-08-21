@@ -261,10 +261,45 @@ export default function EnhancedRichTextEditor({
     };
   }, [placeholder]);
 
+  // Função para limpar e otimizar HTML
+  const cleanHTML = (html: string): string => {
+    // Criar um elemento temporário para manipular o HTML
+    const temp = document.createElement("div");
+    temp.innerHTML = html;
+
+    // Remover elementos font vazios
+    const fontElements = temp.querySelectorAll("font");
+    fontElements.forEach((font) => {
+      if (!font.textContent?.trim()) {
+        font.remove();
+      }
+    });
+
+    // Remover spans vazios
+    const spanElements = temp.querySelectorAll("span");
+    spanElements.forEach((span) => {
+      if (!span.textContent?.trim() && !span.querySelector("img, video")) {
+        span.remove();
+      }
+    });
+
+    // Remover atributos desnecessários
+    const allElements = temp.querySelectorAll("*");
+    allElements.forEach((element) => {
+      // Remover atributos vazios ou desnecessários
+      if (element.hasAttribute("style") && !element.getAttribute("style")?.trim()) {
+        element.removeAttribute("style");
+      }
+    });
+
+    return temp.innerHTML;
+  };
+
   const handleInput = () => {
     if (editorRef.current) {
-      const content = editorRef.current.innerHTML;
-      onChange(content);
+      const rawContent = editorRef.current.innerHTML;
+      const cleanedContent = cleanHTML(rawContent);
+      onChange(cleanedContent);
       // Atualizar estado dos botões após mudança no conteúdo
       setTimeout(() => updateFormattingState(), 10);
     }
