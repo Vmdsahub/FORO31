@@ -30,6 +30,7 @@ export default function EnhancedRichTextEditor({
   isEditMode = true, // Default to edit mode (creation/editing)
 }: EnhancedRichTextEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
+  const colorPickerRef = useRef<HTMLDivElement>(null);
   const [modalImage, setModalImage] = useState<{
     src: string;
     alt: string;
@@ -38,6 +39,7 @@ export default function EnhancedRichTextEditor({
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [currentColor, setCurrentColor] = useState("#000000");
   const [savedSelection, setSavedSelection] = useState<Range | null>(null);
+  const [isInteractingWithColorPicker, setIsInteractingWithColorPicker] = useState(false);
 
   // Função para salvar seleção atual
   const saveCurrentSelection = () => {
@@ -967,12 +969,15 @@ export default function EnhancedRichTextEditor({
         <div className="w-px h-6 bg-gray-300 mx-1" />
 
         {/* Color Picker */}
-        <Popover open={showColorPicker} onOpenChange={(open) => {
-          // Lógica simples: só permitir fechamento se for explicitamente false
-          if (!open) {
-            setShowColorPicker(false);
-          }
-        }}>
+        <Popover
+          open={showColorPicker}
+          onOpenChange={(open) => {
+            // Só fechar se não estiver interagindo com o color picker
+            if (!open && !isInteractingWithColorPicker) {
+              setShowColorPicker(false);
+            }
+          }}
+        >
           <PopoverTrigger asChild>
             <Button
               type="button"
@@ -1007,18 +1012,51 @@ export default function EnhancedRichTextEditor({
             align="start"
             onEscapeKeyDown={() => setShowColorPicker(false)}
             onPointerDownOutside={(e) => {
-              // Lógica simples: se clicou fora do popover content, fechar
+              // Verificar se o clique foi realmente fora do color picker
               const target = e.target as Element;
-              if (!target.closest('[data-radix-popper-content]')) {
-                setShowColorPicker(false);
+              const colorPickerElement = colorPickerRef.current;
+
+              if (colorPickerElement && colorPickerElement.contains(target)) {
+                // Clicou dentro do color picker - NÃO fechar
+                e.preventDefault();
+                return;
+              }
+
+              // Se chegou aqui, clicou realmente fora
+              setShowColorPicker(false);
+            }}
+            onInteractOutside={(e) => {
+              // Prevenir qualquer interação que feche o popover se estiver dentro
+              const target = e.target as Element;
+              const colorPickerElement = colorPickerRef.current;
+
+              if (colorPickerElement && colorPickerElement.contains(target)) {
+                e.preventDefault();
+                e.stopPropagation();
               }
             }}
           >
-            <div className="color-picker-container">
-              <HexColorPicker
-                color={currentColor}
-                onChange={handleColorChange}
-              />
+            <div
+              ref={colorPickerRef}
+              className="color-picker-container"
+              onMouseEnter={() => setIsInteractingWithColorPicker(true)}
+              onMouseLeave={() => setIsInteractingWithColorPicker(false)}
+              onPointerDown={(e) => {
+                e.stopPropagation();
+                setIsInteractingWithColorPicker(true);
+              }}
+              onPointerUp={() => setIsInteractingWithColorPicker(false)}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <HexColorPicker
+                  color={currentColor}
+                  onChange={handleColorChange}
+                />
+              </div>
               <div className="mt-3 space-y-2">
                 <div className="flex items-center gap-2">
                   <div
