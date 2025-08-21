@@ -999,7 +999,10 @@ export default function EnhancedRichTextEditor({
             onPointerDownOutside={(e) => {
               // Só fechar se clicou fora do picker mesmo
               const target = e.target as Element;
-              if (!target.closest('.color-picker-container') && !target.closest('[data-radix-popper-content-wrapper]')) {
+              if (
+                !target.closest(".color-picker-container") &&
+                !target.closest("[data-radix-popper-content-wrapper]")
+              ) {
                 setShowColorPicker(false);
               }
             }}
@@ -1028,7 +1031,16 @@ export default function EnhancedRichTextEditor({
                   />
                 </div>
                 <div className="flex gap-1 flex-wrap">
-                  {['#000000', '#ffffff', '#ef4444', '#22c55e', '#3b82f6', '#f59e0b', '#8b5cf6', '#ec4899'].map((presetColor) => (
+                  {[
+                    "#000000",
+                    "#ffffff",
+                    "#ef4444",
+                    "#22c55e",
+                    "#3b82f6",
+                    "#f59e0b",
+                    "#8b5cf6",
+                    "#ec4899",
+                  ].map((presetColor) => (
                     <button
                       key={presetColor}
                       onClick={() => handleColorChange(presetColor)}
