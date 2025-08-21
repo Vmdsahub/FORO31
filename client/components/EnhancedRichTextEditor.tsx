@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import ImageModal from "@/components/ImageModal";
-import { SketchPicker } from "react-color";
+import { HexColorPicker } from "react-colorful";
 import {
   Popover,
   PopoverContent,
@@ -37,6 +37,26 @@ export default function EnhancedRichTextEditor({
   } | null>(null);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [currentColor, setCurrentColor] = useState("#000000");
+  const [savedSelection, setSavedSelection] = useState<Range | null>(null);
+
+  // Função para salvar seleção atual
+  const saveCurrentSelection = () => {
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+      setSavedSelection(selection.getRangeAt(0).cloneRange());
+    }
+  };
+
+  // Função para restaurar seleção salva
+  const restoreSelection = () => {
+    if (savedSelection) {
+      const selection = window.getSelection();
+      if (selection) {
+        selection.removeAllRanges();
+        selection.addRange(savedSelection);
+      }
+    }
+  };
 
   // Initialize secure upload system
   const [secureUploadStats, setSecureUploadStats] = useState<{
@@ -216,28 +236,75 @@ export default function EnhancedRichTextEditor({
     }, 50);
   };
 
+  const handleEditorClick = () => {
+    // Salvar seleção automaticamente quando usuário clica no editor
+    setTimeout(saveCurrentSelection, 10);
+  };
+
+  const handleEditorKeyUp = () => {
+    // Salvar seleção após navegação com teclado
+    setTimeout(saveCurrentSelection, 10);
+  };
+
   const execCommand = (command: string, value?: string) => {
     document.execCommand(command, false, value);
-    editorRef.current?.focus();
     handleInput();
   };
 
-  const handleBold = () => execCommand("bold");
-  const handleItalic = () => execCommand("italic");
-  const handleUnderline = () => execCommand("underline");
-  const handleHeading = () => execCommand("formatBlock", "H3");
+  const execCommandWithSelection = (command: string, value?: string) => {
+    // Salvar seleção atual
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+      const range = selection.getRangeAt(0);
+      setSavedSelection(range.cloneRange());
+    }
+
+    // Executar comando
+    document.execCommand(command, false, value);
+
+    // Restaurar seleção
+    if (savedSelection) {
+      const selection = window.getSelection();
+      if (selection) {
+        selection.removeAllRanges();
+        selection.addRange(savedSelection);
+      }
+    }
+
+    handleInput();
+  };
+
+  const handleBold = () => execCommandWithSelection("bold");
+  const handleItalic = () => execCommandWithSelection("italic");
+  const handleUnderline = () => execCommandWithSelection("underline");
+  const handleHeading = () => execCommandWithSelection("formatBlock", "H3");
 
   const handleLink = () => {
     const url = prompt("Digite a URL:");
     if (url) {
-      execCommand("createLink", url);
+      execCommandWithSelection("createLink", url);
     }
   };
 
-  const handleColorChange = (color: any) => {
-    setCurrentColor(color.hex);
-    execCommand("foreColor", color.hex);
-    setShowColorPicker(false);
+  const handleColorChange = (color: string) => {
+    setCurrentColor(color);
+
+    // Manter foco no editor
+    if (editorRef.current) {
+      editorRef.current.focus();
+    }
+
+    // Restaurar seleção antes de aplicar cor
+    restoreSelection();
+
+    // Aplicar cor usando execCommand com CSS styles habilitado
+    document.execCommand("styleWithCSS", false, "true");
+    document.execCommand("foreColor", false, color);
+
+    // Salvar a nova seleção após aplicar cor
+    saveCurrentSelection();
+
+    handleInput();
   };
 
   const handleSecureUploadSuccess = (fileInfo: UploadedFileInfo) => {
@@ -906,6 +973,7 @@ export default function EnhancedRichTextEditor({
               size="sm"
               className="h-8 px-2 hover:bg-gray-100"
               title="Cor do texto"
+              onClick={saveCurrentSelection}
             >
               <div className="flex items-center gap-1">
                 <svg
@@ -923,12 +991,67 @@ export default function EnhancedRichTextEditor({
               </div>
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" side="bottom" align="start">
-            <SketchPicker
-              color={currentColor}
-              onChange={handleColorChange}
-              width="200px"
-            />
+          <PopoverContent
+            className="w-auto p-0"
+            side="bottom"
+            align="start"
+            onEscapeKeyDown={() => setShowColorPicker(false)}
+            onPointerDownOutside={(e) => {
+              // Só fechar se clicou fora do picker mesmo
+              const target = e.target as Element;
+              if (
+                !target.closest(".color-picker-container") &&
+                !target.closest("[data-radix-popper-content-wrapper]")
+              ) {
+                setShowColorPicker(false);
+              }
+            }}
+          >
+            <div
+              className="color-picker-container"
+              onMouseDown={(e) => e.stopPropagation()}
+              onPointerDown={(e) => e.stopPropagation()}
+            >
+              <HexColorPicker
+                color={currentColor}
+                onChange={handleColorChange}
+              />
+              <div className="mt-3 space-y-2">
+                <div className="flex items-center gap-2">
+                  <div
+                    className="w-8 h-8 rounded border border-gray-300 shadow-sm"
+                    style={{ backgroundColor: currentColor }}
+                  />
+                  <input
+                    type="text"
+                    value={currentColor}
+                    onChange={(e) => handleColorChange(e.target.value)}
+                    className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:border-blue-500 focus:outline-none"
+                    placeholder="#000000"
+                  />
+                </div>
+                <div className="flex gap-1 flex-wrap">
+                  {[
+                    "#000000",
+                    "#ffffff",
+                    "#ef4444",
+                    "#22c55e",
+                    "#3b82f6",
+                    "#f59e0b",
+                    "#8b5cf6",
+                    "#ec4899",
+                  ].map((presetColor) => (
+                    <button
+                      key={presetColor}
+                      onClick={() => handleColorChange(presetColor)}
+                      className="w-6 h-6 rounded border border-gray-300 hover:scale-110 transition-transform"
+                      style={{ backgroundColor: presetColor }}
+                      title={presetColor}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
           </PopoverContent>
         </Popover>
 
@@ -954,6 +1077,8 @@ export default function EnhancedRichTextEditor({
         contentEditable
         onInput={handleInput}
         onFocus={handleEditorFocus}
+        onClick={handleEditorClick}
+        onKeyUp={handleEditorKeyUp}
         className="w-full p-4 min-h-[200px] focus:outline-none bg-white rich-editor"
         style={{
           lineHeight: "1.7",
@@ -968,6 +1093,40 @@ export default function EnhancedRichTextEditor({
 
       {/* Enhanced CSS for better layout and text handling */}
       <style>{`
+        /* Color picker styles */
+        .color-picker-container {
+          padding: 16px;
+          background: white;
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          min-width: 220px;
+        }
+
+        .react-colorful {
+          width: 200px !important;
+          height: 150px !important;
+        }
+
+        .react-colorful__saturation {
+          border-radius: 6px 6px 0 0;
+        }
+
+        .react-colorful__hue,
+        .react-colorful__alpha {
+          border-radius: 0 0 6px 6px;
+          height: 18px !important;
+          margin-top: 8px;
+        }
+
+        .react-colorful__pointer {
+          width: 18px !important;
+          height: 18px !important;
+        }
+
+        .react-colorful__saturation-pointer {
+          width: 16px !important;
+          height: 16px !important;
+        }
         .rich-editor[data-empty="true"]:before {
           content: attr(data-placeholder);
           color: #9ca3af;
