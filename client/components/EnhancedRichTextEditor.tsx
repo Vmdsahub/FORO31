@@ -8,6 +8,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import SecureUploadWidget, {
   UploadedFileInfo,
   isImageFile,
@@ -40,10 +47,23 @@ export default function EnhancedRichTextEditor({
   const [currentColor, setCurrentColor] = useState("#000000");
   const [savedSelection, setSavedSelection] = useState<Range | null>(null);
   const colorPickerTriggerRef = useRef<HTMLButtonElement>(null);
-  const [fontSize, setFontSize] = useState(15);
+  const [fontSize, setFontSize] = useState("16");
   const [isBold, setIsBold] = useState(false);
   const [isItalic, setIsItalic] = useState(false);
   const [isUnderline, setIsUnderline] = useState(false);
+
+  // Tamanhos de fonte pré-determinados
+  const fontSizes = [
+    { value: "10", label: "10px" },
+    { value: "12", label: "12px" },
+    { value: "14", label: "14px" },
+    { value: "16", label: "16px" },
+    { value: "18", label: "18px" },
+    { value: "20", label: "20px" },
+    { value: "24", label: "24px" },
+    { value: "28", label: "28px" },
+    { value: "32", label: "32px" },
+  ];
 
   // Função para salvar seleção atual
   const saveCurrentSelection = () => {
@@ -325,12 +345,25 @@ export default function EnhancedRichTextEditor({
     handleInput();
   };
 
-  const handleFontSizeChange = (newSize: number) => {
+  const handleFontSizeChange = (newSize: string) => {
     setFontSize(newSize);
-    if (editorRef.current) {
-      editorRef.current.style.fontSize = `${newSize}px`;
-    }
-    handleInput();
+    // Aplicar tamanho da fonte ao próximo texto digitado
+    document.execCommand("styleWithCSS", false, "true");
+    document.execCommand("fontSize", false, "7"); // Primeiro aplicar um tamanho padrão
+    // Depois sobrescrever com CSS customizado
+    setTimeout(() => {
+      if (editorRef.current) {
+        const selection = window.getSelection();
+        if (selection && selection.rangeCount > 0) {
+          // Focus no editor para garantir que próximo texto tenha o tamanho correto
+          editorRef.current.focus();
+          // Aplicar estilo CSS diretamente para próximo texto
+          document.execCommand("styleWithCSS", false, "true");
+          const fontElement = document.createElement("span");
+          fontElement.style.fontSize = `${newSize}px`;
+        }
+      }
+    }, 10);
   };
 
   const resetColor = () => {
@@ -1017,34 +1050,19 @@ export default function EnhancedRichTextEditor({
           </svg>
         </Button>
 
-        {/* Font Size Control */}
-        <div className="flex items-center gap-1">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => handleFontSizeChange(Math.max(10, fontSize - 1))}
-            className="h-8 px-2 hover:bg-gray-100"
-            title="Diminuir fonte"
-          >
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M5 12h14v2H5z" />
-            </svg>
-          </Button>
-          <span className="text-xs text-gray-600 min-w-[25px] text-center">{fontSize}px</span>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => handleFontSizeChange(Math.min(24, fontSize + 1))}
-            className="h-8 px-2 hover:bg-gray-100"
-            title="Aumentar fonte"
-          >
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 5v14m-7-7h14" />
-            </svg>
-          </Button>
-        </div>
+        {/* Font Size Dropdown */}
+        <Select value={fontSize} onValueChange={handleFontSizeChange}>
+          <SelectTrigger className="h-8 w-20 text-xs">
+            <SelectValue placeholder="Fonte" />
+          </SelectTrigger>
+          <SelectContent>
+            {fontSizes.map((size) => (
+              <SelectItem key={size.value} value={size.value} className="text-xs">
+                {size.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
         <Button
           type="button"
@@ -1202,7 +1220,7 @@ export default function EnhancedRichTextEditor({
         className="w-full p-4 min-h-[200px] focus:outline-none bg-white rich-editor"
         style={{
           lineHeight: "1.7",
-          fontSize: `${fontSize}px`,
+          fontSize: "16px", // Tamanho base padrão
           wordWrap: "break-word",
           overflowWrap: "break-word",
           whiteSpace: "pre-wrap",
