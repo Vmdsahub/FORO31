@@ -5,6 +5,8 @@
 export function cleanContentForDisplay(content: string): string {
   if (!content) return content;
 
+  const originalContent = content;
+
   // Remove data-edit-mode attributes from video elements and containers
   let cleanedContent = content
     .replace(/data-edit-mode="true"/g, "")
