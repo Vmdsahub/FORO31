@@ -595,7 +595,7 @@ export default function EnhancedRichTextEditor({
       deleteButton.innerHTML = "🗑️";
       deleteButton.title = "Excluir vídeo";
       deleteButton.style.cssText =
-        "position: absolute; top: -8px; right: -8px; background: red; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center;";
+        "position: absolute; top: -8px; right: -8px; background: red; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer; z-index: 1000; display: flex; align-items: center; justify-content: center; pointer-events: auto;";
 
       deleteButton.onclick = (e) => {
         e.preventDefault();
@@ -670,7 +670,7 @@ export default function EnhancedRichTextEditor({
 
   const insertFileLink = (url: string, name: string, size?: number) => {
     const sizeText = size ? ` (${formatFileSize(size)})` : "";
-    const fileLink = `<div contenteditable="false" style="margin: 8px 0; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); user-select: none; transition: all 0.2s; clear: both;" onmouseover="this.style.backgroundColor='#f9fafb'" onmouseout="this.style.backgroundColor='white'"><div style="display: flex; align-items: center; justify-content: space-between;"><div style="display: flex; align-items: center; gap: 8px;"><span style="font-size: 14px; color: #6b7280;">📎</span><span style="font-size: 14px; color: #374151; font-weight: 500;">${name}${sizeText}</span></div><button onclick="window.downloadFile('${url}', '${name}')" style="background: #3b82f6; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 11px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#2563eb'" onmouseout="this.style.background='#3b82f6'" title="Download do arquivo">Download</button></div></div>`;
+    const fileLink = `<div contenteditable="false" style="margin: 8px 0; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); user-select: none; transition: all 0.2s; clear: both;" onmouseover="this.style.backgroundColor='#f9fafb'" onmouseout="this.style.backgroundColor='white'"><div style="display: flex; align-items: center; justify-content: space-between;"><div style="display: flex; align-items: center; gap: 8px;"><span style="font-size: 14px; color: #6b7280;">��</span><span style="font-size: 14px; color: #374151; font-weight: 500;">${name}${sizeText}</span></div><button onclick="window.downloadFile('${url}', '${name}')" style="background: #3b82f6; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 11px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#2563eb'" onmouseout="this.style.background='#3b82f6'" title="Download do arquivo">Download</button></div></div>`;
 
     const editor = editorRef.current;
     if (!editor) return;
@@ -813,7 +813,7 @@ export default function EnhancedRichTextEditor({
         <SecureUploadWidget
           onSuccess={handleSecureUploadSuccess}
           onError={handleSecureUploadError}
-          buttonText="��� Upload"
+          buttonText="🔒 Upload"
           className="h-8"
           icon={
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
