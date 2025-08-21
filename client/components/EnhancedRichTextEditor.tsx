@@ -1017,7 +1017,6 @@ export default function EnhancedRichTextEditor({
             side="bottom"
             align="start"
             onEscapeKeyDown={(e) => {
-              console.log('ESC pressed - closing color picker');
               e.preventDefault();
               closeColorPicker();
             }}
@@ -1026,33 +1025,25 @@ export default function EnhancedRichTextEditor({
               const colorPickerElement = colorPickerRef.current;
               const triggerElement = colorPickerTriggerRef.current;
 
-              console.log('Pointer down outside detected', {
-                target: target.tagName,
-                isInColorPicker: colorPickerElement?.contains(target),
-                isInTrigger: triggerElement?.contains(target)
-              });
-
-              // NUNCA fechar se clicou dentro do color picker ou trigger
-              if (colorPickerElement?.contains(target) || triggerElement?.contains(target)) {
-                console.log('Click inside - preventing close');
+              // Não fechar se clicou dentro do color picker, trigger, ou elementos react-colorful
+              if (
+                colorPickerElement?.contains(target) ||
+                triggerElement?.contains(target) ||
+                target.closest('.react-colorful') ||
+                target.closest('[data-radix-popper-content]')
+              ) {
                 e.preventDefault();
-                e.stopPropagation();
                 return;
               }
 
               // Só fechar se clicou realmente fora
-              console.log('Click outside - closing');
               closeColorPicker();
             }}
             onInteractOutside={(e) => {
               e.preventDefault();
-              e.stopPropagation();
-              console.log('Interact outside blocked');
             }}
             onFocusOutside={(e) => {
               e.preventDefault();
-              e.stopPropagation();
-              console.log('Focus outside blocked');
             }}
           >
             <div
@@ -1073,7 +1064,6 @@ export default function EnhancedRichTextEditor({
                     type="text"
                     value={currentColor}
                     onChange={(e) => {
-                      console.log('Input change:', e.target.value);
                       handleColorChange(e.target.value);
                     }}
                     className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:border-blue-500 focus:outline-none"
@@ -1094,7 +1084,6 @@ export default function EnhancedRichTextEditor({
                     <button
                       key={presetColor}
                       onClick={(e) => {
-                        console.log('Preset color clicked:', presetColor);
                         handleColorChange(presetColor);
                       }}
                       className="w-6 h-6 rounded border border-gray-300 hover:scale-110 transition-transform"
@@ -1107,10 +1096,8 @@ export default function EnhancedRichTextEditor({
                   <Button
                     onClick={(e) => {
                       e.stopPropagation();
-                      e.preventDefault();
                       closeColorPicker();
                     }}
-                    onPointerDown={(e) => e.stopPropagation()}
                     size="sm"
                     variant="outline"
                     className="w-full text-xs"
