@@ -237,7 +237,7 @@ export default function EnhancedRichTextEditor({
   const handleColorChange = (color: any) => {
     setCurrentColor(color.hex);
     execCommand("foreColor", color.hex);
-    setShowColorPicker(false);
+    // Não fechar automaticamente - deixar o usuário ajustar a cor
   };
 
   const handleSecureUploadSuccess = (fileInfo: UploadedFileInfo) => {
