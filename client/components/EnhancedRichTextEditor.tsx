@@ -908,26 +908,6 @@ export default function EnhancedRichTextEditor({
           opacity: 0.5;
         }
 
-        /* CRITICAL: Ensure delete buttons are always clickable */
-        .rich-editor button[title="Excluir imagem"],
-        .rich-editor button[title="Excluir vídeo"],
-        .rich-editor button:has(🗑️),
-        .rich-editor button[title*="Excluir"] {
-          pointer-events: auto !important;
-          user-select: auto !important;
-          cursor: pointer !important;
-          z-index: 1000 !important;
-          position: absolute !important;
-        }
-
-        /* Override any parent container rules for delete buttons */
-        .rich-editor .image-container button,
-        .rich-editor .video-preview button {
-          pointer-events: auto !important;
-          user-select: auto !important;
-          cursor: pointer !important;
-          z-index: 1000 !important;
-        }
         
         /* Better text flow and line breaks */
         .rich-editor * {
