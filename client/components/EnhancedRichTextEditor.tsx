@@ -337,10 +337,11 @@ export default function EnhancedRichTextEditor({
   };
 
   const handleEditorClick = () => {
-    // Salvar seleção e aplicar cor atual
+    // Salvar seleção e aplicar cor e tamanho atuais
     setTimeout(() => {
       saveCurrentSelection();
       applyCurrentColor();
+      applyCurrentFontSize();
     }, 10);
   };
 
