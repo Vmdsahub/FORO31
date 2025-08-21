@@ -37,6 +37,7 @@ export default function EnhancedRichTextEditor({
   } | null>(null);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [currentColor, setCurrentColor] = useState("#000000");
+  const [savedSelection, setSavedSelection] = useState<Range | null>(null);
 
   // Initialize secure upload system
   const [secureUploadStats, setSecureUploadStats] = useState<{
@@ -218,7 +219,29 @@ export default function EnhancedRichTextEditor({
 
   const execCommand = (command: string, value?: string) => {
     document.execCommand(command, false, value);
-    editorRef.current?.focus();
+    handleInput();
+  };
+
+  const execCommandWithSelection = (command: string, value?: string) => {
+    // Salvar seleção atual
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+      const range = selection.getRangeAt(0);
+      setSavedSelection(range.cloneRange());
+    }
+
+    // Executar comando
+    document.execCommand(command, false, value);
+
+    // Restaurar seleção
+    if (savedSelection) {
+      const selection = window.getSelection();
+      if (selection) {
+        selection.removeAllRanges();
+        selection.addRange(savedSelection);
+      }
+    }
+
     handleInput();
   };
 
@@ -236,8 +259,35 @@ export default function EnhancedRichTextEditor({
 
   const handleColorChange = (color: any) => {
     setCurrentColor(color.hex);
-    execCommand("foreColor", color.hex);
-    // Não fechar automaticamente - deixar o usuário ajustar a cor
+
+    // Salvar seleção antes de aplicar cor
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+      const range = selection.getRangeAt(0);
+      setSavedSelection(range.cloneRange());
+
+      // Aplicar cor diretamente na seleção
+      if (!range.collapsed) {
+        const span = document.createElement('span');
+        span.style.color = color.hex;
+
+        try {
+          range.surroundContents(span);
+        } catch (e) {
+          // Se não conseguir envolver, usar execCommand
+          document.execCommand("foreColor", false, color.hex);
+        }
+      } else {
+        // Se não há seleção, usar execCommand para próximo texto
+        document.execCommand("foreColor", false, color.hex);
+      }
+
+      // Restaurar seleção
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+
+    handleInput();
   };
 
   const handleSecureUploadSuccess = (fileInfo: UploadedFileInfo) => {
@@ -906,6 +956,13 @@ export default function EnhancedRichTextEditor({
               size="sm"
               className="h-8 px-2 hover:bg-gray-100"
               title="Cor do texto"
+              onClick={() => {
+                // Salvar seleção quando abrir o picker
+                const selection = window.getSelection();
+                if (selection && selection.rangeCount > 0) {
+                  setSavedSelection(selection.getRangeAt(0).cloneRange());
+                }
+              }}
             >
               <div className="flex items-center gap-1">
                 <svg
@@ -927,15 +984,27 @@ export default function EnhancedRichTextEditor({
             className="w-auto p-0"
             side="bottom"
             align="start"
-            onInteractOutside={() => setShowColorPicker(false)}
             onEscapeKeyDown={() => setShowColorPicker(false)}
+            onPointerDownOutside={(e) => {
+              // Só fechar se clicou fora do picker mesmo
+              const target = e.target as Element;
+              if (!target.closest('.sketch-picker')) {
+                setShowColorPicker(false);
+              }
+            }}
           >
-            <SketchPicker
-              color={currentColor}
-              onChange={handleColorChange}
-              onChangeComplete={handleColorChange}
-              width="200px"
-            />
+            <div
+              className="sketch-picker"
+              onMouseDown={(e) => e.stopPropagation()}
+              onPointerDown={(e) => e.stopPropagation()}
+            >
+              <SketchPicker
+                color={currentColor}
+                onChange={handleColorChange}
+                onChangeComplete={handleColorChange}
+                width="200px"
+              />
+            </div>
           </PopoverContent>
         </Popover>
 
