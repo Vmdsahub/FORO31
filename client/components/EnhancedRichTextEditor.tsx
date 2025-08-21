@@ -989,7 +989,7 @@ export default function EnhancedRichTextEditor({
             onPointerDownOutside={(e) => {
               // Só fechar se clicou fora do picker mesmo
               const target = e.target as Element;
-              if (!target.closest('.sketch-picker')) {
+              if (!target.closest('.sketch-picker') && !target.closest('[data-radix-popper-content-wrapper]')) {
                 setShowColorPicker(false);
               }
             }}
