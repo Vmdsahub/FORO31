@@ -21,37 +21,37 @@ export function cleanContentForDisplay(content: string): string {
   // Pattern 1: Remove buttons with delete title attributes
   cleanedContent = cleanedContent.replace(
     /<button[^>]*title="Excluir [^"]*"[^>]*>[\s]*🗑️[\s]*<\/button>/g,
-    ""
+    "",
   );
 
   // Pattern 2: Remove buttons with onclick handlers
   cleanedContent = cleanedContent.replace(
     /<button[^>]*onclick="[^"]*"[^>]*>[\s]*🗑️[\s]*<\/button>/g,
-    ""
+    "",
   );
 
   // Pattern 3: Remove any button containing just the trash emoji
   cleanedContent = cleanedContent.replace(
     /<button[^>]*>[\s]*🗑️[\s]*<\/button>/g,
-    ""
+    "",
   );
 
   // Remove wrapper divs that contained images and delete buttons, keep only the image
   cleanedContent = cleanedContent.replace(
     /<div[^>]*style="[^"]*position:\s*relative[^"]*"[^>]*>\s*(<img[^>]*>)\s*<button[^>]*>[\s]*🗑️[\s]*<\/button>\s*<\/div>/g,
-    "$1"
+    "$1",
   );
 
   // Clean up any remaining wrapper divs with only images
   cleanedContent = cleanedContent.replace(
     /<div[^>]*style="[^"]*position:\s*relative[^"]*"[^>]*>\s*(<img[^>]*>)\s*<\/div>/g,
-    "$1"
+    "$1",
   );
 
   // Remove delete buttons from video previews while keeping the video structure
   cleanedContent = cleanedContent.replace(
     /(<div[^>]*class="video-preview"[^>]*>.*?)<button[^>]*>[\s]*🗑️[\s]*<\/button>(.*?<\/div>)/gs,
-    "$1$2"
+    "$1$2",
   );
 
   // Log if any cleaning was performed
@@ -59,7 +59,7 @@ export function cleanContentForDisplay(content: string): string {
     console.log("🧹 Content cleaned for display - removed trash buttons:", {
       original: originalContent.length,
       cleaned: cleanedContent.length,
-      removed: originalContent.length - cleanedContent.length
+      removed: originalContent.length - cleanedContent.length,
     });
   }
 
@@ -83,37 +83,37 @@ export function cleanContentForSaving(content: string): string {
   // Pattern 1: Remove buttons with delete title attributes
   cleanedContent = cleanedContent.replace(
     /<button[^>]*title="Excluir [^"]*"[^>]*>[\s]*🗑️[\s]*<\/button>/g,
-    ""
+    "",
   );
 
   // Pattern 2: Remove buttons with onclick handlers
   cleanedContent = cleanedContent.replace(
     /<button[^>]*onclick="[^"]*"[^>]*>[\s]*🗑️[\s]*<\/button>/g,
-    ""
+    "",
   );
 
   // Pattern 3: Remove any button containing just the trash emoji
   cleanedContent = cleanedContent.replace(
     /<button[^>]*>[\s]*🗑️[\s]*<\/button>/g,
-    ""
+    "",
   );
 
   // Remove wrapper divs that contained images and delete buttons, keep only the image
   cleanedContent = cleanedContent.replace(
     /<div[^>]*style="[^"]*position:\s*relative[^"]*"[^>]*>\s*(<img[^>]*>)\s*<button[^>]*>[\s]*🗑️[\s]*<\/button>\s*<\/div>/g,
-    "$1"
+    "$1",
   );
 
   // Clean up any remaining wrapper divs with only images
   cleanedContent = cleanedContent.replace(
     /<div[^>]*style="[^"]*position:\s*relative[^"]*"[^>]*>\s*(<img[^>]*>)\s*<\/div>/g,
-    "$1"
+    "$1",
   );
 
   // Remove delete buttons from video previews while keeping the video structure
   cleanedContent = cleanedContent.replace(
     /(<div[^>]*class="video-preview"[^>]*>.*?)<button[^>]*>[\s]*🗑️[\s]*<\/button>(.*?<\/div>)/gs,
-    "$1$2"
+    "$1$2",
   );
 
   return cleanedContent;
