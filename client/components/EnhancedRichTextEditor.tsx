@@ -239,15 +239,39 @@ export default function EnhancedRichTextEditor({
 
   // Função para aplicar cor atual à seleção/cursor
   const applyCurrentColorToSelection = () => {
+    if (!currentColor || currentColor === '#000000') return;
+
     const selection = window.getSelection();
     if (!selection || selection.rangeCount === 0) return;
 
+    // Forçar aplicação da cor selecionada
+    document.execCommand('styleWithCSS', false, 'true');
+    document.execCommand('foreColor', false, currentColor);
+
+    // Criar um span com a cor para garantir que novas digitações usem essa cor
     const range = selection.getRangeAt(0);
     if (range.collapsed) {
-      // Cursor está posicionado, mas sem seleção
-      // Aplicar cor ao próximo texto que for digitado
-      document.execCommand('styleWithCSS', false, 'true');
-      document.execCommand('foreColor', false, currentColor);
+      const span = document.createElement('span');
+      span.style.color = currentColor;
+      span.textContent = '\u200B'; // Zero-width space
+      range.insertNode(span);
+      range.setStartAfter(span);
+      range.collapse(true);
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+  };
+
+  // Handler para interceptar teclas e aplicar cor
+  const handleEditorKeyDown = (e: React.KeyboardEvent) => {
+    // Se for uma tecla que vai inserir texto
+    if (e.key.length === 1 || e.key === 'Enter') {
+      // Aplicar cor antes de inserir o caractere
+      if (currentColor && currentColor !== '#000000') {
+        setTimeout(() => {
+          applyCurrentColorToSelection();
+        }, 0);
+      }
     }
   };
 
@@ -262,7 +286,7 @@ export default function EnhancedRichTextEditor({
     // Salvar seleção automaticamente quando usuário clica no editor
     setTimeout(() => {
       saveCurrentSelection();
-      // Aplicar cor atual se necess��rio
+      // Aplicar cor atual se necessário
       if (currentColor && currentColor !== '#000000') {
         applyCurrentColorToSelection();
       }
@@ -1129,6 +1153,7 @@ export default function EnhancedRichTextEditor({
         onFocus={handleEditorFocus}
         onClick={handleEditorClick}
         onKeyUp={handleEditorKeyUp}
+        onKeyDown={handleEditorKeyDown}
         className="w-full p-4 min-h-[200px] focus:outline-none bg-white rich-editor"
         style={{
           lineHeight: "1.7",
