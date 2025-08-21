@@ -923,10 +923,17 @@ export default function EnhancedRichTextEditor({
               </div>
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" side="bottom" align="start">
+          <PopoverContent
+            className="w-auto p-0"
+            side="bottom"
+            align="start"
+            onInteractOutside={() => setShowColorPicker(false)}
+            onEscapeKeyDown={() => setShowColorPicker(false)}
+          >
             <SketchPicker
               color={currentColor}
               onChange={handleColorChange}
+              onChangeComplete={handleColorChange}
               width="200px"
             />
           </PopoverContent>
