@@ -68,16 +68,28 @@ export function cleanContentForSaving(content: string): string {
     .replace(/\s+/g, " ")
     .replace(/\s+>/g, ">");
 
-  // Remove delete buttons (trash icon buttons) before saving
-  // This regex catches various forms of delete buttons with trash icons
+  // Remove ALL delete buttons (trash icon buttons) before saving
+  // Pattern 1: Remove buttons with delete title attributes
   cleanedContent = cleanedContent.replace(
-    /<button[^>]*(?:title="Excluir [^"]*"|onclick="[^"]*")[^>]*>[\s]*🗑️[\s]*<\/button>/g,
+    /<button[^>]*title="Excluir [^"]*"[^>]*>[\s]*🗑️[\s]*<\/button>/g,
+    ""
+  );
+
+  // Pattern 2: Remove buttons with onclick handlers
+  cleanedContent = cleanedContent.replace(
+    /<button[^>]*onclick="[^"]*"[^>]*>[\s]*🗑️[\s]*<\/button>/g,
+    ""
+  );
+
+  // Pattern 3: Remove any button containing just the trash emoji
+  cleanedContent = cleanedContent.replace(
+    /<button[^>]*>[\s]*🗑️[\s]*<\/button>/g,
     ""
   );
 
   // Remove wrapper divs that contained images and delete buttons, keep only the image
   cleanedContent = cleanedContent.replace(
-    /<div[^>]*style="[^"]*position:\s*relative[^"]*"[^>]*>\s*(<img[^>]*>)\s*<button[^>]*>🗑️<\/button>\s*<\/div>/g,
+    /<div[^>]*style="[^"]*position:\s*relative[^"]*"[^>]*>\s*(<img[^>]*>)\s*<button[^>]*>[\s]*🗑️[\s]*<\/button>\s*<\/div>/g,
     "$1"
   );
 
@@ -89,7 +101,7 @@ export function cleanContentForSaving(content: string): string {
 
   // Remove delete buttons from video previews while keeping the video structure
   cleanedContent = cleanedContent.replace(
-    /(<div[^>]*class="video-preview"[^>]*>.*?)<button[^>]*title="Excluir vídeo"[^>]*>🗑️<\/button>(.*?<\/div>)/gs,
+    /(<div[^>]*class="video-preview"[^>]*>.*?)<button[^>]*>[\s]*🗑️[\s]*<\/button>(.*?<\/div>)/gs,
     "$1$2"
   );
 
