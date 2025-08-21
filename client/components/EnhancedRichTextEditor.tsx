@@ -39,6 +39,25 @@ export default function EnhancedRichTextEditor({
   const [currentColor, setCurrentColor] = useState("#000000");
   const [savedSelection, setSavedSelection] = useState<Range | null>(null);
 
+  // Função para salvar seleção atual
+  const saveCurrentSelection = () => {
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+      setSavedSelection(selection.getRangeAt(0).cloneRange());
+    }
+  };
+
+  // Função para restaurar seleção salva
+  const restoreSelection = () => {
+    if (savedSelection) {
+      const selection = window.getSelection();
+      if (selection) {
+        selection.removeAllRanges();
+        selection.addRange(savedSelection);
+      }
+    }
+  };
+
   // Initialize secure upload system
   const [secureUploadStats, setSecureUploadStats] = useState<{
     safeFiles: number;
