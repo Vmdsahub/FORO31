@@ -198,6 +198,41 @@ export default function EnhancedRichTextEditor({
     };
   }, [isEditMode]);
 
+  // Debug: Monitor global clicks when color picker is open
+  useEffect(() => {
+    if (!showColorPicker) return;
+
+    const handleGlobalClick = (e: MouseEvent) => {
+      const target = e.target as Element;
+      console.log('🔍 GLOBAL CLICK DETECTED:', {
+        target: target.tagName,
+        className: target.className,
+        id: target.id,
+        isInColorPicker: colorPickerRef.current?.contains(target),
+        isInTrigger: colorPickerTriggerRef.current?.contains(target),
+        path: e.composedPath().map(el => (el as Element).tagName).filter(Boolean).slice(0, 5)
+      });
+    };
+
+    const handleGlobalPointerDown = (e: PointerEvent) => {
+      const target = e.target as Element;
+      console.log('👆 GLOBAL POINTER DOWN:', {
+        target: target.tagName,
+        className: target.className,
+        isInColorPicker: colorPickerRef.current?.contains(target),
+        isInTrigger: colorPickerTriggerRef.current?.contains(target)
+      });
+    };
+
+    document.addEventListener('click', handleGlobalClick, true);
+    document.addEventListener('pointerdown', handleGlobalPointerDown, true);
+
+    return () => {
+      document.removeEventListener('click', handleGlobalClick, true);
+      document.removeEventListener('pointerdown', handleGlobalPointerDown, true);
+    };
+  }, [showColorPicker]);
+
   // Manage placeholder manually
   useEffect(() => {
     const editor = editorRef.current;
