@@ -274,37 +274,9 @@ export default function EnhancedRichTextEditor({
 
   // Handler para quando usuário começa a digitar
   const handleEditorKeyDown = (e: React.KeyboardEvent) => {
-    // Para teclas que inserem texto, aplicar estilos
+    // Para teclas que inserem texto, garantir que a cor está aplicada
     if (e.key.length === 1) {
-      // Aplicar formatação em tempo real ANTES do caractere ser inserido
-      document.execCommand("styleWithCSS", false, "true");
-
-      // Aplicar cor se diferente do padrão
-      if (currentColor !== "#000000") {
-        document.execCommand("foreColor", false, currentColor);
-      }
-
-      // Aplicar tamanho da fonte se diferente do padrão
-      if (fontSize !== "16") {
-        // Criar um span temporário com o tamanho correto
-        const span = document.createElement("span");
-        span.style.fontSize = `${fontSize}px`;
-        span.style.color = currentColor;
-
-        // Inserir o span na posição do cursor
-        const selection = window.getSelection();
-        if (selection && selection.rangeCount > 0) {
-          const range = selection.getRangeAt(0);
-          range.insertNode(span);
-
-          // Mover cursor para dentro do span
-          const newRange = document.createRange();
-          newRange.setStart(span, 0);
-          newRange.collapse(true);
-          selection.removeAllRanges();
-          selection.addRange(newRange);
-        }
-      }
+      setTimeout(() => applyCurrentColor(), 0);
     }
   };
 
