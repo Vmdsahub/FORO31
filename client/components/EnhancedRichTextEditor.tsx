@@ -394,33 +394,6 @@ export default function EnhancedRichTextEditor({
     }
   };
 
-  // Aplicar tamanho da fonte atual quando necessário
-  const applyCurrentFontSize = () => {
-    if (fontSize && fontSize !== "16") {
-      document.execCommand("styleWithCSS", false, "true");
-
-      // Usar insertHTML para inserir um span com o tamanho correto onde o cursor está
-      const span = `<span style="font-size: ${fontSize}px;"></span>`;
-      document.execCommand("insertHTML", false, span);
-
-      // Mover cursor para dentro do span criado
-      setTimeout(() => {
-        const selection = window.getSelection();
-        if (selection && editorRef.current) {
-          const spans = editorRef.current.querySelectorAll(`span[style*="font-size: ${fontSize}px"]`);
-          const lastSpan = spans[spans.length - 1] as HTMLElement;
-          if (lastSpan && lastSpan.innerHTML === "") {
-            const range = document.createRange();
-            range.setStart(lastSpan, 0);
-            range.collapse(true);
-            selection.removeAllRanges();
-            selection.addRange(range);
-          }
-        }
-      }, 10);
-    }
-  };
-
   const resetColor = () => {
     setCurrentColor("#000000");
     if (savedSelection) {
