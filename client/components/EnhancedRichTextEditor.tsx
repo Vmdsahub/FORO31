@@ -40,6 +40,10 @@ export default function EnhancedRichTextEditor({
   const [currentColor, setCurrentColor] = useState("#000000");
   const [savedSelection, setSavedSelection] = useState<Range | null>(null);
   const colorPickerTriggerRef = useRef<HTMLButtonElement>(null);
+  const [fontSize, setFontSize] = useState(15);
+  const [isBold, setIsBold] = useState(false);
+  const [isItalic, setIsItalic] = useState(false);
+  const [isUnderline, setIsUnderline] = useState(false);
 
   // Função para salvar seleção atual
   const saveCurrentSelection = () => {
@@ -303,10 +307,48 @@ export default function EnhancedRichTextEditor({
     handleInput();
   };
 
-  const handleBold = () => execCommandWithSelection("bold");
-  const handleItalic = () => execCommandWithSelection("italic");
-  const handleUnderline = () => execCommandWithSelection("underline");
-  const handleHeading = () => execCommandWithSelection("formatBlock", "H3");
+  const handleBold = () => {
+    setIsBold(!isBold);
+    document.execCommand("bold", false);
+    handleInput();
+  };
+
+  const handleItalic = () => {
+    setIsItalic(!isItalic);
+    document.execCommand("italic", false);
+    handleInput();
+  };
+
+  const handleUnderline = () => {
+    setIsUnderline(!isUnderline);
+    document.execCommand("underline", false);
+    handleInput();
+  };
+
+  const handleFontSizeChange = (newSize: number) => {
+    setFontSize(newSize);
+    if (editorRef.current) {
+      editorRef.current.style.fontSize = `${newSize}px`;
+    }
+    handleInput();
+  };
+
+  const resetColor = () => {
+    setCurrentColor("#000000");
+    if (savedSelection) {
+      restoreSelection();
+      document.execCommand("styleWithCSS", false, "true");
+      document.execCommand("foreColor", false, "#000000");
+      saveCurrentSelection();
+      handleInput();
+    }
+    setTimeout(() => {
+      if (editorRef.current) {
+        editorRef.current.focus();
+        applyCurrentColor();
+      }
+    }, 50);
+  };
 
   const handleLink = () => {
     const url = prompt("Digite a URL:");
@@ -938,10 +980,10 @@ export default function EnhancedRichTextEditor({
       <div className="flex items-center gap-2 p-3 border-b border-gray-200 bg-gray-50 flex-wrap">
         <Button
           type="button"
-          variant="outline"
+          variant={isBold ? "default" : "outline"}
           size="sm"
           onClick={handleBold}
-          className="h-8 px-2 hover:bg-gray-100"
+          className={`h-8 px-2 hover:bg-gray-100 ${isBold ? 'bg-blue-500 text-white hover:bg-blue-600' : ''}`}
           title="Negrito (Ctrl+B)"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -951,10 +993,10 @@ export default function EnhancedRichTextEditor({
 
         <Button
           type="button"
-          variant="outline"
+          variant={isItalic ? "default" : "outline"}
           size="sm"
           onClick={handleItalic}
-          className="h-8 px-2 hover:bg-gray-100"
+          className={`h-8 px-2 hover:bg-gray-100 ${isItalic ? 'bg-blue-500 text-white hover:bg-blue-600' : ''}`}
           title="Itálico (Ctrl+I)"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -964,10 +1006,10 @@ export default function EnhancedRichTextEditor({
 
         <Button
           type="button"
-          variant="outline"
+          variant={isUnderline ? "default" : "outline"}
           size="sm"
           onClick={handleUnderline}
-          className="h-8 px-2 hover:bg-gray-100"
+          className={`h-8 px-2 hover:bg-gray-100 ${isUnderline ? 'bg-blue-500 text-white hover:bg-blue-600' : ''}`}
           title="Sublinhado"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -975,18 +1017,34 @@ export default function EnhancedRichTextEditor({
           </svg>
         </Button>
 
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={handleHeading}
-          className="h-8 px-2 hover:bg-gray-100"
-          title="Título"
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M5 4v3h5.5v12h3V7H19V4z" />
-          </svg>
-        </Button>
+        {/* Font Size Control */}
+        <div className="flex items-center gap-1">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => handleFontSizeChange(Math.max(10, fontSize - 1))}
+            className="h-8 px-2 hover:bg-gray-100"
+            title="Diminuir fonte"
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M5 12h14v2H5z" />
+            </svg>
+          </Button>
+          <span className="text-xs text-gray-600 min-w-[25px] text-center">{fontSize}px</span>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => handleFontSizeChange(Math.min(24, fontSize + 1))}
+            className="h-8 px-2 hover:bg-gray-100"
+            title="Aumentar fonte"
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 5v14m-7-7h14" />
+            </svg>
+          </Button>
+        </div>
 
         <Button
           type="button"
@@ -1098,6 +1156,18 @@ export default function EnhancedRichTextEditor({
                     className="w-20 px-2 py-1 text-xs border border-gray-300 rounded focus:border-blue-500 focus:outline-none"
                     placeholder="#000000"
                   />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={resetColor}
+                    className="h-6 px-1 text-xs hover:bg-gray-100"
+                    title="Resetar cor padrão"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                    </svg>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -1132,7 +1202,7 @@ export default function EnhancedRichTextEditor({
         className="w-full p-4 min-h-[200px] focus:outline-none bg-white rich-editor"
         style={{
           lineHeight: "1.7",
-          fontSize: "15px",
+          fontSize: `${fontSize}px`,
           wordWrap: "break-word",
           overflowWrap: "break-word",
           whiteSpace: "pre-wrap",
