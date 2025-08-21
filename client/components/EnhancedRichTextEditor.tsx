@@ -352,6 +352,7 @@ export default function EnhancedRichTextEditor({
       // Se foi uma tecla de caractere, aplicar cor e tamanho
       if (e.key.length === 1) {
         applyCurrentColor();
+        applyCurrentFontSize();
       }
     }, 10);
   };
