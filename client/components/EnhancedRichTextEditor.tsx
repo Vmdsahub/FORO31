@@ -1172,34 +1172,6 @@ export default function EnhancedRichTextEditor({
         .color-picker-container input {
           cursor: text !important;
         }
-
-        /* Bloquear eventos que possam vazar do color picker */
-        .color-picker-container,
-        .react-colorful,
-        .react-colorful * {
-          -webkit-touch-callout: none !important;
-          -webkit-user-select: none !important;
-          -khtml-user-select: none !important;
-          -moz-user-select: none !important;
-          -ms-user-select: none !important;
-          user-select: none !important;
-        }
-
-        /* Proteger especificamente a área de seleção de cor */
-        .react-colorful__saturation,
-        .react-colorful__hue,
-        .react-colorful__alpha {
-          touch-action: none !important;
-        }
-
-        /* Garantir que o popover não feche por eventos internos */
-        [data-radix-popper-content-wrapper] {
-          pointer-events: auto !important;
-        }
-
-        .color-picker-container * {
-          pointer-events: auto !important;
-        }
         .rich-editor[data-empty="true"]:before {
           content: attr(data-placeholder);
           color: #9ca3af;
