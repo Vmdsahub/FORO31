@@ -963,13 +963,7 @@ export default function EnhancedRichTextEditor({
               size="sm"
               className="h-8 px-2 hover:bg-gray-100"
               title="Cor do texto"
-              onClick={() => {
-                // Salvar seleção quando abrir o picker
-                const selection = window.getSelection();
-                if (selection && selection.rangeCount > 0) {
-                  setSavedSelection(selection.getRangeAt(0).cloneRange());
-                }
-              }}
+              onClick={saveCurrentSelection}
             >
               <div className="flex items-center gap-1">
                 <svg
