@@ -1224,6 +1224,31 @@ export default function EnhancedRichTextEditor({
         .color-picker-container input {
           cursor: text !important;
         }
+
+        /* Proteção específica para o color picker */
+        .color-picker-container {
+          isolation: isolate;
+          contain: layout style;
+        }
+
+        .color-picker-container,
+        .color-picker-container *,
+        .react-colorful,
+        .react-colorful * {
+          user-select: none !important;
+        }
+
+        .color-picker-container input {
+          user-select: text !important;
+        }
+
+        /* Bloquear propagação de eventos no color picker */
+        .react-colorful__saturation,
+        .react-colorful__hue,
+        .react-colorful__alpha,
+        .react-colorful__pointer {
+          pointer-events: auto !important;
+        }
         .rich-editor[data-empty="true"]:before {
           content: attr(data-placeholder);
           color: #9ca3af;
