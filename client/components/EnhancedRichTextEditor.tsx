@@ -311,7 +311,10 @@ export default function EnhancedRichTextEditor({
     const allElements = temp.querySelectorAll("*");
     allElements.forEach((element) => {
       // Remover atributos vazios ou desnecessários
-      if (element.hasAttribute("style") && !element.getAttribute("style")?.trim()) {
+      if (
+        element.hasAttribute("style") &&
+        !element.getAttribute("style")?.trim()
+      ) {
         element.removeAttribute("style");
       }
     });
@@ -345,13 +348,25 @@ export default function EnhancedRichTextEditor({
       // Converter tamanho para um valor válido de execCommand (1-7)
       let sizeValue = "3"; // padrão médio
 
-      switch(fontSize) {
-        case "10": sizeValue = "1"; break;
-        case "12": sizeValue = "2"; break;
-        case "14": sizeValue = "3"; break;
-        case "16": sizeValue = "4"; break;
-        case "18": sizeValue = "5"; break;
-        case "20": sizeValue = "6"; break;
+      switch (fontSize) {
+        case "10":
+          sizeValue = "1";
+          break;
+        case "12":
+          sizeValue = "2";
+          break;
+        case "14":
+          sizeValue = "3";
+          break;
+        case "16":
+          sizeValue = "4";
+          break;
+        case "18":
+          sizeValue = "5";
+          break;
+        case "20":
+          sizeValue = "6";
+          break;
       }
 
       document.execCommand("fontSize", false, sizeValue);
@@ -1114,7 +1129,7 @@ export default function EnhancedRichTextEditor({
           variant={isBold ? "default" : "outline"}
           size="sm"
           onClick={handleBold}
-          className={`h-8 px-2 hover:bg-gray-100 ${isBold ? 'bg-blue-500 text-white hover:bg-blue-600' : ''}`}
+          className={`h-8 px-2 hover:bg-gray-100 ${isBold ? "bg-blue-500 text-white hover:bg-blue-600" : ""}`}
           title="Negrito (Ctrl+B)"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -1127,7 +1142,7 @@ export default function EnhancedRichTextEditor({
           variant={isItalic ? "default" : "outline"}
           size="sm"
           onClick={handleItalic}
-          className={`h-8 px-2 hover:bg-gray-100 ${isItalic ? 'bg-blue-500 text-white hover:bg-blue-600' : ''}`}
+          className={`h-8 px-2 hover:bg-gray-100 ${isItalic ? "bg-blue-500 text-white hover:bg-blue-600" : ""}`}
           title="Itálico (Ctrl+I)"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -1140,7 +1155,7 @@ export default function EnhancedRichTextEditor({
           variant={isUnderline ? "default" : "outline"}
           size="sm"
           onClick={handleUnderline}
-          className={`h-8 px-2 hover:bg-gray-100 ${isUnderline ? 'bg-blue-500 text-white hover:bg-blue-600' : ''}`}
+          className={`h-8 px-2 hover:bg-gray-100 ${isUnderline ? "bg-blue-500 text-white hover:bg-blue-600" : ""}`}
           title="Sublinhado"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -1155,7 +1170,11 @@ export default function EnhancedRichTextEditor({
           </SelectTrigger>
           <SelectContent>
             {fontSizes.map((size) => (
-              <SelectItem key={size.value} value={size.value} className="text-xs">
+              <SelectItem
+                key={size.value}
+                value={size.value}
+                className="text-xs"
+              >
                 {size.label}
               </SelectItem>
             ))}
@@ -1280,7 +1299,12 @@ export default function EnhancedRichTextEditor({
                     className="h-6 px-1 text-xs hover:bg-gray-100"
                     title="Resetar cor padrão"
                   >
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
                       <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                     </svg>
                   </Button>
