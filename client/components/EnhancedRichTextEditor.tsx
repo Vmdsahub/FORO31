@@ -229,70 +229,14 @@ export default function EnhancedRichTextEditor({
     if (editorRef.current) {
       const content = editorRef.current.innerHTML;
       onChange(content);
-
-      // Aplicar cor atual ao texto sendo digitado se uma cor está selecionada
-      if (currentColor && currentColor !== '#000000') {
-        applyCurrentColorToSelection();
-      }
     }
   };
 
-  // Função para aplicar cor atual à seleção/cursor
-  const applyCurrentColorToSelection = () => {
-    if (!currentColor || currentColor === '#000000') return;
-
-    const selection = window.getSelection();
-    if (!selection || selection.rangeCount === 0) return;
-
-    // Forçar aplicação da cor selecionada
-    document.execCommand('styleWithCSS', false, 'true');
-    document.execCommand('foreColor', false, currentColor);
-
-    // Criar um span com a cor para garantir que novas digitações usem essa cor
-    const range = selection.getRangeAt(0);
-    if (range.collapsed) {
-      const span = document.createElement('span');
-      span.style.color = currentColor;
-      span.textContent = '\u200B'; // Zero-width space
-      range.insertNode(span);
-      range.setStartAfter(span);
-      range.collapse(true);
-      selection.removeAllRanges();
-      selection.addRange(range);
-    }
-  };
-
-  // Handler para interceptar teclas e aplicar cor
-  const handleEditorKeyDown = (e: React.KeyboardEvent) => {
-    // Se for uma tecla que vai inserir texto
-    if (e.key.length === 1) {
-      if (currentColor && currentColor !== '#000000') {
-        e.preventDefault();
-
-        // Inserir o caractere com a cor correta
-        const selection = window.getSelection();
-        if (selection && selection.rangeCount > 0) {
-          const range = selection.getRangeAt(0);
-
-          // Criar span com a cor correta
-          const span = document.createElement('span');
-          span.style.color = currentColor;
-          span.textContent = e.key;
-
-          // Inserir o span
-          range.deleteContents();
-          range.insertNode(span);
-
-          // Posicionar cursor após o span
-          range.setStartAfter(span);
-          range.collapse(true);
-          selection.removeAllRanges();
-          selection.addRange(range);
-
-          // Trigger input event
-          handleInput();
-        }
-      }
+  // Aplicar cor atual quando necessário
+  const applyCurrentColor = () => {
+    if (currentColor && currentColor !== '#000000') {
+      document.execCommand('styleWithCSS', false, 'true');
+      document.execCommand('foreColor', false, currentColor);
     }
   };
 
@@ -304,13 +248,10 @@ export default function EnhancedRichTextEditor({
   };
 
   const handleEditorClick = () => {
-    // Salvar seleção automaticamente quando usuário clica no editor
+    // Salvar seleção e aplicar cor atual
     setTimeout(() => {
       saveCurrentSelection();
-      // Aplicar cor atual se necessário
-      if (currentColor && currentColor !== '#000000') {
-        applyCurrentColorToSelection();
-      }
+      applyCurrentColor();
     }, 10);
   };
 
@@ -318,10 +259,9 @@ export default function EnhancedRichTextEditor({
     // Salvar seleção após navegação com teclado
     setTimeout(() => {
       saveCurrentSelection();
-
-      // Se foi uma tecla de caractere, aplicar cor atual
-      if (e.key.length === 1 && currentColor && currentColor !== '#000000') {
-        applyCurrentColorToSelection();
+      // Se foi uma tecla de caractere, aplicar cor
+      if (e.key.length === 1) {
+        applyCurrentColor();
       }
     }, 10);
   };
@@ -376,15 +316,15 @@ export default function EnhancedRichTextEditor({
       document.execCommand("foreColor", false, color);
       saveCurrentSelection();
       handleInput();
-    } else {
-      // Se não há seleção salva, preparar para próxima digitação
-      const selection = window.getSelection();
-      if (selection && selection.rangeCount > 0) {
-        document.execCommand("styleWithCSS", false, "true");
-        document.execCommand("foreColor", false, color);
-        saveCurrentSelection();
-      }
     }
+
+    // Garantir que a próxima digitação use esta cor
+    setTimeout(() => {
+      if (editorRef.current) {
+        editorRef.current.focus();
+        applyCurrentColor();
+      }
+    }, 50);
   };
 
   const closeColorPicker = () => {
@@ -1182,7 +1122,6 @@ export default function EnhancedRichTextEditor({
         onFocus={handleEditorFocus}
         onClick={handleEditorClick}
         onKeyUp={handleEditorKeyUp}
-        onKeyDown={handleEditorKeyDown}
         className="w-full p-4 min-h-[200px] focus:outline-none bg-white rich-editor"
         style={{
           lineHeight: "1.7",
