@@ -973,7 +973,12 @@ export default function EnhancedRichTextEditor({
         <div className="w-px h-6 bg-gray-300 mx-1" />
 
         {/* Color Picker */}
-        <Popover open={showColorPicker} onOpenChange={setShowColorPicker}>
+        <Popover open={showColorPicker} onOpenChange={(open) => {
+          // Lógica simples: só permitir fechamento se for explicitamente false
+          if (!open) {
+            setShowColorPicker(false);
+          }
+        }}>
           <PopoverTrigger asChild>
             <Button
               type="button"
@@ -981,7 +986,10 @@ export default function EnhancedRichTextEditor({
               size="sm"
               className="h-8 px-2 hover:bg-gray-100"
               title="Cor do texto"
-              onClick={saveCurrentSelection}
+              onClick={() => {
+                saveCurrentSelection();
+                setShowColorPicker(!showColorPicker);
+              }}
             >
               <div className="flex items-center gap-1">
                 <svg
@@ -1005,83 +1013,18 @@ export default function EnhancedRichTextEditor({
             align="start"
             onEscapeKeyDown={() => setShowColorPicker(false)}
             onPointerDownOutside={(e) => {
-              // Ser muito específico sobre o que constitui "fora"
+              // Lógica simples: se clicou fora do popover content, fechar
               const target = e.target as Element;
-              const isInsideColorPicker =
-                target.closest(".color-picker-container") ||
-                target.closest("[data-radix-popper-content-wrapper]") ||
-                target.closest("[data-radix-popper-content]") ||
-                target.closest(".react-colorful") ||
-                target.classList.contains('react-colorful') ||
-                target.closest('[role="dialog"]') ||
-                target.closest('[data-state="open"]');
-
-              console.log('PointerDownOutside - isInside:', isInsideColorPicker, 'target:', target);
-
-              if (!isInsideColorPicker) {
+              if (!target.closest('[data-radix-popper-content]')) {
                 setShowColorPicker(false);
               }
             }}
-            onInteractOutside={(e) => {
-              // Bloquear TODOS os eventos de fora quando estamos dentro do color picker
-              const target = e.target as Element;
-              const isInsideColorPicker =
-                target.closest(".color-picker-container") ||
-                target.closest(".react-colorful") ||
-                target.closest("[data-radix-popper-content]") ||
-                target.classList.contains('react-colorful') ||
-                target.closest('[role="dialog"]');
-
-              console.log('InteractOutside - isInside:', isInsideColorPicker, 'target:', target);
-
-              if (isInsideColorPicker) {
-                e.preventDefault();
-                e.stopPropagation();
-                return false;
-              }
-            }}
-            onFocusOutside={(e) => {
-              // Prevenir fechamento por mudança de foco dentro do color picker
-              const target = e.target as Element;
-              if (
-                target.closest(".color-picker-container") ||
-                target.closest(".react-colorful")
-              ) {
-                e.preventDefault();
-              }
-            }}
           >
-            <div
-              className="color-picker-container"
-              onMouseDown={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-              }}
-              onPointerDown={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-              }}
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
-              onTouchStart={(e) => {
-                e.stopPropagation();
-              }}
-              onTouchEnd={(e) => {
-                e.stopPropagation();
-              }}
-            >
-              <div
-                onMouseDown={(e) => e.stopPropagation()}
-                onPointerDown={(e) => e.stopPropagation()}
-                onClick={(e) => e.stopPropagation()}
-                onTouchStart={(e) => e.stopPropagation()}
-              >
-                <HexColorPicker
-                  color={currentColor}
-                  onChange={handleColorChange}
-                />
-              </div>
+            <div className="color-picker-container">
+              <HexColorPicker
+                color={currentColor}
+                onChange={handleColorChange}
+              />
               <div className="mt-3 space-y-2">
                 <div className="flex items-center gap-2">
                   <div
@@ -1109,7 +1052,10 @@ export default function EnhancedRichTextEditor({
                   ].map((presetColor) => (
                     <button
                       key={presetColor}
-                      onClick={() => handleColorChange(presetColor)}
+                      onClick={(e) => {
+                      e.stopPropagation();
+                      handleColorChange(presetColor);
+                    }}
                       className="w-6 h-6 rounded border border-gray-300 hover:scale-110 transition-transform"
                       style={{ backgroundColor: presetColor }}
                       title={presetColor}
