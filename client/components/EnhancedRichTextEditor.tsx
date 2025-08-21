@@ -274,9 +274,49 @@ export default function EnhancedRichTextEditor({
 
   // Handler para quando usuário começa a digitar
   const handleEditorKeyDown = (e: React.KeyboardEvent) => {
-    // Para teclas que inserem texto, garantir que a cor está aplicada
+    // Para teclas que inserem texto, garantir que a cor e tamanho estão aplicados
     if (e.key.length === 1) {
-      setTimeout(() => applyCurrentColor(), 0);
+      setTimeout(() => {
+        applyCurrentColor();
+        // Aplicar tamanho da fonte se não for o padrão
+        if (fontSize !== "16") {
+          const selection = window.getSelection();
+          if (selection && selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+            const container = range.commonAncestorContainer;
+
+            // Se não estamos dentro de um span com tamanho, criar um
+            let parentSpan = container.nodeType === Node.TEXT_NODE
+              ? container.parentElement
+              : container as Element;
+
+            if (!parentSpan || !parentSpan.style.fontSize || parentSpan.style.fontSize === "16px") {
+              // Envolver o texto atual em um span com o tamanho correto
+              document.execCommand("styleWithCSS", false, "true");
+              document.execCommand("fontSize", false, "1"); // Aplicar tamanho temporário
+
+              // Depois substituir com nosso tamanho customizado
+              setTimeout(() => {
+                const fontElements = editorRef.current?.querySelectorAll("font[size='1']");
+                if (fontElements && fontElements.length > 0) {
+                  const lastFont = fontElements[fontElements.length - 1] as HTMLElement;
+                  const span = document.createElement("span");
+                  span.style.fontSize = `${fontSize}px`;
+                  span.innerHTML = lastFont.innerHTML;
+                  lastFont.parentNode?.replaceChild(span, lastFont);
+
+                  // Mover cursor para o final do span
+                  const newRange = document.createRange();
+                  newRange.selectNodeContents(span);
+                  newRange.collapse(false);
+                  selection.removeAllRanges();
+                  selection.addRange(newRange);
+                }
+              }, 10);
+            }
+          }
+        }
+      }, 0);
     }
   };
 
@@ -292,7 +332,7 @@ export default function EnhancedRichTextEditor({
     // Salvar seleção após navegação com teclado
     setTimeout(() => {
       saveCurrentSelection();
-      // Se foi uma tecla de caractere, aplicar cor
+      // Se foi uma tecla de caractere, aplicar cor e tamanho
       if (e.key.length === 1) {
         applyCurrentColor();
       }
@@ -348,34 +388,37 @@ export default function EnhancedRichTextEditor({
   const handleFontSizeChange = (newSize: string) => {
     setFontSize(newSize);
 
-    // Focus no editor primeiro
+    // Focus no editor
     if (editorRef.current) {
       editorRef.current.focus();
     }
+  };
 
-    // Salvar posição atual do cursor
-    const selection = window.getSelection();
-    if (selection && selection.rangeCount > 0) {
-      const range = selection.getRangeAt(0);
+  // Aplicar tamanho da fonte atual quando necessário
+  const applyCurrentFontSize = () => {
+    if (fontSize && fontSize !== "16") {
+      document.execCommand("styleWithCSS", false, "true");
 
-      // Criar um span invisível com o tamanho da fonte para ser usado como "modelo"
-      const fontSpan = document.createElement("span");
-      fontSpan.style.fontSize = `${newSize}px`;
-      fontSpan.innerHTML = ""; // Span vazio para receber o próximo texto
+      // Usar insertHTML para inserir um span com o tamanho correto onde o cursor está
+      const span = `<span style="font-size: ${fontSize}px;"></span>`;
+      document.execCommand("insertHTML", false, span);
 
-      // Inserir o span na posição do cursor
-      range.insertNode(fontSpan);
-
-      // Posicionar cursor dentro do span
-      const newRange = document.createRange();
-      newRange.setStart(fontSpan, 0);
-      newRange.collapse(true);
-
-      selection.removeAllRanges();
-      selection.addRange(newRange);
+      // Mover cursor para dentro do span criado
+      setTimeout(() => {
+        const selection = window.getSelection();
+        if (selection && editorRef.current) {
+          const spans = editorRef.current.querySelectorAll(`span[style*="font-size: ${fontSize}px"]`);
+          const lastSpan = spans[spans.length - 1] as HTMLElement;
+          if (lastSpan && lastSpan.innerHTML === "") {
+            const range = document.createRange();
+            range.setStart(lastSpan, 0);
+            range.collapse(true);
+            selection.removeAllRanges();
+            selection.addRange(range);
+          }
+        }
+      }, 10);
     }
-
-    handleInput();
   };
 
   const resetColor = () => {
