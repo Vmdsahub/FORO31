@@ -253,7 +253,7 @@ export default function EnhancedRichTextEditor({
   const handleLink = () => {
     const url = prompt("Digite a URL:");
     if (url) {
-      execCommand("createLink", url);
+      execCommandWithSelection("createLink", url);
     }
   };
 
