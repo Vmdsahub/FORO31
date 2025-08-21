@@ -254,7 +254,14 @@ export default function EnhancedRichTextEditor({
             e.preventDefault();
             e.stopPropagation();
             if (confirm("Excluir esta imagem?")) {
+              const container = imageWrapper.closest('.image-container');
               imageWrapper.remove();
+
+              // Remove o container se ficar vazio
+              if (container && container.children.length === 0) {
+                container.remove();
+              }
+
               handleInput();
             }
           };
