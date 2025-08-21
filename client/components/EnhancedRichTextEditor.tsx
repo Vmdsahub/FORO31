@@ -354,12 +354,14 @@ export default function EnhancedRichTextEditor({
   };
 
   const closeColorPicker = () => {
+    console.log('🔴 CLOSING COLOR PICKER - closeColorPicker called');
     setIsInteractingWithColorPicker(false);
     setShowColorPicker(false);
     // Restaurar foco no editor
     setTimeout(() => {
       if (editorRef.current) {
         editorRef.current.focus();
+        console.log('✅ Focus restored to editor');
       }
     }, 50);
   };
