@@ -52,6 +52,22 @@ export default function EnhancedRichTextEditor({
   const [isItalic, setIsItalic] = useState(false);
   const [isUnderline, setIsUnderline] = useState(false);
 
+  // Função para detectar estado atual de formatação
+  const updateFormattingState = () => {
+    try {
+      const isBoldActive = document.queryCommandState("bold");
+      const isItalicActive = document.queryCommandState("italic");
+      const isUnderlineActive = document.queryCommandState("underline");
+
+      setIsBold(isBoldActive);
+      setIsItalic(isItalicActive);
+      setIsUnderline(isUnderlineActive);
+    } catch (error) {
+      // Fallback se queryCommandState falhar
+      console.warn("Error detecting formatting state:", error);
+    }
+  };
+
   // Tamanhos de fonte pré-determinados
   const fontSizes = [
     { value: "10", label: "10px" },
