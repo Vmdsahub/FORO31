@@ -198,40 +198,6 @@ export default function EnhancedRichTextEditor({
     };
   }, [isEditMode]);
 
-  // Debug: Monitor global clicks when color picker is open
-  useEffect(() => {
-    if (!showColorPicker) return;
-
-    const handleGlobalClick = (e: MouseEvent) => {
-      const target = e.target as Element;
-      console.log('🔍 GLOBAL CLICK DETECTED:', {
-        target: target.tagName,
-        className: target.className,
-        id: target.id,
-        isInColorPicker: colorPickerRef.current?.contains(target),
-        isInTrigger: colorPickerTriggerRef.current?.contains(target),
-        path: e.composedPath().map(el => (el as Element).tagName).filter(Boolean).slice(0, 5)
-      });
-    };
-
-    const handleGlobalPointerDown = (e: PointerEvent) => {
-      const target = e.target as Element;
-      console.log('👆 GLOBAL POINTER DOWN:', {
-        target: target.tagName,
-        className: target.className,
-        isInColorPicker: colorPickerRef.current?.contains(target),
-        isInTrigger: colorPickerTriggerRef.current?.contains(target)
-      });
-    };
-
-    document.addEventListener('click', handleGlobalClick, true);
-    document.addEventListener('pointerdown', handleGlobalPointerDown, true);
-
-    return () => {
-      document.removeEventListener('click', handleGlobalClick, true);
-      document.removeEventListener('pointerdown', handleGlobalPointerDown, true);
-    };
-  }, [showColorPicker]);
 
   // Manage placeholder manually
   useEffect(() => {
@@ -325,43 +291,25 @@ export default function EnhancedRichTextEditor({
   };
 
   const handleColorChange = (color: string) => {
-    console.log('Color change:', color);
     setCurrentColor(color);
 
     // Aplicar cor imediatamente se há seleção salva
     if (savedSelection) {
-      // NÃO restaurar foco durante mudança de cor
-      const currentSelection = window.getSelection();
-      if (currentSelection) {
-        currentSelection.removeAllRanges();
-        currentSelection.addRange(savedSelection);
-      }
-
+      restoreSelection();
       document.execCommand("styleWithCSS", false, "true");
       document.execCommand("foreColor", false, color);
-
-      // Salvar nova seleção sem triggerar eventos
-      const selection = window.getSelection();
-      if (selection && selection.rangeCount > 0) {
-        setSavedSelection(selection.getRangeAt(0).cloneRange());
-      }
-
-      // Evitar chamar handleInput que pode interferir
-      if (editorRef.current) {
-        onChange(editorRef.current.innerHTML);
-      }
+      saveCurrentSelection();
+      handleInput();
     }
   };
 
   const closeColorPicker = () => {
-    console.log('🔴 CLOSING COLOR PICKER - closeColorPicker called');
     setIsInteractingWithColorPicker(false);
     setShowColorPicker(false);
     // Restaurar foco no editor
     setTimeout(() => {
       if (editorRef.current) {
         editorRef.current.focus();
-        console.log('✅ Focus restored to editor');
       }
     }, 50);
   };
@@ -1027,11 +975,9 @@ export default function EnhancedRichTextEditor({
         <Popover
           open={showColorPicker}
           onOpenChange={(open) => {
-            console.log('Popover onOpenChange:', open, 'isInteracting:', isInteractingWithColorPicker);
-            // NUNCA permitir fechamento automático
+            // Controle manual - só fecha via closeColorPicker()
             if (!open) {
-              console.log('Tentativa de fechamento bloqueada');
-              return;
+              return; // Bloquear fechamento automático
             }
           }}
           modal={false}
@@ -1046,8 +992,6 @@ export default function EnhancedRichTextEditor({
               title="Cor do texto"
               onClick={(e) => {
                 e.stopPropagation();
-                e.preventDefault();
-                console.log('Color picker button clicked');
                 saveCurrentSelection();
                 setShowColorPicker(!showColorPicker);
               }}
