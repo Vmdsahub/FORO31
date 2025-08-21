@@ -880,11 +880,9 @@ export default function EnhancedRichTextEditor({
           cursor: default !important;
         }
 
-        /* EXCEPTION: Allow delete buttons to be clickable */
-        .rich-editor .image-container button[title*="Excluir"],
-        .rich-editor .video-preview button[title*="Excluir"] {
+        /* Allow delete buttons to be clickable */
+        .rich-editor button[title*="Excluir"] {
           pointer-events: auto !important;
-          user-select: auto !important;
           cursor: pointer !important;
         }
 
