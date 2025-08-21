@@ -45,7 +45,7 @@ export default function EnhancedRichTextEditor({
   } | null>(null);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [currentColor, setCurrentColor] = useState("#000000");
-  const [savedSelection, setSavedSelection] = useState<Range | null>(null);
+  const savedSelectionRef = useRef<Range | null>(null);
   const colorPickerTriggerRef = useRef<HTMLButtonElement>(null);
   const [fontSize, setFontSize] = useState("16");
   const [isBold, setIsBold] = useState(false);
@@ -82,17 +82,17 @@ export default function EnhancedRichTextEditor({
   const saveCurrentSelection = () => {
     const selection = window.getSelection();
     if (selection && selection.rangeCount > 0) {
-      setSavedSelection(selection.getRangeAt(0).cloneRange());
+      savedSelectionRef.current = selection.getRangeAt(0).cloneRange();
     }
   };
 
   // Função para restaurar seleção salva
   const restoreSelection = () => {
-    if (savedSelection) {
+    if (savedSelectionRef.current) {
       const selection = window.getSelection();
       if (selection) {
         selection.removeAllRanges();
-        selection.addRange(savedSelection);
+        selection.addRange(savedSelectionRef.current);
       }
     }
   };
@@ -431,18 +431,18 @@ export default function EnhancedRichTextEditor({
     const selection = window.getSelection();
     if (selection && selection.rangeCount > 0) {
       const range = selection.getRangeAt(0);
-      setSavedSelection(range.cloneRange());
+      savedSelectionRef.current = range.cloneRange();
     }
 
     // Executar comando
     document.execCommand(command, false, value);
 
     // Restaurar seleção
-    if (savedSelection) {
+    if (savedSelectionRef.current) {
       const selection = window.getSelection();
       if (selection) {
         selection.removeAllRanges();
-        selection.addRange(savedSelection);
+        selection.addRange(savedSelectionRef.current);
       }
     }
 
@@ -481,7 +481,7 @@ export default function EnhancedRichTextEditor({
 
   const resetColor = () => {
     setCurrentColor("#000000");
-    if (savedSelection) {
+    if (savedSelectionRef.current) {
       restoreSelection();
       document.execCommand("styleWithCSS", false, "true");
       document.execCommand("foreColor", false, "#000000");
@@ -507,7 +507,7 @@ export default function EnhancedRichTextEditor({
     setCurrentColor(color);
 
     // Aplicar cor imediatamente se há seleção salva
-    if (savedSelection) {
+    if (savedSelectionRef.current) {
       restoreSelection();
       document.execCommand("styleWithCSS", false, "true");
       document.execCommand("foreColor", false, color);
@@ -1128,6 +1128,7 @@ export default function EnhancedRichTextEditor({
           type="button"
           variant={isBold ? "default" : "outline"}
           size="sm"
+          onMouseDown={(e) => e.preventDefault()}
           onClick={handleBold}
           className={`h-8 px-2 hover:bg-gray-100 ${isBold ? "bg-blue-500 text-white hover:bg-blue-600" : ""}`}
           title="Negrito (Ctrl+B)"
@@ -1141,6 +1142,7 @@ export default function EnhancedRichTextEditor({
           type="button"
           variant={isItalic ? "default" : "outline"}
           size="sm"
+          onMouseDown={(e) => e.preventDefault()}
           onClick={handleItalic}
           className={`h-8 px-2 hover:bg-gray-100 ${isItalic ? "bg-blue-500 text-white hover:bg-blue-600" : ""}`}
           title="Itálico (Ctrl+I)"
@@ -1154,6 +1156,7 @@ export default function EnhancedRichTextEditor({
           type="button"
           variant={isUnderline ? "default" : "outline"}
           size="sm"
+          onMouseDown={(e) => e.preventDefault()}
           onClick={handleUnderline}
           className={`h-8 px-2 hover:bg-gray-100 ${isUnderline ? "bg-blue-500 text-white hover:bg-blue-600" : ""}`}
           title="Sublinhado"
@@ -1185,6 +1188,7 @@ export default function EnhancedRichTextEditor({
           type="button"
           variant="outline"
           size="sm"
+          onMouseDown={(e) => e.preventDefault()}
           onClick={handleLink}
           className="h-8 px-2 hover:bg-gray-100"
           title="Link"
@@ -1215,6 +1219,7 @@ export default function EnhancedRichTextEditor({
               size="sm"
               className="h-8 px-2 hover:bg-gray-100"
               title="Cor do texto"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={(e) => {
                 e.stopPropagation();
                 saveCurrentSelection();
@@ -1295,6 +1300,7 @@ export default function EnhancedRichTextEditor({
                     type="button"
                     variant="outline"
                     size="sm"
+                    onMouseDown={(e) => e.preventDefault()}
                     onClick={resetColor}
                     className="h-6 px-1 text-xs hover:bg-gray-100"
                     title="Resetar cor padrão"

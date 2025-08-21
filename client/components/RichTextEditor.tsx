@@ -231,6 +231,7 @@ export default function RichTextEditor({
           type="button"
           variant="outline"
           size="sm"
+          onMouseDown={(e) => e.preventDefault()}
           onClick={handleBold}
           className="h-8 px-2 hover:bg-gray-100"
           title="Negrito (Ctrl+B)"
@@ -244,6 +245,7 @@ export default function RichTextEditor({
           type="button"
           variant="outline"
           size="sm"
+          onMouseDown={(e) => e.preventDefault()}
           onClick={handleItalic}
           className="h-8 px-2 hover:bg-gray-100"
           title="Itálico (Ctrl+I)"
@@ -257,6 +259,7 @@ export default function RichTextEditor({
           type="button"
           variant="outline"
           size="sm"
+          onMouseDown={(e) => e.preventDefault()}
           onClick={handleUnderline}
           className="h-8 px-2 hover:bg-gray-100"
           title="Sublinhado"
@@ -270,6 +273,7 @@ export default function RichTextEditor({
           type="button"
           variant="outline"
           size="sm"
+          onMouseDown={(e) => e.preventDefault()}
           onClick={handleHeading}
           className="h-8 px-2 hover:bg-gray-100"
           title="Título"
@@ -283,6 +287,7 @@ export default function RichTextEditor({
           type="button"
           variant="outline"
           size="sm"
+          onMouseDown={(e) => e.preventDefault()}
           onClick={handleLink}
           className="h-8 px-2 hover:bg-gray-100"
           title="Link"
@@ -298,6 +303,7 @@ export default function RichTextEditor({
           type="button"
           variant="outline"
           size="sm"
+          onMouseDown={(e) => e.preventDefault()}
           onClick={handleImageUploadClick}
           disabled={isUploading}
           className="h-8 px-2 hover:bg-gray-100"
@@ -312,6 +318,7 @@ export default function RichTextEditor({
           type="button"
           variant="outline"
           size="sm"
+          onMouseDown={(e) => e.preventDefault()}
           onClick={handleVideoUploadClick}
           disabled={isUploading}
           className="h-8 px-2 hover:bg-gray-100"
