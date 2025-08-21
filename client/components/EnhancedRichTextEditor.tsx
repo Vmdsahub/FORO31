@@ -284,27 +284,15 @@ export default function EnhancedRichTextEditor({
       editorRef.current.focus();
     }
 
-    // Restaurar seleção salva se existir
-    if (savedSelection) {
-      const selection = window.getSelection();
-      if (selection) {
-        selection.removeAllRanges();
-        selection.addRange(savedSelection);
-      }
-    }
+    // Restaurar seleção antes de aplicar cor
+    restoreSelection();
 
-    // Aplicar cor usando execCommand - funciona melhor para manter seleção
+    // Aplicar cor usando execCommand com CSS styles habilitado
     document.execCommand("styleWithCSS", false, "true");
     document.execCommand("foreColor", false, color.hex);
 
-    // Manter seleção após aplicar cor
-    if (savedSelection) {
-      const selection = window.getSelection();
-      if (selection) {
-        selection.removeAllRanges();
-        selection.addRange(savedSelection);
-      }
-    }
+    // Salvar a nova seleção após aplicar cor
+    saveCurrentSelection();
 
     handleInput();
   };
