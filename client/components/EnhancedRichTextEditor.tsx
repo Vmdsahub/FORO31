@@ -335,6 +335,8 @@ export default function EnhancedRichTextEditor({
     // Salvar seleção após navegação com teclado
     setTimeout(() => {
       saveCurrentSelection();
+      // Atualizar estado dos botões sempre após keyUp
+      updateFormattingState();
       // Se foi uma tecla de caractere, aplicar cor e tamanho
       if (e.key.length === 1) {
         applyCurrentColor();
