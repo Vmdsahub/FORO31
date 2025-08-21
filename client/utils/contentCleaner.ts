@@ -55,14 +55,16 @@ export function cleanContentForSaving(content: string): string {
     ""
   );
 
-  // Clean up wrapper divs that only contained delete buttons
+  // Remove wrapper divs that contained images and delete buttons, keep only the image
   cleanedContent = cleanedContent.replace(
-    /<div[^>]*style="[^"]*position:\s*relative[^"]*"[^>]*>\s*<img[^>]*>\s*<\/div>/g,
-    (match) => {
-      // Extract just the img tag from the wrapper
-      const imgMatch = match.match(/<img[^>]*>/);
-      return imgMatch ? imgMatch[0] : match;
-    }
+    /<div[^>]*style="[^"]*position:\s*relative[^"]*"[^>]*>\s*(<img[^>]*>)\s*<button[^>]*>🗑️<\/button>\s*<\/div>/g,
+    "$1"
+  );
+
+  // Clean up any remaining wrapper divs with only images
+  cleanedContent = cleanedContent.replace(
+    /<div[^>]*style="[^"]*position:\s*relative[^"]*"[^>]*>\s*(<img[^>]*>)\s*<\/div>/g,
+    "$1"
   );
 
   return cleanedContent;
