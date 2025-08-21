@@ -54,6 +54,15 @@ export function cleanContentForDisplay(content: string): string {
     "$1$2"
   );
 
+  // Log if any cleaning was performed
+  if (originalContent !== cleanedContent && originalContent.includes("🗑️")) {
+    console.log("🧹 Content cleaned for display - removed trash buttons:", {
+      original: originalContent.length,
+      cleaned: cleanedContent.length,
+      removed: originalContent.length - cleanedContent.length
+    });
+  }
+
   return cleanedContent;
 }
 
