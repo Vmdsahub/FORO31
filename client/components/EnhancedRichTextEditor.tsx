@@ -946,6 +946,7 @@ export default function EnhancedRichTextEditor({
         ref={editorRef}
         contentEditable
         onInput={handleInput}
+        onFocus={handleEditorFocus}
         className="w-full p-4 min-h-[200px] focus:outline-none bg-white rich-editor"
         style={{
           lineHeight: "1.7",
