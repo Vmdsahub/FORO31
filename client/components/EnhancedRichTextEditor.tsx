@@ -263,6 +263,58 @@ export default function EnhancedRichTextEditor({
     }
   };
 
+  // Aplicar tamanho da fonte atual quando necessário
+  const applyCurrentFontSize = () => {
+    if (fontSize && fontSize !== "16") {
+      document.execCommand("styleWithCSS", false, "true");
+
+      // Converter tamanho para um valor válido de execCommand (1-7)
+      let sizeValue = "3"; // padrão médio
+
+      switch(fontSize) {
+        case "10": sizeValue = "1"; break;
+        case "12": sizeValue = "2"; break;
+        case "14": sizeValue = "3"; break;
+        case "16": sizeValue = "4"; break;
+        case "18": sizeValue = "5"; break;
+        case "20": sizeValue = "6"; break;
+        case "24":
+        case "28":
+        case "32": sizeValue = "7"; break;
+      }
+
+      document.execCommand("fontSize", false, sizeValue);
+
+      // Para tamanhos maiores que 24px, ajustar com CSS
+      if (parseInt(fontSize) >= 24) {
+        setTimeout(() => {
+          const selection = window.getSelection();
+          if (selection && selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+            let container = range.commonAncestorContainer;
+
+            // Encontrar o elemento font mais próximo
+            while (container && container.nodeType !== Node.ELEMENT_NODE) {
+              container = container.parentNode;
+            }
+
+            if (container) {
+              const fontElement = (container as Element).closest("font") ||
+                                 (container as Element).querySelector("font");
+
+              if (fontElement) {
+                const span = document.createElement("span");
+                span.style.fontSize = `${fontSize}px`;
+                span.innerHTML = fontElement.innerHTML;
+                fontElement.parentNode?.replaceChild(span, fontElement);
+              }
+            }
+          }
+        }, 10);
+      }
+    }
+  };
+
   const handleEditorFocus = () => {
     // Add delete buttons when user focuses on editor
     setTimeout(() => {
