@@ -236,6 +236,16 @@ export default function EnhancedRichTextEditor({
     }, 50);
   };
 
+  const handleEditorClick = () => {
+    // Salvar seleção automaticamente quando usuário clica no editor
+    setTimeout(saveCurrentSelection, 10);
+  };
+
+  const handleEditorKeyUp = () => {
+    // Salvar seleção após navegação com teclado
+    setTimeout(saveCurrentSelection, 10);
+  };
+
   const execCommand = (command: string, value?: string) => {
     document.execCommand(command, false, value);
     handleInput();
