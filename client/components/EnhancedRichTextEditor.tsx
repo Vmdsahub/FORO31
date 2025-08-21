@@ -286,8 +286,8 @@ export default function EnhancedRichTextEditor({
     }
   };
 
-  const handleColorChange = (color: any) => {
-    setCurrentColor(color.hex);
+  const handleColorChange = (color: string) => {
+    setCurrentColor(color);
 
     // Manter foco no editor
     if (editorRef.current) {
@@ -299,7 +299,7 @@ export default function EnhancedRichTextEditor({
 
     // Aplicar cor usando execCommand com CSS styles habilitado
     document.execCommand("styleWithCSS", false, "true");
-    document.execCommand("foreColor", false, color.hex);
+    document.execCommand("foreColor", false, color);
 
     // Salvar a nova seleção após aplicar cor
     saveCurrentSelection();
