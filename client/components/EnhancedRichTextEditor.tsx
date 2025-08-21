@@ -265,6 +265,8 @@ export default function EnhancedRichTextEditor({
     if (editorRef.current) {
       const content = editorRef.current.innerHTML;
       onChange(content);
+      // Atualizar estado dos botões após mudança no conteúdo
+      setTimeout(() => updateFormattingState(), 10);
     }
   };
 
