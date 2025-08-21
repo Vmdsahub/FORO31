@@ -248,7 +248,7 @@ export default function EnhancedRichTextEditor({
           deleteButton.innerHTML = "🗑️";
           deleteButton.title = "Excluir imagem";
           deleteButton.style.cssText =
-            "position: absolute; top: -8px; right: -8px; background: red; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center;";
+            "position: absolute; top: -8px; right: -8px; background: red; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer; z-index: 1000; display: flex; align-items: center; justify-content: center; pointer-events: auto;";
 
           deleteButton.onclick = (e) => {
             e.preventDefault();
@@ -913,7 +913,7 @@ export default function EnhancedRichTextEditor({
         /* CRITICAL: Ensure delete buttons are always clickable */
         .rich-editor button[title="Excluir imagem"],
         .rich-editor button[title="Excluir vídeo"],
-        .rich-editor button:has(��️),
+        .rich-editor button:has(🗑️),
         .rich-editor button[title*="Excluir"] {
           pointer-events: auto !important;
           user-select: auto !important;
