@@ -1081,6 +1081,40 @@ export default function EnhancedRichTextEditor({
 
       {/* Enhanced CSS for better layout and text handling */}
       <style>{`
+        /* Color picker styles */
+        .color-picker-container {
+          padding: 16px;
+          background: white;
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          min-width: 220px;
+        }
+
+        .react-colorful {
+          width: 200px !important;
+          height: 150px !important;
+        }
+
+        .react-colorful__saturation {
+          border-radius: 6px 6px 0 0;
+        }
+
+        .react-colorful__hue,
+        .react-colorful__alpha {
+          border-radius: 0 0 6px 6px;
+          height: 18px !important;
+          margin-top: 8px;
+        }
+
+        .react-colorful__pointer {
+          width: 18px !important;
+          height: 18px !important;
+        }
+
+        .react-colorful__saturation-pointer {
+          width: 16px !important;
+          height: 16px !important;
+        }
         .rich-editor[data-empty="true"]:before {
           content: attr(data-placeholder);
           color: #9ca3af;
