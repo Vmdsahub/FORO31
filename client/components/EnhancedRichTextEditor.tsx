@@ -274,49 +274,37 @@ export default function EnhancedRichTextEditor({
 
   // Handler para quando usuário começa a digitar
   const handleEditorKeyDown = (e: React.KeyboardEvent) => {
-    // Para teclas que inserem texto, garantir que a cor e tamanho estão aplicados
+    // Para teclas que inserem texto, aplicar estilos
     if (e.key.length === 1) {
-      setTimeout(() => {
-        applyCurrentColor();
-        // Aplicar tamanho da fonte se não for o padrão
-        if (fontSize !== "16") {
-          const selection = window.getSelection();
-          if (selection && selection.rangeCount > 0) {
-            const range = selection.getRangeAt(0);
-            const container = range.commonAncestorContainer;
+      // Aplicar formatação em tempo real ANTES do caractere ser inserido
+      document.execCommand("styleWithCSS", false, "true");
 
-            // Se não estamos dentro de um span com tamanho, criar um
-            let parentSpan = container.nodeType === Node.TEXT_NODE
-              ? container.parentElement
-              : container as Element;
+      // Aplicar cor se diferente do padrão
+      if (currentColor !== "#000000") {
+        document.execCommand("foreColor", false, currentColor);
+      }
 
-            if (!parentSpan || !parentSpan.style.fontSize || parentSpan.style.fontSize === "16px") {
-              // Envolver o texto atual em um span com o tamanho correto
-              document.execCommand("styleWithCSS", false, "true");
-              document.execCommand("fontSize", false, "1"); // Aplicar tamanho temporário
+      // Aplicar tamanho da fonte se diferente do padrão
+      if (fontSize !== "16") {
+        // Criar um span temporário com o tamanho correto
+        const span = document.createElement("span");
+        span.style.fontSize = `${fontSize}px`;
+        span.style.color = currentColor;
 
-              // Depois substituir com nosso tamanho customizado
-              setTimeout(() => {
-                const fontElements = editorRef.current?.querySelectorAll("font[size='1']");
-                if (fontElements && fontElements.length > 0) {
-                  const lastFont = fontElements[fontElements.length - 1] as HTMLElement;
-                  const span = document.createElement("span");
-                  span.style.fontSize = `${fontSize}px`;
-                  span.innerHTML = lastFont.innerHTML;
-                  lastFont.parentNode?.replaceChild(span, lastFont);
+        // Inserir o span na posição do cursor
+        const selection = window.getSelection();
+        if (selection && selection.rangeCount > 0) {
+          const range = selection.getRangeAt(0);
+          range.insertNode(span);
 
-                  // Mover cursor para o final do span
-                  const newRange = document.createRange();
-                  newRange.selectNodeContents(span);
-                  newRange.collapse(false);
-                  selection.removeAllRanges();
-                  selection.addRange(newRange);
-                }
-              }, 10);
-            }
-          }
+          // Mover cursor para dentro do span
+          const newRange = document.createRange();
+          newRange.setStart(span, 0);
+          newRange.collapse(true);
+          selection.removeAllRanges();
+          selection.addRange(newRange);
         }
-      }, 0);
+      }
     }
   };
 
