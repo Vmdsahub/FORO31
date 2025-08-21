@@ -326,9 +326,12 @@ export default function EnhancedRichTextEditor({
 
   // Handler para quando usuário começa a digitar
   const handleEditorKeyDown = (e: React.KeyboardEvent) => {
-    // Para teclas que inserem texto, garantir que a cor está aplicada
+    // Para teclas que inserem texto, garantir que cor e tamanho estão aplicados
     if (e.key.length === 1) {
-      setTimeout(() => applyCurrentColor(), 0);
+      setTimeout(() => {
+        applyCurrentColor();
+        applyCurrentFontSize();
+      }, 0);
     }
   };
 
