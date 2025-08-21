@@ -56,12 +56,102 @@ export default function EnhancedRichTextEditor({
       .catch((err) => console.warn("Could not load upload stats:", err));
   }, []);
 
-  // Sync editor content with value
+  // Function to add delete buttons to existing media elements that don't have them
+  const addDeleteButtonsToExistingMedia = () => {
+    if (!editorRef.current || !isEditMode) return;
+
+    // Find images without delete buttons
+    const images = editorRef.current.querySelectorAll(
+      "img:not([data-has-delete])",
+    );
+    images.forEach((img) => {
+      const imgElement = img as HTMLImageElement;
+
+      // Skip if already has a delete button wrapper
+      if (imgElement.parentElement?.style.position === "relative") return;
+
+      // Create wrapper and delete button
+      const wrapper = document.createElement("div");
+      wrapper.style.cssText =
+        "display: inline-block; position: relative; margin: 0 8px 8px 0;";
+
+      const deleteButton = document.createElement("button");
+      deleteButton.innerHTML = "🗑️";
+      deleteButton.title = "Excluir imagem";
+      deleteButton.style.cssText =
+        "position: absolute; top: -8px; right: -8px; background: red; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; pointer-events: auto;";
+
+      deleteButton.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (confirm("Excluir esta imagem?")) {
+          const container = wrapper.closest(".image-container");
+          wrapper.remove();
+
+          // Remove o container se ficar vazio
+          if (container && container.children.length === 0) {
+            container.remove();
+          }
+
+          handleInput();
+        }
+      };
+
+      // Replace img with wrapper
+      imgElement.parentNode?.insertBefore(wrapper, imgElement);
+      wrapper.appendChild(imgElement);
+      wrapper.appendChild(deleteButton);
+
+      // Mark as processed
+      imgElement.setAttribute("data-has-delete", "true");
+    });
+
+    // Find videos without delete buttons
+    const videos = editorRef.current.querySelectorAll(
+      ".video-preview:not([data-has-delete])",
+    );
+    videos.forEach((videoElement) => {
+      // Skip if already has delete button
+      if (videoElement.querySelector('button[title*="Excluir"]')) return;
+
+      const deleteButton = document.createElement("button");
+      deleteButton.innerHTML = "🗑️";
+      deleteButton.title = "Excluir vídeo";
+      deleteButton.style.cssText =
+        "position: absolute; top: -8px; right: -8px; background: red; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; pointer-events: auto;";
+
+      deleteButton.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (confirm("Excluir este vídeo?")) {
+          const container = videoElement.closest(".image-container");
+          videoElement.remove();
+
+          // Remove o container se ficar vazio
+          if (container && container.children.length === 0) {
+            container.remove();
+          }
+
+          handleInput();
+        }
+      };
+
+      videoElement.appendChild(deleteButton);
+      videoElement.setAttribute("data-has-delete", "true");
+    });
+  };
+
+  // Sync editor content with value and add delete buttons to existing media
   useEffect(() => {
     if (editorRef.current && editorRef.current.innerHTML !== value) {
       editorRef.current.innerHTML = value;
+
+      // Add delete buttons to any existing media after content loads
+      setTimeout(() => {
+        addDeleteButtonsToExistingMedia();
+      }, 100);
     }
-  }, [value]);
+  }, [value, isEditMode]);
 
   // Configure global functions - conditional based on edit mode
   useEffect(() => {
@@ -117,6 +207,13 @@ export default function EnhancedRichTextEditor({
       const content = editorRef.current.innerHTML;
       onChange(content);
     }
+  };
+
+  const handleEditorFocus = () => {
+    // Add delete buttons when user focuses on editor
+    setTimeout(() => {
+      addDeleteButtonsToExistingMedia();
+    }, 50);
   };
 
   const execCommand = (command: string, value?: string) => {
@@ -248,13 +345,20 @@ export default function EnhancedRichTextEditor({
           deleteButton.innerHTML = "🗑️";
           deleteButton.title = "Excluir imagem";
           deleteButton.style.cssText =
-            "position: absolute; top: -8px; right: -8px; background: red; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center;";
+            "position: absolute; top: -8px; right: -8px; background: red; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; pointer-events: auto;";
 
           deleteButton.onclick = (e) => {
             e.preventDefault();
             e.stopPropagation();
             if (confirm("Excluir esta imagem?")) {
+              const container = imageWrapper.closest(".image-container");
               imageWrapper.remove();
+
+              // Remove o container se ficar vazio
+              if (container && container.children.length === 0) {
+                container.remove();
+              }
+
               handleInput();
             }
           };
@@ -339,7 +443,14 @@ export default function EnhancedRichTextEditor({
         e.preventDefault();
         e.stopPropagation();
         if (confirm("Excluir esta imagem?")) {
+          const container = imageWrapper.closest(".image-container");
           imageWrapper.remove();
+
+          // Remove o container se ficar vazio
+          if (container && container.children.length === 0) {
+            container.remove();
+          }
+
           handleInput();
         }
       };
@@ -492,13 +603,20 @@ export default function EnhancedRichTextEditor({
           deleteButton.innerHTML = "🗑️";
           deleteButton.title = "Excluir vídeo";
           deleteButton.style.cssText =
-            "position: absolute; top: -8px; right: -8px; background: red; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center;";
+            "position: absolute; top: -8px; right: -8px; background: red; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; pointer-events: auto;";
 
           deleteButton.onclick = (e) => {
             e.preventDefault();
             e.stopPropagation();
             if (confirm("Excluir este vídeo?")) {
+              const container = videoPreview.closest(".image-container");
               videoPreview.remove();
+
+              // Remove o container se ficar vazio
+              if (container && container.children.length === 0) {
+                container.remove();
+              }
+
               handleInput();
             }
           };
@@ -595,13 +713,20 @@ export default function EnhancedRichTextEditor({
       deleteButton.innerHTML = "🗑️";
       deleteButton.title = "Excluir vídeo";
       deleteButton.style.cssText =
-        "position: absolute; top: -8px; right: -8px; background: red; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center;";
+        "position: absolute; top: -8px; right: -8px; background: red; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; pointer-events: auto;";
 
       deleteButton.onclick = (e) => {
         e.preventDefault();
         e.stopPropagation();
         if (confirm("Excluir este vídeo?")) {
+          const container = videoPreview.closest(".image-container");
           videoPreview.remove();
+
+          // Remove o container se ficar vazio
+          if (container && container.children.length === 0) {
+            container.remove();
+          }
+
           handleInput();
         }
       };
@@ -828,6 +953,7 @@ export default function EnhancedRichTextEditor({
         ref={editorRef}
         contentEditable
         onInput={handleInput}
+        onFocus={handleEditorFocus}
         className="w-full p-4 min-h-[200px] focus:outline-none bg-white rich-editor"
         style={{
           lineHeight: "1.7",
@@ -880,6 +1006,12 @@ export default function EnhancedRichTextEditor({
           cursor: default !important;
         }
 
+        /* Allow delete buttons to be clickable */
+        .rich-editor button[title*="Excluir"] {
+          pointer-events: auto !important;
+          cursor: pointer !important;
+        }
+
         /* Specific styles for edit mode elements */
         .rich-editor .video-preview[data-edit-mode="true"] {
           pointer-events: none !important;
@@ -901,6 +1033,7 @@ export default function EnhancedRichTextEditor({
           cursor: default !important;
           opacity: 0.5;
         }
+
         
         /* Better text flow and line breaks */
         .rich-editor * {
