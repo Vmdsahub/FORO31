@@ -622,7 +622,14 @@ export default function EnhancedRichTextEditor({
         e.preventDefault();
         e.stopPropagation();
         if (confirm("Excluir este vídeo?")) {
+          const container = videoPreview.closest('.image-container');
           videoPreview.remove();
+
+          // Remove o container se ficar vazio
+          if (container && container.children.length === 0) {
+            container.remove();
+          }
+
           handleInput();
         }
       };
