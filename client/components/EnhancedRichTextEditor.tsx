@@ -319,8 +319,9 @@ export default function EnhancedRichTextEditor({
     // Add delete buttons when user focuses on editor
     setTimeout(() => {
       addDeleteButtonsToExistingMedia();
-      // Aplicar cor atual quando focar no editor
+      // Aplicar cor e tamanho atuais quando focar no editor
       applyCurrentColor();
+      applyCurrentFontSize();
     }, 50);
   };
 
