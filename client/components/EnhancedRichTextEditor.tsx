@@ -326,6 +326,8 @@ export default function EnhancedRichTextEditor({
       saveCurrentSelection();
       applyCurrentColor();
       applyCurrentFontSize();
+      // Atualizar estado dos botões de formatação
+      updateFormattingState();
     }, 10);
   };
 
