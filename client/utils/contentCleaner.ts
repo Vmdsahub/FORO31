@@ -15,6 +15,22 @@ export function cleanContentForDisplay(content: string): string {
     .replace(/\s+/g, " ")
     .replace(/\s+>/g, ">");
 
+  // Remove delete buttons (trash icon buttons) from content when displaying
+  cleanedContent = cleanedContent.replace(
+    /<button[^>]*title="Excluir [^"]*"[^>]*>🗑️<\/button>/g,
+    ""
+  );
+
+  // Also remove any wrapper divs that only contained delete buttons
+  cleanedContent = cleanedContent.replace(
+    /<div[^>]*style="[^"]*position:\s*relative[^"]*"[^>]*>\s*<img[^>]*>\s*<\/div>/g,
+    (match) => {
+      // Extract just the img tag from the wrapper
+      const imgMatch = match.match(/<img[^>]*>/);
+      return imgMatch ? imgMatch[0] : match;
+    }
+  );
+
   return cleanedContent;
 }
 
