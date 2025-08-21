@@ -235,6 +235,16 @@ export default function EnhancedRichTextEditor({
   }, [isEditMode]);
 
   // Manage placeholder manually
+  // Limpar conteúdo inicial
+  useEffect(() => {
+    if (value && editorRef.current) {
+      const cleaned = cleanHTML(value);
+      if (cleaned !== value) {
+        onChange(cleaned);
+      }
+    }
+  }, []); // Executar apenas uma vez no mount
+
   useEffect(() => {
     const editor = editorRef.current;
     if (!editor) return;
