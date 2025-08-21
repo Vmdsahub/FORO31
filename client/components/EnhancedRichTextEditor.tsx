@@ -39,7 +39,6 @@ export default function EnhancedRichTextEditor({
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [currentColor, setCurrentColor] = useState("#000000");
   const [savedSelection, setSavedSelection] = useState<Range | null>(null);
-  const [isInteractingWithColorPicker, setIsInteractingWithColorPicker] = useState(false);
   const colorPickerTriggerRef = useRef<HTMLButtonElement>(null);
 
   // Função para salvar seleção atual
