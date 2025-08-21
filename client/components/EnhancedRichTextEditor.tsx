@@ -8,6 +8,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import SecureUploadWidget, {
   UploadedFileInfo,
   isImageFile,
@@ -40,6 +47,36 @@ export default function EnhancedRichTextEditor({
   const [currentColor, setCurrentColor] = useState("#000000");
   const [savedSelection, setSavedSelection] = useState<Range | null>(null);
   const colorPickerTriggerRef = useRef<HTMLButtonElement>(null);
+  const [fontSize, setFontSize] = useState("16");
+  const [isBold, setIsBold] = useState(false);
+  const [isItalic, setIsItalic] = useState(false);
+  const [isUnderline, setIsUnderline] = useState(false);
+
+  // Função para detectar estado atual de formatação
+  const updateFormattingState = () => {
+    try {
+      const isBoldActive = document.queryCommandState("bold");
+      const isItalicActive = document.queryCommandState("italic");
+      const isUnderlineActive = document.queryCommandState("underline");
+
+      setIsBold(isBoldActive);
+      setIsItalic(isItalicActive);
+      setIsUnderline(isUnderlineActive);
+    } catch (error) {
+      // Fallback se queryCommandState falhar
+      console.warn("Error detecting formatting state:", error);
+    }
+  };
+
+  // Tamanhos de fonte pré-determinados
+  const fontSizes = [
+    { value: "10", label: "10px" },
+    { value: "12", label: "12px" },
+    { value: "14", label: "14px" },
+    { value: "16", label: "16px" },
+    { value: "18", label: "18px" },
+    { value: "20", label: "20px" },
+  ];
 
   // Função para salvar seleção atual
   const saveCurrentSelection = () => {
@@ -198,6 +235,16 @@ export default function EnhancedRichTextEditor({
   }, [isEditMode]);
 
   // Manage placeholder manually
+  // Limpar conteúdo inicial
+  useEffect(() => {
+    if (value && editorRef.current) {
+      const cleaned = cleanHTML(value);
+      if (cleaned !== value) {
+        onChange(cleaned);
+      }
+    }
+  }, []); // Executar apenas uma vez no mount
+
   useEffect(() => {
     const editor = editorRef.current;
     if (!editor) return;
@@ -212,22 +259,76 @@ export default function EnhancedRichTextEditor({
       }
     };
 
+    const handleBlur = () => {
+      updatePlaceholder();
+      // Limpar HTML ao perder foco
+      setTimeout(() => {
+        if (editorRef.current) {
+          const cleaned = cleanHTML(editorRef.current.innerHTML);
+          if (cleaned !== editorRef.current.innerHTML) {
+            editorRef.current.innerHTML = cleaned;
+            onChange(cleaned);
+          }
+        }
+      }, 100);
+    };
+
     updatePlaceholder();
     editor.addEventListener("input", updatePlaceholder);
     editor.addEventListener("focus", updatePlaceholder);
-    editor.addEventListener("blur", updatePlaceholder);
+    editor.addEventListener("blur", handleBlur);
 
     return () => {
       editor.removeEventListener("input", updatePlaceholder);
       editor.removeEventListener("focus", updatePlaceholder);
-      editor.removeEventListener("blur", updatePlaceholder);
+      editor.removeEventListener("blur", handleBlur);
     };
   }, [placeholder]);
 
+  // Função para limpar e otimizar HTML
+  const cleanHTML = (html: string): string => {
+    // Criar um elemento temporário para manipular o HTML
+    const temp = document.createElement("div");
+    temp.innerHTML = html;
+
+    // Remover elementos font vazios
+    const fontElements = temp.querySelectorAll("font");
+    fontElements.forEach((font) => {
+      if (!font.textContent?.trim()) {
+        font.remove();
+      }
+    });
+
+    // Remover spans vazios
+    const spanElements = temp.querySelectorAll("span");
+    spanElements.forEach((span) => {
+      if (!span.textContent?.trim() && !span.querySelector("img, video")) {
+        span.remove();
+      }
+    });
+
+    // Remover atributos desnecessários
+    const allElements = temp.querySelectorAll("*");
+    allElements.forEach((element) => {
+      // Remover atributos vazios ou desnecessários
+      if (
+        element.hasAttribute("style") &&
+        !element.getAttribute("style")?.trim()
+      ) {
+        element.removeAttribute("style");
+      }
+    });
+
+    return temp.innerHTML;
+  };
+
   const handleInput = () => {
     if (editorRef.current) {
-      const content = editorRef.current.innerHTML;
-      onChange(content);
+      const rawContent = editorRef.current.innerHTML;
+      const cleanedContent = cleanHTML(rawContent);
+      onChange(cleanedContent);
+      // Atualizar estado dos botões após mudança no conteúdo
+      setTimeout(() => updateFormattingState(), 10);
     }
   };
 
@@ -239,28 +340,70 @@ export default function EnhancedRichTextEditor({
     }
   };
 
+  // Aplicar tamanho da fonte atual quando necessário
+  const applyCurrentFontSize = () => {
+    if (fontSize && fontSize !== "16") {
+      document.execCommand("styleWithCSS", false, "true");
+
+      // Converter tamanho para um valor válido de execCommand (1-7)
+      let sizeValue = "3"; // padrão médio
+
+      switch (fontSize) {
+        case "10":
+          sizeValue = "1";
+          break;
+        case "12":
+          sizeValue = "2";
+          break;
+        case "14":
+          sizeValue = "3";
+          break;
+        case "16":
+          sizeValue = "4";
+          break;
+        case "18":
+          sizeValue = "5";
+          break;
+        case "20":
+          sizeValue = "6";
+          break;
+      }
+
+      document.execCommand("fontSize", false, sizeValue);
+    }
+  };
+
   const handleEditorFocus = () => {
     // Add delete buttons when user focuses on editor
     setTimeout(() => {
       addDeleteButtonsToExistingMedia();
-      // Aplicar cor atual quando focar no editor
+      // Aplicar cor e tamanho atuais quando focar no editor
       applyCurrentColor();
+      applyCurrentFontSize();
+      // Atualizar estado dos botões de formatação
+      updateFormattingState();
     }, 50);
   };
 
   // Handler para quando usuário começa a digitar
   const handleEditorKeyDown = (e: React.KeyboardEvent) => {
-    // Para teclas que inserem texto, garantir que a cor está aplicada
+    // Para teclas que inserem texto, garantir que cor e tamanho estão aplicados
     if (e.key.length === 1) {
-      setTimeout(() => applyCurrentColor(), 0);
+      setTimeout(() => {
+        applyCurrentColor();
+        applyCurrentFontSize();
+      }, 0);
     }
   };
 
   const handleEditorClick = () => {
-    // Salvar seleção e aplicar cor atual
+    // Salvar seleção e aplicar cor e tamanho atuais
     setTimeout(() => {
       saveCurrentSelection();
       applyCurrentColor();
+      applyCurrentFontSize();
+      // Atualizar estado dos botões de formatação
+      updateFormattingState();
     }, 10);
   };
 
@@ -268,9 +411,12 @@ export default function EnhancedRichTextEditor({
     // Salvar seleção após navegação com teclado
     setTimeout(() => {
       saveCurrentSelection();
-      // Se foi uma tecla de caractere, aplicar cor
+      // Atualizar estado dos botões sempre após keyUp
+      updateFormattingState();
+      // Se foi uma tecla de caractere, aplicar cor e tamanho
       if (e.key.length === 1) {
         applyCurrentColor();
+        applyCurrentFontSize();
       }
     }, 10);
   };
@@ -303,10 +449,52 @@ export default function EnhancedRichTextEditor({
     handleInput();
   };
 
-  const handleBold = () => execCommandWithSelection("bold");
-  const handleItalic = () => execCommandWithSelection("italic");
-  const handleUnderline = () => execCommandWithSelection("underline");
-  const handleHeading = () => execCommandWithSelection("formatBlock", "H3");
+  const handleBold = () => {
+    document.execCommand("bold", false);
+    handleInput();
+    // Atualizar estado após comando
+    setTimeout(() => updateFormattingState(), 10);
+  };
+
+  const handleItalic = () => {
+    document.execCommand("italic", false);
+    handleInput();
+    // Atualizar estado após comando
+    setTimeout(() => updateFormattingState(), 10);
+  };
+
+  const handleUnderline = () => {
+    document.execCommand("underline", false);
+    handleInput();
+    // Atualizar estado após comando
+    setTimeout(() => updateFormattingState(), 10);
+  };
+
+  const handleFontSizeChange = (newSize: string) => {
+    setFontSize(newSize);
+
+    // Focus no editor
+    if (editorRef.current) {
+      editorRef.current.focus();
+    }
+  };
+
+  const resetColor = () => {
+    setCurrentColor("#000000");
+    if (savedSelection) {
+      restoreSelection();
+      document.execCommand("styleWithCSS", false, "true");
+      document.execCommand("foreColor", false, "#000000");
+      saveCurrentSelection();
+      handleInput();
+    }
+    setTimeout(() => {
+      if (editorRef.current) {
+        editorRef.current.focus();
+        applyCurrentColor();
+      }
+    }, 50);
+  };
 
   const handleLink = () => {
     const url = prompt("Digite a URL:");
@@ -938,10 +1126,10 @@ export default function EnhancedRichTextEditor({
       <div className="flex items-center gap-2 p-3 border-b border-gray-200 bg-gray-50 flex-wrap">
         <Button
           type="button"
-          variant="outline"
+          variant={isBold ? "default" : "outline"}
           size="sm"
           onClick={handleBold}
-          className="h-8 px-2 hover:bg-gray-100"
+          className={`h-8 px-2 hover:bg-gray-100 ${isBold ? "bg-blue-500 text-white hover:bg-blue-600" : ""}`}
           title="Negrito (Ctrl+B)"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -951,10 +1139,10 @@ export default function EnhancedRichTextEditor({
 
         <Button
           type="button"
-          variant="outline"
+          variant={isItalic ? "default" : "outline"}
           size="sm"
           onClick={handleItalic}
-          className="h-8 px-2 hover:bg-gray-100"
+          className={`h-8 px-2 hover:bg-gray-100 ${isItalic ? "bg-blue-500 text-white hover:bg-blue-600" : ""}`}
           title="Itálico (Ctrl+I)"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -964,10 +1152,10 @@ export default function EnhancedRichTextEditor({
 
         <Button
           type="button"
-          variant="outline"
+          variant={isUnderline ? "default" : "outline"}
           size="sm"
           onClick={handleUnderline}
-          className="h-8 px-2 hover:bg-gray-100"
+          className={`h-8 px-2 hover:bg-gray-100 ${isUnderline ? "bg-blue-500 text-white hover:bg-blue-600" : ""}`}
           title="Sublinhado"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -975,18 +1163,23 @@ export default function EnhancedRichTextEditor({
           </svg>
         </Button>
 
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={handleHeading}
-          className="h-8 px-2 hover:bg-gray-100"
-          title="Título"
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M5 4v3h5.5v12h3V7H19V4z" />
-          </svg>
-        </Button>
+        {/* Font Size Dropdown */}
+        <Select value={fontSize} onValueChange={handleFontSizeChange}>
+          <SelectTrigger className="h-8 w-20 text-xs">
+            <SelectValue placeholder="Fonte" />
+          </SelectTrigger>
+          <SelectContent>
+            {fontSizes.map((size) => (
+              <SelectItem
+                key={size.value}
+                value={size.value}
+                className="text-xs"
+              >
+                {size.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
         <Button
           type="button"
@@ -1098,6 +1291,23 @@ export default function EnhancedRichTextEditor({
                     className="w-20 px-2 py-1 text-xs border border-gray-300 rounded focus:border-blue-500 focus:outline-none"
                     placeholder="#000000"
                   />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={resetColor}
+                    className="h-6 px-1 text-xs hover:bg-gray-100"
+                    title="Resetar cor padrão"
+                  >
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                    </svg>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -1131,8 +1341,8 @@ export default function EnhancedRichTextEditor({
         onKeyDown={handleEditorKeyDown}
         className="w-full p-4 min-h-[200px] focus:outline-none bg-white rich-editor"
         style={{
-          lineHeight: "1.7",
-          fontSize: "15px",
+          lineHeight: "1.4", // Reduzido de 1.7 para 1.4
+          fontSize: "16px", // Tamanho base padrão
           wordWrap: "break-word",
           overflowWrap: "break-word",
           whiteSpace: "pre-wrap",
