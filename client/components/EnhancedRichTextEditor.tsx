@@ -997,19 +997,34 @@ export default function EnhancedRichTextEditor({
             align="start"
             onEscapeKeyDown={() => setShowColorPicker(false)}
             onPointerDownOutside={(e) => {
-              // Só fechar se clicou fora do picker mesmo
+              // Só fechar se clicou fora do popover inteiro
               const target = e.target as Element;
               if (
                 !target.closest(".color-picker-container") &&
-                !target.closest("[data-radix-popper-content-wrapper]")
+                !target.closest("[data-radix-popper-content-wrapper]") &&
+                !target.closest("[data-radix-popper-content]") &&
+                !target.closest(".react-colorful")
               ) {
                 setShowColorPicker(false);
+              }
+            }}
+            onInteractOutside={(e) => {
+              // Prevenir fechamento ao interagir com o color picker
+              const target = e.target as Element;
+              if (
+                target.closest(".color-picker-container") ||
+                target.closest(".react-colorful") ||
+                target.closest("[data-radix-popper-content]")
+              ) {
+                e.preventDefault();
               }
             }}
           >
             <div
               className="color-picker-container"
               onMouseDown={(e) => e.stopPropagation()}
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={(e) => e.stopPropagation()}
               onPointerDown={(e) => e.stopPropagation()}
             >
               <HexColorPicker
@@ -1163,6 +1178,25 @@ export default function EnhancedRichTextEditor({
           pointer-events: none !important;
           user-select: none !important;
           cursor: default !important;
+        }
+
+        /* Corrigir cursor nas áreas do rich editor onde não deve ser text cursor */
+        .rich-editor .color-picker-container,
+        .rich-editor .color-picker-container *,
+        .rich-editor [data-radix-popper-content],
+        .rich-editor [data-radix-popper-content] *,
+        .react-colorful,
+        .react-colorful * {
+          cursor: default !important;
+        }
+
+        /* Cursor ponteiro para botões e elementos interativos */
+        .rich-editor button,
+        .rich-editor .react-colorful__saturation,
+        .rich-editor .react-colorful__hue,
+        .rich-editor .react-colorful__alpha,
+        .rich-editor .react-colorful__pointer {
+          cursor: pointer !important;
         }
 
         /* Allow delete buttons to be clickable */
