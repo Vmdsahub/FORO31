@@ -202,6 +202,13 @@ export default function EnhancedRichTextEditor({
     }
   };
 
+  const handleEditorFocus = () => {
+    // Add delete buttons when user focuses on editor
+    setTimeout(() => {
+      addDeleteButtonsToExistingMedia();
+    }, 50);
+  };
+
   const execCommand = (command: string, value?: string) => {
     document.execCommand(command, false, value);
     editorRef.current?.focus();
