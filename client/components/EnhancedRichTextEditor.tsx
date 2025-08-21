@@ -374,21 +374,24 @@ export default function EnhancedRichTextEditor({
   };
 
   const handleBold = () => {
-    setIsBold(!isBold);
     document.execCommand("bold", false);
     handleInput();
+    // Atualizar estado após comando
+    setTimeout(() => updateFormattingState(), 10);
   };
 
   const handleItalic = () => {
-    setIsItalic(!isItalic);
     document.execCommand("italic", false);
     handleInput();
+    // Atualizar estado após comando
+    setTimeout(() => updateFormattingState(), 10);
   };
 
   const handleUnderline = () => {
-    setIsUnderline(!isUnderline);
     document.execCommand("underline", false);
     handleInput();
+    // Atualizar estado após comando
+    setTimeout(() => updateFormattingState(), 10);
   };
 
   const handleFontSizeChange = (newSize: string) => {
