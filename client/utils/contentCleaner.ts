@@ -57,8 +57,9 @@ export function cleanContentForSaving(content: string): string {
     .replace(/\s+>/g, ">");
 
   // Remove delete buttons (trash icon buttons) before saving
+  // This regex catches various forms of delete buttons with trash icons
   cleanedContent = cleanedContent.replace(
-    /<button[^>]*title="Excluir [^"]*"[^>]*>🗑️<\/button>/g,
+    /<button[^>]*(?:title="Excluir [^"]*"|onclick="[^"]*")[^>]*>[\s]*🗑️[\s]*<\/button>/g,
     ""
   );
 
