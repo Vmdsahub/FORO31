@@ -60,9 +60,6 @@ export default function EnhancedRichTextEditor({
     { value: "16", label: "16px" },
     { value: "18", label: "18px" },
     { value: "20", label: "20px" },
-    { value: "24", label: "24px" },
-    { value: "28", label: "28px" },
-    { value: "32", label: "32px" },
   ];
 
   // Função para salvar seleção atual
@@ -278,40 +275,9 @@ export default function EnhancedRichTextEditor({
         case "16": sizeValue = "4"; break;
         case "18": sizeValue = "5"; break;
         case "20": sizeValue = "6"; break;
-        case "24":
-        case "28":
-        case "32": sizeValue = "7"; break;
       }
 
       document.execCommand("fontSize", false, sizeValue);
-
-      // Para tamanhos maiores que 24px, ajustar com CSS
-      if (parseInt(fontSize) >= 24) {
-        setTimeout(() => {
-          const selection = window.getSelection();
-          if (selection && selection.rangeCount > 0) {
-            const range = selection.getRangeAt(0);
-            let container = range.commonAncestorContainer;
-
-            // Encontrar o elemento font mais próximo
-            while (container && container.nodeType !== Node.ELEMENT_NODE) {
-              container = container.parentNode;
-            }
-
-            if (container) {
-              const fontElement = (container as Element).closest("font") ||
-                                 (container as Element).querySelector("font");
-
-              if (fontElement) {
-                const span = document.createElement("span");
-                span.style.fontSize = `${fontSize}px`;
-                span.innerHTML = fontElement.innerHTML;
-                fontElement.parentNode?.replaceChild(span, fontElement);
-              }
-            }
-          }
-        }, 10);
-      }
     }
   };
 
@@ -1265,7 +1231,7 @@ export default function EnhancedRichTextEditor({
         onKeyDown={handleEditorKeyDown}
         className="w-full p-4 min-h-[200px] focus:outline-none bg-white rich-editor"
         style={{
-          lineHeight: "1.7",
+          lineHeight: "1.4", // Reduzido de 1.7 para 1.4
           fontSize: "16px", // Tamanho base padrão
           wordWrap: "break-word",
           overflowWrap: "break-word",
