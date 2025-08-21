@@ -244,7 +244,17 @@ export default function EnhancedRichTextEditor({
     // Add delete buttons when user focuses on editor
     setTimeout(() => {
       addDeleteButtonsToExistingMedia();
+      // Aplicar cor atual quando focar no editor
+      applyCurrentColor();
     }, 50);
+  };
+
+  // Handler para quando usuário começa a digitar
+  const handleEditorKeyDown = (e: React.KeyboardEvent) => {
+    // Para teclas que inserem texto, garantir que a cor está aplicada
+    if (e.key.length === 1) {
+      setTimeout(() => applyCurrentColor(), 0);
+    }
   };
 
   const handleEditorClick = () => {
