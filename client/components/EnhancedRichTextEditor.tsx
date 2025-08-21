@@ -265,12 +265,33 @@ export default function EnhancedRichTextEditor({
   // Handler para interceptar teclas e aplicar cor
   const handleEditorKeyDown = (e: React.KeyboardEvent) => {
     // Se for uma tecla que vai inserir texto
-    if (e.key.length === 1 || e.key === 'Enter') {
-      // Aplicar cor antes de inserir o caractere
+    if (e.key.length === 1) {
       if (currentColor && currentColor !== '#000000') {
-        setTimeout(() => {
-          applyCurrentColorToSelection();
-        }, 0);
+        e.preventDefault();
+
+        // Inserir o caractere com a cor correta
+        const selection = window.getSelection();
+        if (selection && selection.rangeCount > 0) {
+          const range = selection.getRangeAt(0);
+
+          // Criar span com a cor correta
+          const span = document.createElement('span');
+          span.style.color = currentColor;
+          span.textContent = e.key;
+
+          // Inserir o span
+          range.deleteContents();
+          range.insertNode(span);
+
+          // Posicionar cursor após o span
+          range.setStartAfter(span);
+          range.collapse(true);
+          selection.removeAllRanges();
+          selection.addRange(range);
+
+          // Trigger input event
+          handleInput();
+        }
       }
     }
   };
