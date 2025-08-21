@@ -197,7 +197,6 @@ export default function EnhancedRichTextEditor({
     };
   }, [isEditMode]);
 
-
   // Manage placeholder manually
   useEffect(() => {
     const editor = editorRef.current;
@@ -234,9 +233,9 @@ export default function EnhancedRichTextEditor({
 
   // Aplicar cor atual quando necessário
   const applyCurrentColor = () => {
-    if (currentColor && currentColor !== '#000000') {
-      document.execCommand('styleWithCSS', false, 'true');
-      document.execCommand('foreColor', false, currentColor);
+    if (currentColor && currentColor !== "#000000") {
+      document.execCommand("styleWithCSS", false, "true");
+      document.execCommand("foreColor", false, currentColor);
     }
   };
 
@@ -1062,8 +1061,8 @@ export default function EnhancedRichTextEditor({
               if (
                 colorPickerElement?.contains(target) ||
                 triggerElement?.contains(target) ||
-                target.closest('.react-colorful') ||
-                target.closest('[data-radix-popper-content]')
+                target.closest(".react-colorful") ||
+                target.closest("[data-radix-popper-content]")
               ) {
                 e.preventDefault();
                 return;
@@ -1079,10 +1078,7 @@ export default function EnhancedRichTextEditor({
               e.preventDefault();
             }}
           >
-            <div
-              ref={colorPickerRef}
-              className="color-picker-container"
-            >
+            <div ref={colorPickerRef} className="color-picker-container">
               <HexColorPicker
                 color={currentColor}
                 onChange={handleColorChange}
