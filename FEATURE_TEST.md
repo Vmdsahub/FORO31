@@ -21,14 +21,17 @@
   - Feedback visual com toast de sucesso
   - Preserva formatação original
 
-### 3. �� Seletor de Cor (Wheel Color Selector)
+### 3. 🎨 Seletor de Cor (Wheel Color Selector)
 
 - **Status**: ✅ Implementado
 - **Funcionalidade**: Ferramenta em botão para alterar cor do texto
 - **Recursos**:
-  - Usa react-color SketchPicker
+  - Usa react-colorful HexColorPicker (moderno, sem warnings)
   - Preview da cor atual no botão
+  - Cores predefinidas para seleção rápida
+  - Input manual de valor hexadecimal
   - Aplicação imediata da cor selecionada
+  - Permanece aberto para ajustes finos
 
 ### 4. 📤 Upload Seguro com Uploadcare
 
@@ -65,7 +68,7 @@
 ### Uploadcare
 
 - ✅ Chave pública exposta apenas no frontend
-- ✅ Chave privada protegida em variável de ambiente do servidor
+- ��� Chave privada protegida em variável de ambiente do servidor
 - ✅ Webhook endpoint para monitoramento de uploads
 - ✅ Endpoint de configuração seguro
 - ✅ Verificação opcional de arquivos
