@@ -303,7 +303,6 @@ export default function EnhancedRichTextEditor({
   };
 
   const closeColorPicker = () => {
-    setIsInteractingWithColorPicker(false);
     setShowColorPicker(false);
     // Restaurar foco no editor
     setTimeout(() => {
