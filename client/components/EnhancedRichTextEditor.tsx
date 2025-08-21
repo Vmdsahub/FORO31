@@ -289,30 +289,24 @@ export default function EnhancedRichTextEditor({
   const handleColorChange = (color: string) => {
     setCurrentColor(color);
 
-    // NÃO fechar o popover durante mudança de cor
-    // Evitar qualquer ação que possa disparar fechamento
-
-    // Aplicar cor usando execCommand apenas se há seleção salva
+    // Aplicar cor imediatamente se há seleção salva
     if (savedSelection) {
-      // Restaurar seleção antes de aplicar cor
       restoreSelection();
-
-      // Aplicar cor usando execCommand com CSS styles habilitado
       document.execCommand("styleWithCSS", false, "true");
       document.execCommand("foreColor", false, color);
-
-      // Salvar a nova seleção após aplicar cor
       saveCurrentSelection();
-
       handleInput();
     }
+  };
 
-    // Manter foco no editor mas sem interferir no popover
+  const closeColorPicker = () => {
+    setShowColorPicker(false);
+    // Restaurar foco no editor
     setTimeout(() => {
-      if (editorRef.current && !showColorPicker) {
+      if (editorRef.current) {
         editorRef.current.focus();
       }
-    }, 100);
+    }, 50);
   };
 
   const handleSecureUploadSuccess = (fileInfo: UploadedFileInfo) => {
@@ -1034,7 +1028,11 @@ export default function EnhancedRichTextEditor({
                   <input
                     type="text"
                     value={currentColor}
-                    onChange={(e) => handleColorChange(e.target.value)}
+                    onChange={(e) => {
+                      e.stopPropagation();
+                      handleColorChange(e.target.value);
+                    }}
+                    onClick={(e) => e.stopPropagation()}
                     className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:border-blue-500 focus:outline-none"
                     placeholder="#000000"
                   />
@@ -1061,6 +1059,16 @@ export default function EnhancedRichTextEditor({
                       title={presetColor}
                     />
                   ))}
+                </div>
+                <div className="mt-3 pt-3 border-t border-gray-200">
+                  <Button
+                    onClick={closeColorPicker}
+                    size="sm"
+                    variant="outline"
+                    className="w-full text-xs"
+                  >
+                    Fechar
+                  </Button>
                 </div>
               </div>
             </div>
