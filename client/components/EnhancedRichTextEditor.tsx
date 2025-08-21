@@ -353,37 +353,26 @@ export default function EnhancedRichTextEditor({
       editorRef.current.focus();
     }
 
-    // Aplicar tamanho da fonte usando execCommand para o próximo texto
-    document.execCommand("styleWithCSS", false, "true");
+    // Salvar posição atual do cursor
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+      const range = selection.getRangeAt(0);
 
-    // Converter para um valor compatível com execCommand fontSize
-    // execCommand fontSize aceita valores de 1-7, então precisamos usar CSS diretamente
-    const fontSizeMap: { [key: string]: string } = {
-      "10": "1",
-      "12": "2",
-      "14": "3",
-      "16": "4",
-      "18": "5",
-      "20": "6",
-      "24": "7",
-      "28": "7",
-      "32": "7"
-    };
+      // Criar um span invisível com o tamanho da fonte para ser usado como "modelo"
+      const fontSpan = document.createElement("span");
+      fontSpan.style.fontSize = `${newSize}px`;
+      fontSpan.innerHTML = ""; // Span vazio para receber o próximo texto
 
-    const execCommandSize = fontSizeMap[newSize] || "4";
-    document.execCommand("fontSize", false, execCommandSize);
+      // Inserir o span na posição do cursor
+      range.insertNode(fontSpan);
 
-    // Para tamanhos maiores que 24px, aplicar CSS diretamente
-    if (parseInt(newSize) > 24) {
-      setTimeout(() => {
-        // Selecionar o último elemento font criado e aplicar CSS customizado
-        const fontElements = editorRef.current?.querySelectorAll("font[size]");
-        if (fontElements && fontElements.length > 0) {
-          const lastFont = fontElements[fontElements.length - 1] as HTMLElement;
-          lastFont.style.fontSize = `${newSize}px`;
-          lastFont.removeAttribute("size");
-        }
-      }, 10);
+      // Posicionar cursor dentro do span
+      const newRange = document.createRange();
+      newRange.setStart(fontSpan, 0);
+      newRange.collapse(true);
+
+      selection.removeAllRanges();
+      selection.addRange(newRange);
     }
 
     handleInput();
