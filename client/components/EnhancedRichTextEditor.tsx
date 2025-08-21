@@ -259,15 +259,29 @@ export default function EnhancedRichTextEditor({
       }
     };
 
+    const handleBlur = () => {
+      updatePlaceholder();
+      // Limpar HTML ao perder foco
+      setTimeout(() => {
+        if (editorRef.current) {
+          const cleaned = cleanHTML(editorRef.current.innerHTML);
+          if (cleaned !== editorRef.current.innerHTML) {
+            editorRef.current.innerHTML = cleaned;
+            onChange(cleaned);
+          }
+        }
+      }, 100);
+    };
+
     updatePlaceholder();
     editor.addEventListener("input", updatePlaceholder);
     editor.addEventListener("focus", updatePlaceholder);
-    editor.addEventListener("blur", updatePlaceholder);
+    editor.addEventListener("blur", handleBlur);
 
     return () => {
       editor.removeEventListener("input", updatePlaceholder);
       editor.removeEventListener("focus", updatePlaceholder);
-      editor.removeEventListener("blur", updatePlaceholder);
+      editor.removeEventListener("blur", handleBlur);
     };
   }, [placeholder]);
 
