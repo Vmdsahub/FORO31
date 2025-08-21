@@ -289,22 +289,30 @@ export default function EnhancedRichTextEditor({
   const handleColorChange = (color: string) => {
     setCurrentColor(color);
 
-    // Manter foco no editor
-    if (editorRef.current) {
-      editorRef.current.focus();
+    // NÃO fechar o popover durante mudança de cor
+    // Evitar qualquer ação que possa disparar fechamento
+
+    // Aplicar cor usando execCommand apenas se há seleção salva
+    if (savedSelection) {
+      // Restaurar seleção antes de aplicar cor
+      restoreSelection();
+
+      // Aplicar cor usando execCommand com CSS styles habilitado
+      document.execCommand("styleWithCSS", false, "true");
+      document.execCommand("foreColor", false, color);
+
+      // Salvar a nova seleção após aplicar cor
+      saveCurrentSelection();
+
+      handleInput();
     }
 
-    // Restaurar seleção antes de aplicar cor
-    restoreSelection();
-
-    // Aplicar cor usando execCommand com CSS styles habilitado
-    document.execCommand("styleWithCSS", false, "true");
-    document.execCommand("foreColor", false, color);
-
-    // Salvar a nova seleção após aplicar cor
-    saveCurrentSelection();
-
-    handleInput();
+    // Manter foco no editor mas sem interferir no popover
+    setTimeout(() => {
+      if (editorRef.current && !showColorPicker) {
+        editorRef.current.focus();
+      }
+    }, 100);
   };
 
   const handleSecureUploadSuccess = (fileInfo: UploadedFileInfo) => {
@@ -997,24 +1005,47 @@ export default function EnhancedRichTextEditor({
             align="start"
             onEscapeKeyDown={() => setShowColorPicker(false)}
             onPointerDownOutside={(e) => {
-              // Só fechar se clicou fora do popover inteiro
+              // Ser muito específico sobre o que constitui "fora"
               const target = e.target as Element;
-              if (
-                !target.closest(".color-picker-container") &&
-                !target.closest("[data-radix-popper-content-wrapper]") &&
-                !target.closest("[data-radix-popper-content]") &&
-                !target.closest(".react-colorful")
-              ) {
+              const isInsideColorPicker =
+                target.closest(".color-picker-container") ||
+                target.closest("[data-radix-popper-content-wrapper]") ||
+                target.closest("[data-radix-popper-content]") ||
+                target.closest(".react-colorful") ||
+                target.classList.contains('react-colorful') ||
+                target.closest('[role="dialog"]') ||
+                target.closest('[data-state="open"]');
+
+              console.log('PointerDownOutside - isInside:', isInsideColorPicker, 'target:', target);
+
+              if (!isInsideColorPicker) {
                 setShowColorPicker(false);
               }
             }}
             onInteractOutside={(e) => {
-              // Prevenir fechamento ao interagir com o color picker
+              // Bloquear TODOS os eventos de fora quando estamos dentro do color picker
+              const target = e.target as Element;
+              const isInsideColorPicker =
+                target.closest(".color-picker-container") ||
+                target.closest(".react-colorful") ||
+                target.closest("[data-radix-popper-content]") ||
+                target.classList.contains('react-colorful') ||
+                target.closest('[role="dialog"]');
+
+              console.log('InteractOutside - isInside:', isInsideColorPicker, 'target:', target);
+
+              if (isInsideColorPicker) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+              }
+            }}
+            onFocusOutside={(e) => {
+              // Prevenir fechamento por mudança de foco dentro do color picker
               const target = e.target as Element;
               if (
                 target.closest(".color-picker-container") ||
-                target.closest(".react-colorful") ||
-                target.closest("[data-radix-popper-content]")
+                target.closest(".react-colorful")
               ) {
                 e.preventDefault();
               }
@@ -1022,15 +1053,35 @@ export default function EnhancedRichTextEditor({
           >
             <div
               className="color-picker-container"
-              onMouseDown={(e) => e.stopPropagation()}
-              onPointerDown={(e) => e.stopPropagation()}
-              onClick={(e) => e.stopPropagation()}
-              onPointerDown={(e) => e.stopPropagation()}
+              onMouseDown={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+              }}
+              onPointerDown={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+              onTouchStart={(e) => {
+                e.stopPropagation();
+              }}
+              onTouchEnd={(e) => {
+                e.stopPropagation();
+              }}
             >
-              <HexColorPicker
-                color={currentColor}
-                onChange={handleColorChange}
-              />
+              <div
+                onMouseDown={(e) => e.stopPropagation()}
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={(e) => e.stopPropagation()}
+                onTouchStart={(e) => e.stopPropagation()}
+              >
+                <HexColorPicker
+                  color={currentColor}
+                  onChange={handleColorChange}
+                />
+              </div>
               <div className="mt-3 space-y-2">
                 <div className="flex items-center gap-2">
                   <div
