@@ -1005,16 +1005,40 @@ export default function EnhancedRichTextEditor({
             }}
           >
             <div
-              className="sketch-picker"
+              className="color-picker-container"
               onMouseDown={(e) => e.stopPropagation()}
               onPointerDown={(e) => e.stopPropagation()}
             >
-              <SketchPicker
+              <HexColorPicker
                 color={currentColor}
                 onChange={handleColorChange}
-                onChangeComplete={handleColorChange}
-                width="200px"
               />
+              <div className="mt-3 space-y-2">
+                <div className="flex items-center gap-2">
+                  <div
+                    className="w-8 h-8 rounded border border-gray-300 shadow-sm"
+                    style={{ backgroundColor: currentColor }}
+                  />
+                  <input
+                    type="text"
+                    value={currentColor}
+                    onChange={(e) => handleColorChange(e.target.value)}
+                    className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:border-blue-500 focus:outline-none"
+                    placeholder="#000000"
+                  />
+                </div>
+                <div className="flex gap-1 flex-wrap">
+                  {['#000000', '#ffffff', '#ef4444', '#22c55e', '#3b82f6', '#f59e0b', '#8b5cf6', '#ec4899'].map((presetColor) => (
+                    <button
+                      key={presetColor}
+                      onClick={() => handleColorChange(presetColor)}
+                      className="w-6 h-6 rounded border border-gray-300 hover:scale-110 transition-transform"
+                      style={{ backgroundColor: presetColor }}
+                      title={presetColor}
+                    />
+                  ))}
+                </div>
+              </div>
             </div>
           </PopoverContent>
         </Popover>
