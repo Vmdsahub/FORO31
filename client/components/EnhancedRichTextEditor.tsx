@@ -245,10 +245,10 @@ export default function EnhancedRichTextEditor({
     handleInput();
   };
 
-  const handleBold = () => execCommand("bold");
-  const handleItalic = () => execCommand("italic");
-  const handleUnderline = () => execCommand("underline");
-  const handleHeading = () => execCommand("formatBlock", "H3");
+  const handleBold = () => execCommandWithSelection("bold");
+  const handleItalic = () => execCommandWithSelection("italic");
+  const handleUnderline = () => execCommandWithSelection("underline");
+  const handleHeading = () => execCommandWithSelection("formatBlock", "H3");
 
   const handleLink = () => {
     const url = prompt("Digite a URL:");
