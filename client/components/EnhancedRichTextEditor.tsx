@@ -260,31 +260,31 @@ export default function EnhancedRichTextEditor({
   const handleColorChange = (color: any) => {
     setCurrentColor(color.hex);
 
-    // Salvar seleção antes de aplicar cor
-    const selection = window.getSelection();
-    if (selection && selection.rangeCount > 0) {
-      const range = selection.getRangeAt(0);
-      setSavedSelection(range.cloneRange());
+    // Manter foco no editor
+    if (editorRef.current) {
+      editorRef.current.focus();
+    }
 
-      // Aplicar cor diretamente na seleção
-      if (!range.collapsed) {
-        const span = document.createElement('span');
-        span.style.color = color.hex;
-
-        try {
-          range.surroundContents(span);
-        } catch (e) {
-          // Se não conseguir envolver, usar execCommand
-          document.execCommand("foreColor", false, color.hex);
-        }
-      } else {
-        // Se não há seleção, usar execCommand para próximo texto
-        document.execCommand("foreColor", false, color.hex);
+    // Restaurar seleção salva se existir
+    if (savedSelection) {
+      const selection = window.getSelection();
+      if (selection) {
+        selection.removeAllRanges();
+        selection.addRange(savedSelection);
       }
+    }
 
-      // Restaurar seleção
-      selection.removeAllRanges();
-      selection.addRange(range);
+    // Aplicar cor usando execCommand - funciona melhor para manter seleção
+    document.execCommand("styleWithCSS", false, "true");
+    document.execCommand("foreColor", false, color.hex);
+
+    // Manter seleção após aplicar cor
+    if (savedSelection) {
+      const selection = window.getSelection();
+      if (selection) {
+        selection.removeAllRanges();
+        selection.addRange(savedSelection);
+      }
     }
 
     handleInput();
