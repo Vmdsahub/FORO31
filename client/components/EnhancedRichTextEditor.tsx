@@ -1142,6 +1142,31 @@ export default function EnhancedRichTextEditor({
           width: 16px !important;
           height: 16px !important;
         }
+
+        /* Garantir cursor correto em todo o color picker */
+        .color-picker-container,
+        .color-picker-container *,
+        [data-radix-popper-content-wrapper],
+        [data-radix-popper-content-wrapper] *,
+        [data-radix-popper-content],
+        [data-radix-popper-content] * {
+          cursor: default !important;
+        }
+
+        /* Cursor ponteiro apenas para elementos interativos do color picker */
+        .react-colorful__saturation,
+        .react-colorful__hue,
+        .react-colorful__alpha,
+        .react-colorful__pointer,
+        .react-colorful__saturation-pointer,
+        .color-picker-container button,
+        .color-picker-container input {
+          cursor: pointer !important;
+        }
+
+        .color-picker-container input {
+          cursor: text !important;
+        }
         .rich-editor[data-empty="true"]:before {
           content: attr(data-placeholder);
           color: #9ca3af;
