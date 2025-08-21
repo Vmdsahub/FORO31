@@ -346,7 +346,14 @@ export default function EnhancedRichTextEditor({
         e.preventDefault();
         e.stopPropagation();
         if (confirm("Excluir esta imagem?")) {
+          const container = imageWrapper.closest('.image-container');
           imageWrapper.remove();
+
+          // Remove o container se ficar vazio
+          if (container && container.children.length === 0) {
+            container.remove();
+          }
+
           handleInput();
         }
       };
@@ -496,7 +503,7 @@ export default function EnhancedRichTextEditor({
         // Adicionar lixeira para excluir vídeo apenas em modo de edição
         if (isEditMode) {
           const deleteButton = document.createElement("button");
-          deleteButton.innerHTML = "🗑️";
+          deleteButton.innerHTML = "🗑���";
           deleteButton.title = "Excluir vídeo";
           deleteButton.style.cssText =
             "position: absolute; top: -8px; right: -8px; background: red; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer; z-index: 1000; display: flex; align-items: center; justify-content: center; pointer-events: auto;";
