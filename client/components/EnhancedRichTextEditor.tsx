@@ -40,6 +40,7 @@ export default function EnhancedRichTextEditor({
   const [currentColor, setCurrentColor] = useState("#000000");
   const [savedSelection, setSavedSelection] = useState<Range | null>(null);
   const [isInteractingWithColorPicker, setIsInteractingWithColorPicker] = useState(false);
+  const colorPickerTriggerRef = useRef<HTMLButtonElement>(null);
 
   // Função para salvar seleção atual
   const saveCurrentSelection = () => {
@@ -289,15 +290,31 @@ export default function EnhancedRichTextEditor({
   };
 
   const handleColorChange = (color: string) => {
+    console.log('Color change:', color);
     setCurrentColor(color);
 
     // Aplicar cor imediatamente se há seleção salva
     if (savedSelection) {
-      restoreSelection();
+      // NÃO restaurar foco durante mudança de cor
+      const currentSelection = window.getSelection();
+      if (currentSelection) {
+        currentSelection.removeAllRanges();
+        currentSelection.addRange(savedSelection);
+      }
+
       document.execCommand("styleWithCSS", false, "true");
       document.execCommand("foreColor", false, color);
-      saveCurrentSelection();
-      handleInput();
+
+      // Salvar nova seleção sem triggerar eventos
+      const selection = window.getSelection();
+      if (selection && selection.rangeCount > 0) {
+        setSavedSelection(selection.getRangeAt(0).cloneRange());
+      }
+
+      // Evitar chamar handleInput que pode interferir
+      if (editorRef.current) {
+        onChange(editorRef.current.innerHTML);
+      }
     }
   };
 
@@ -973,20 +990,27 @@ export default function EnhancedRichTextEditor({
         <Popover
           open={showColorPicker}
           onOpenChange={(open) => {
-            // Só fechar se não estiver interagindo com o color picker
-            if (!open && !isInteractingWithColorPicker) {
-              setShowColorPicker(false);
+            console.log('Popover onOpenChange:', open, 'isInteracting:', isInteractingWithColorPicker);
+            // NUNCA permitir fechamento automático
+            if (!open) {
+              console.log('Tentativa de fechamento bloqueada');
+              return;
             }
           }}
+          modal={false}
         >
           <PopoverTrigger asChild>
             <Button
+              ref={colorPickerTriggerRef}
               type="button"
               variant="outline"
               size="sm"
               className="h-8 px-2 hover:bg-gray-100"
               title="Cor do texto"
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                console.log('Color picker button clicked');
                 saveCurrentSelection();
                 setShowColorPicker(!showColorPicker);
               }}
@@ -1011,30 +1035,43 @@ export default function EnhancedRichTextEditor({
             className="w-auto p-0"
             side="bottom"
             align="start"
-            onEscapeKeyDown={() => setShowColorPicker(false)}
+            onEscapeKeyDown={(e) => {
+              console.log('ESC pressed - closing color picker');
+              e.preventDefault();
+              closeColorPicker();
+            }}
             onPointerDownOutside={(e) => {
-              // Verificar se o clique foi realmente fora do color picker
               const target = e.target as Element;
               const colorPickerElement = colorPickerRef.current;
+              const triggerElement = colorPickerTriggerRef.current;
 
-              if (colorPickerElement && colorPickerElement.contains(target)) {
-                // Clicou dentro do color picker - NÃO fechar
+              console.log('Pointer down outside detected', {
+                target: target.tagName,
+                isInColorPicker: colorPickerElement?.contains(target),
+                isInTrigger: triggerElement?.contains(target)
+              });
+
+              // NUNCA fechar se clicou dentro do color picker ou trigger
+              if (colorPickerElement?.contains(target) || triggerElement?.contains(target)) {
+                console.log('Click inside - preventing close');
                 e.preventDefault();
+                e.stopPropagation();
                 return;
               }
 
-              // Se chegou aqui, clicou realmente fora
-              setShowColorPicker(false);
+              // Só fechar se clicou realmente fora
+              console.log('Click outside - closing');
+              closeColorPicker();
             }}
             onInteractOutside={(e) => {
-              // Prevenir qualquer interação que feche o popover se estiver dentro
-              const target = e.target as Element;
-              const colorPickerElement = colorPickerRef.current;
-
-              if (colorPickerElement && colorPickerElement.contains(target)) {
-                e.preventDefault();
-                e.stopPropagation();
-              }
+              e.preventDefault();
+              e.stopPropagation();
+              console.log('Interact outside blocked');
+            }}
+            onFocusOutside={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              console.log('Focus outside blocked');
             }}
           >
             <div
