@@ -1077,18 +1077,38 @@ export default function EnhancedRichTextEditor({
             <div
               ref={colorPickerRef}
               className="color-picker-container"
-              onMouseEnter={() => setIsInteractingWithColorPicker(true)}
-              onMouseLeave={() => setIsInteractingWithColorPicker(false)}
               onPointerDown={(e) => {
+                console.log('Color picker container pointer down');
                 e.stopPropagation();
-                setIsInteractingWithColorPicker(true);
+                e.preventDefault();
               }}
-              onPointerUp={() => setIsInteractingWithColorPicker(false)}
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                console.log('Color picker container clicked');
+                e.stopPropagation();
+                e.preventDefault();
+              }}
+              onMouseDown={(e) => {
+                console.log('Color picker container mouse down');
+                e.stopPropagation();
+                e.preventDefault();
+              }}
             >
               <div
-                onPointerDown={(e) => e.stopPropagation()}
-                onClick={(e) => e.stopPropagation()}
+                onPointerDown={(e) => {
+                  console.log('Color picker wrapper pointer down');
+                  e.stopPropagation();
+                  e.preventDefault();
+                }}
+                onClick={(e) => {
+                  console.log('Color picker wrapper clicked');
+                  e.stopPropagation();
+                  e.preventDefault();
+                }}
+                onMouseDown={(e) => {
+                  console.log('Color picker wrapper mouse down');
+                  e.stopPropagation();
+                  e.preventDefault();
+                }}
               >
                 <HexColorPicker
                   color={currentColor}
@@ -1105,13 +1125,25 @@ export default function EnhancedRichTextEditor({
                     type="text"
                     value={currentColor}
                     onChange={(e) => {
+                      console.log('Input change:', e.target.value);
                       e.stopPropagation();
                       handleColorChange(e.target.value);
                     }}
-                    onClick={(e) => e.stopPropagation()}
-                    onPointerDown={(e) => e.stopPropagation()}
-                    onFocus={() => setIsInteractingWithColorPicker(true)}
-                    onBlur={() => setIsInteractingWithColorPicker(false)}
+                    onClick={(e) => {
+                      console.log('Input clicked');
+                      e.stopPropagation();
+                      e.preventDefault();
+                    }}
+                    onPointerDown={(e) => {
+                      console.log('Input pointer down');
+                      e.stopPropagation();
+                      e.preventDefault();
+                    }}
+                    onMouseDown={(e) => {
+                      console.log('Input mouse down');
+                      e.stopPropagation();
+                      e.preventDefault();
+                    }}
                     className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:border-blue-500 focus:outline-none"
                     placeholder="#000000"
                   />
@@ -1130,11 +1162,18 @@ export default function EnhancedRichTextEditor({
                     <button
                       key={presetColor}
                       onClick={(e) => {
+                        console.log('Preset color clicked:', presetColor);
                         e.stopPropagation();
                         e.preventDefault();
                         handleColorChange(presetColor);
                       }}
                       onPointerDown={(e) => {
+                        console.log('Preset color pointer down:', presetColor);
+                        e.stopPropagation();
+                        e.preventDefault();
+                      }}
+                      onMouseDown={(e) => {
+                        console.log('Preset color mouse down:', presetColor);
                         e.stopPropagation();
                         e.preventDefault();
                       }}
