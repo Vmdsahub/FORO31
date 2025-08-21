@@ -1149,7 +1149,7 @@ export default function EnhancedRichTextEditor({
                     onChange={(e) => {
                       handleColorChange(e.target.value);
                     }}
-                    className="flex-1 px-2 py-1 text-xs border border-gray-300 rounded focus:border-blue-500 focus:outline-none"
+                    className="w-20 px-2 py-1 text-xs border border-gray-300 rounded focus:border-blue-500 focus:outline-none"
                     placeholder="#000000"
                   />
                 </div>
