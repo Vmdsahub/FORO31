@@ -347,23 +347,46 @@ export default function EnhancedRichTextEditor({
 
   const handleFontSizeChange = (newSize: string) => {
     setFontSize(newSize);
-    // Aplicar tamanho da fonte ao próximo texto digitado
+
+    // Focus no editor primeiro
+    if (editorRef.current) {
+      editorRef.current.focus();
+    }
+
+    // Aplicar tamanho da fonte usando execCommand para o próximo texto
     document.execCommand("styleWithCSS", false, "true");
-    document.execCommand("fontSize", false, "7"); // Primeiro aplicar um tamanho padrão
-    // Depois sobrescrever com CSS customizado
-    setTimeout(() => {
-      if (editorRef.current) {
-        const selection = window.getSelection();
-        if (selection && selection.rangeCount > 0) {
-          // Focus no editor para garantir que próximo texto tenha o tamanho correto
-          editorRef.current.focus();
-          // Aplicar estilo CSS diretamente para próximo texto
-          document.execCommand("styleWithCSS", false, "true");
-          const fontElement = document.createElement("span");
-          fontElement.style.fontSize = `${newSize}px`;
+
+    // Converter para um valor compatível com execCommand fontSize
+    // execCommand fontSize aceita valores de 1-7, então precisamos usar CSS diretamente
+    const fontSizeMap: { [key: string]: string } = {
+      "10": "1",
+      "12": "2",
+      "14": "3",
+      "16": "4",
+      "18": "5",
+      "20": "6",
+      "24": "7",
+      "28": "7",
+      "32": "7"
+    };
+
+    const execCommandSize = fontSizeMap[newSize] || "4";
+    document.execCommand("fontSize", false, execCommandSize);
+
+    // Para tamanhos maiores que 24px, aplicar CSS diretamente
+    if (parseInt(newSize) > 24) {
+      setTimeout(() => {
+        // Selecionar o último elemento font criado e aplicar CSS customizado
+        const fontElements = editorRef.current?.querySelectorAll("font[size]");
+        if (fontElements && fontElements.length > 0) {
+          const lastFont = fontElements[fontElements.length - 1] as HTMLElement;
+          lastFont.style.fontSize = `${newSize}px`;
+          lastFont.removeAttribute("size");
         }
-      }
-    }, 10);
+      }, 10);
+    }
+
+    handleInput();
   };
 
   const resetColor = () => {
