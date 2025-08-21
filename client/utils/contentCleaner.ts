@@ -73,5 +73,11 @@ export function cleanContentForSaving(content: string): string {
     "$1"
   );
 
+  // Remove delete buttons from video previews while keeping the video structure
+  cleanedContent = cleanedContent.replace(
+    /(<div[^>]*class="video-preview"[^>]*>.*?)<button[^>]*title="Excluir vídeo"[^>]*>🗑️<\/button>(.*?<\/div>)/gs,
+    "$1$2"
+  );
+
   return cleanedContent;
 }
