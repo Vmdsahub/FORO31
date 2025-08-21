@@ -376,6 +376,14 @@ export default function EnhancedRichTextEditor({
       document.execCommand("foreColor", false, color);
       saveCurrentSelection();
       handleInput();
+    } else {
+      // Se não há seleção salva, preparar para próxima digitação
+      const selection = window.getSelection();
+      if (selection && selection.rangeCount > 0) {
+        document.execCommand("styleWithCSS", false, "true");
+        document.execCommand("foreColor", false, color);
+        saveCurrentSelection();
+      }
     }
   };
 
