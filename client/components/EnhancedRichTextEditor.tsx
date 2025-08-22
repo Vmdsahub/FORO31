@@ -1244,14 +1244,7 @@ export default function EnhancedRichTextEditor({
               className="h-8 px-2 hover:bg-gray-100"
               title="Cor do texto"
               onMouseDown={(e) => e.preventDefault()}
-              onClick={(e) => {
-                e.stopPropagation();
-                // Salvar seleção atual antes de abrir o color picker
-                if (editorRef.current && document.activeElement === editorRef.current) {
-                  saveCurrentSelection();
-                }
-                setShowColorPicker(!showColorPicker);
-              }}
+              onClick={handleColorPicker}
             >
               <div className="flex items-center gap-1">
                 <svg
