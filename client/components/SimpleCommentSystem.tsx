@@ -149,36 +149,36 @@ function CommentItem({
           </div>
 
           {/* Conteúdo do coment��rio */}
-          <div className="text-gray-700 mb-8 text-sm leading-relaxed pr-24 pt-6">
-            {isEditing ? (
-              <div className="space-y-3">
-                <EnhancedRichTextEditor
-                  value={editContent}
-                  onChange={setEditContent}
-                  placeholder="Editar comentário..."
-                  isEditMode={true}
-                />
-                <div className="flex items-center gap-2">
-                  <Button
-                    onClick={handleSaveEdit}
-                    size="sm"
-                    className="bg-green-600 hover:bg-green-700"
-                  >
-                    Salvar
-                  </Button>
-                  <Button
-                    onClick={handleCancelEdit}
-                    size="sm"
-                    variant="outline"
-                  >
-                    Cancelar
-                  </Button>
-                </div>
+          {isEditing ? (
+            <div className="mb-8 space-y-3">
+              <EnhancedRichTextEditor
+                value={editContent}
+                onChange={setEditContent}
+                placeholder="Editar comentário..."
+                isEditMode={true}
+              />
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={handleSaveEdit}
+                  size="sm"
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  Salvar
+                </Button>
+                <Button
+                  onClick={handleCancelEdit}
+                  size="sm"
+                  variant="outline"
+                >
+                  Cancelar
+                </Button>
               </div>
-            ) : (
+            </div>
+          ) : (
+            <div className="text-gray-700 mb-8 text-sm leading-relaxed pr-24 pt-6">
               <MarkdownRenderer content={comment.content} />
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Ações no canto inferior direito */}
           <div className="absolute bottom-0 right-4 flex items-center gap-2">
