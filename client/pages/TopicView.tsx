@@ -345,6 +345,7 @@ export default function TopicView() {
                   onChange={(e) => setEditTitle(e.target.value)}
                   className="text-2xl font-bold"
                   placeholder="Título do tópico"
+                  maxLength={80}
                 />
                 <Input
                   value={editDescription}
