@@ -293,7 +293,7 @@ export default function EnhancedRichTextEditor({
             editorRef.current.innerHTML = cleaned;
             onChange(cleaned);
           }
-          // Garantir que não h�� formatação residual se botões estão desativados
+          // Garantir que não há formatação residual se botões estão desativados
           if (
             !isBold &&
             !isItalic &&
@@ -422,7 +422,7 @@ export default function EnhancedRichTextEditor({
     // Add delete buttons when user focuses on editor
     setTimeout(() => {
       addDeleteButtonsToExistingMedia();
-      // Salvar seleção atual
+      // Salvar sele��ão atual
       saveCurrentSelection();
       // Limpar formatação no estado inicial se todos os botões estão desativados
       if (
@@ -556,44 +556,7 @@ export default function EnhancedRichTextEditor({
     }
   };
 
-  const handleEditorClick = (e: React.MouseEvent) => {
-    const editor = editorRef.current;
-    if (!editor) return;
-
-    // Se clicou no final do editor e não há conteúdo editável
-    const rect = editor.getBoundingClientRect();
-    const clickY = e.clientY;
-    const editorBottom = rect.bottom - 20; // 20px margin from bottom
-
-    if (clickY > editorBottom) {
-      // Ensure there's always an editable area at the end
-      const lastChild = editor.lastElementChild;
-      const isLastChildEditable = lastChild?.classList.contains('editable-text-area') ||
-                                 lastChild?.tagName === 'DIV' && !lastChild.classList.contains('image-container');
-
-      if (!isLastChildEditable) {
-        const textDiv = document.createElement("div");
-        textDiv.innerHTML = "<br>";
-        textDiv.style.cssText = "min-height: 1.5em; line-height: 1.5; margin-top: 8px; cursor: text;";
-        textDiv.contentEditable = "true";
-        textDiv.className = "editable-text-area";
-        textDiv.setAttribute("data-placeholder", "Digite aqui...");
-
-        editor.appendChild(textDiv);
-
-        // Focus the new div
-        const selection = window.getSelection();
-        if (selection) {
-          const range = document.createRange();
-          range.setStart(textDiv, 0);
-          range.collapse(true);
-          selection.removeAllRanges();
-          selection.addRange(range);
-          textDiv.focus();
-        }
-      }
-    }
-
+  const handleEditorClick = () => {
     // Salvar seleção atual
     setTimeout(() => {
       saveCurrentSelection();
