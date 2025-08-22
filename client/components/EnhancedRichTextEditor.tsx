@@ -37,7 +37,6 @@ export default function EnhancedRichTextEditor({
   isEditMode = true, // Default to edit mode (creation/editing)
 }: EnhancedRichTextEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
-  const colorPickerRef = useRef<HTMLDivElement>(null);
   const [modalImage, setModalImage] = useState<{
     src: string;
     alt: string;
@@ -46,7 +45,6 @@ export default function EnhancedRichTextEditor({
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [currentColor, setCurrentColor] = useState("#000000");
   const savedSelectionRef = useRef<Range | null>(null);
-  const colorPickerTriggerRef = useRef<HTMLButtonElement>(null);
   const [fontSize, setFontSize] = useState("16");
   const [isBold, setIsBold] = useState(false);
   const [isItalic, setIsItalic] = useState(false);
