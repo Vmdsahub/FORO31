@@ -501,6 +501,12 @@ export default function EnhancedRichTextEditor({
     }, 10);
   };
 
+  // Handler para beforeinput - mais imediato que keydown
+  const handleBeforeInput = () => {
+    // Forçar estado correto ANTES de qualquer input
+    forceButtonStateOnInput();
+  };
+
   const execCommand = (command: string, value?: string) => {
     document.execCommand(command, false, value);
     handleInput();
