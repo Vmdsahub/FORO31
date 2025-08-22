@@ -453,7 +453,7 @@ export default function TopicView() {
                     </button>
                   )}
 
-                  {/* 2. Botão Salvar */}
+                  {/* 3. Botão Salvar */}
                   <button
                     onClick={handleSaveTopic}
                     className={`flex items-center gap-2 transition-colors ${
