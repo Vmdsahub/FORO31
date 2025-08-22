@@ -444,9 +444,8 @@ export default function EnhancedRichTextEditor({
 
   const handleUnderline = () => {
     document.execCommand("underline", false);
+    setIsUnderline(!isUnderline); // Controle manual do estado
     handleInput();
-    // Atualizar estado após comando
-    setTimeout(() => updateFormattingState(), 10);
   };
 
   const handleFontSizeChange = (newSize: string) => {
