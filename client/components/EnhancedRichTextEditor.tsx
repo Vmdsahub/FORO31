@@ -957,38 +957,25 @@ export default function EnhancedRichTextEditor({
     // Insert the container at the end of the editor
     editor.appendChild(imageContainer);
 
-    // Position cursor after the image container and ensure text input is visible
+    // Position cursor after the image container naturally
     setTimeout(() => {
       const selection = window.getSelection();
       if (selection) {
-        // Create a div for text input after the image with better visibility
-        const textDiv = document.createElement("div");
-        textDiv.innerHTML = "<br>"; // Use br for better line break handling
-        textDiv.style.cssText = "min-height: 1.5em; line-height: 1.5; margin-top: 8px; cursor: text;";
-        textDiv.contentEditable = "true";
-        textDiv.className = "editable-text-area";
-
-        // Add placeholder behavior
-        textDiv.setAttribute("data-placeholder", "Digite aqui...");
-
-        editor.appendChild(textDiv);
+        // Simply add a line break for text input
+        const lineBreak = document.createElement("div");
+        lineBreak.innerHTML = "<br>";
+        editor.appendChild(lineBreak);
 
         const range = document.createRange();
-        range.setStart(textDiv, 0);
+        range.setStart(lineBreak, 0);
         range.collapse(true);
         selection.removeAllRanges();
         selection.addRange(range);
-
-        // Focus the text div specifically and make sure it's visible
-        textDiv.focus();
-
-        // Scroll into view if needed
-        textDiv.scrollIntoView({ behavior: "smooth", block: "nearest" });
       }
 
       editor.focus();
       handleInput();
-    }, 100); // Increased timeout for better reliability
+    }, 50);
   };
 
   const insertVideoHtml = (src: string, name: string) => {
@@ -1505,7 +1492,7 @@ export default function EnhancedRichTextEditor({
 
         <div className="w-px h-6 bg-gray-300 mx-1" />
 
-        {/* Secure Upload Widget - único botão de upload */}
+        {/* Secure Upload Widget - único bot��o de upload */}
         <SecureUploadWidget
           onSuccess={handleSecureUploadSuccess}
           onError={handleSecureUploadError}
