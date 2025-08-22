@@ -152,6 +152,33 @@ export default function TopicView() {
     }
   };
 
+  const handleDeleteTopicByAuthor = async () => {
+    if (!user || !topic || user.id !== topic.authorId) return;
+
+    if (!confirm("Tem certeza que você quer apagar este tópico?")) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/topics/${topicId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+        },
+      });
+
+      if (response.ok) {
+        toast.success("Tópico excluído com sucesso!");
+        navigate("/"); // Volta para a página principal
+      } else {
+        toast.error("Erro ao excluir tópico");
+      }
+    } catch (error) {
+      console.error("Error deleting topic:", error);
+      toast.error("Erro ao excluir tópico");
+    }
+  };
+
   const handleSaveTopic = () => {
     if (!user || !topic) {
       toast.error("Faça login para salvar tópicos");
