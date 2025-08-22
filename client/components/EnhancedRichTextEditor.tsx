@@ -214,9 +214,14 @@ export default function EnhancedRichTextEditor({
       // Add delete buttons to any existing media after content loads
       setTimeout(() => {
         addDeleteButtonsToExistingMedia();
+
+        // Limpar formatação inicial se todos os botões estão no estado padrão
+        if (!isBold && !isItalic && !isUnderline && currentColor === "#000000" && fontSize === "16") {
+          clearAllFormatting();
+        }
       }, 100);
     }
-  }, [value, isEditMode]);
+  }, [value, isEditMode, isBold, isItalic, isUnderline, currentColor, fontSize]);
 
   // Configure global functions - conditional based on edit mode
   useEffect(() => {
