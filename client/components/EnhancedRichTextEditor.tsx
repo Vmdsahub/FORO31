@@ -52,8 +52,28 @@ export default function EnhancedRichTextEditor({
   const [isItalic, setIsItalic] = useState(false);
   const [isUnderline, setIsUnderline] = useState(false);
 
-  // Função para detectar estado atual de formatação - REMOVIDA
-  // Os botões agora são controlados manualmente pelo usuário
+  // Função para sincronizar estado do browser com os botões
+  const syncBrowserStateWithButtons = () => {
+    try {
+      // Verifica estado atual do browser
+      const browserBold = document.queryCommandState("bold");
+      const browserItalic = document.queryCommandState("italic");
+      const browserUnderline = document.queryCommandState("underline");
+
+      // Se browser state não corresponde aos botões, corrige
+      if (browserBold !== isBold) {
+        document.execCommand("bold", false);
+      }
+      if (browserItalic !== isItalic) {
+        document.execCommand("italic", false);
+      }
+      if (browserUnderline !== isUnderline) {
+        document.execCommand("underline", false);
+      }
+    } catch (error) {
+      console.warn("Error syncing browser state:", error);
+    }
+  };
 
   // Tamanhos de fonte pré-determinados
   const fontSizes = [
