@@ -570,28 +570,12 @@ export default function EnhancedRichTextEditor({
     }, 10); // Reduzido de 50ms para 10ms para ser mais responsivo
   };
 
+  const handleColorPicker = () => {
+    setShowColorPicker(!showColorPicker);
+  };
+
   const closeColorPicker = () => {
     setShowColorPicker(false);
-    // Restaurar foco no editor e posição do cursor
-    setTimeout(() => {
-      if (editorRef.current) {
-        editorRef.current.focus();
-        // Restaurar seleção salva se existir
-        if (savedSelectionRef.current) {
-          try {
-            const selection = window.getSelection();
-            if (selection) {
-              selection.removeAllRanges();
-              selection.addRange(savedSelectionRef.current);
-              // Salvar novamente após restaurar para manter consistência
-              saveCurrentSelection();
-            }
-          } catch (error) {
-            console.warn("Error restoring selection:", error);
-          }
-        }
-      }
-    }, 50);
   };
 
   const handleSecureUploadSuccess = (fileInfo: UploadedFileInfo) => {
@@ -1705,7 +1689,7 @@ export default function EnhancedRichTextEditor({
               {" "}
               upload ultra-seguro com validação ClamAV-style
             </span>
-            . Upload de mídia é automaticamente inserido no conteúdo.
+            . Upload de mídia �� automaticamente inserido no conteúdo.
             {isEditMode ? (
               <span className="text-orange-600">
                 {" "}
