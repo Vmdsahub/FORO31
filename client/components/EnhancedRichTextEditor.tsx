@@ -50,45 +50,6 @@ export default function EnhancedRichTextEditor({
   const [isItalic, setIsItalic] = useState(false);
   const [isUnderline, setIsUnderline] = useState(false);
 
-  // Função simplificada para sincronizar estado do browser com os botões
-  const syncBrowserStateWithButtons = () => {
-    try {
-      const selection = window.getSelection();
-      if (!selection || !editorRef.current) return;
-
-      // Salvar posição atual
-      const currentRange = selection.rangeCount > 0 ? selection.getRangeAt(0).cloneRange() : null;
-
-      // Aplicar estado dos botões diretamente sem condições complexas
-      if (isBold) {
-        document.execCommand("bold", false);
-      }
-      if (isItalic) {
-        document.execCommand("italic", false);
-      }
-      if (isUnderline) {
-        document.execCommand("underline", false);
-      }
-
-      // Aplicar cor atual
-      if (currentColor && currentColor !== "#000000") {
-        document.execCommand("styleWithCSS", false, "true");
-        document.execCommand("foreColor", false, currentColor);
-      }
-
-      // Restaurar posição do cursor
-      if (currentRange && selection) {
-        try {
-          selection.removeAllRanges();
-          selection.addRange(currentRange);
-        } catch (error) {
-          console.warn("Error restoring cursor:", error);
-        }
-      }
-    } catch (error) {
-      console.warn("Error syncing browser state:", error);
-    }
-  };
 
   // Tamanhos de fonte pré-determinados
   const fontSizes = [
@@ -1359,6 +1320,10 @@ export default function EnhancedRichTextEditor({
         onKeyUp={handleEditorKeyUp}
         onKeyDown={handleEditorKeyDown}
         onBeforeInput={handleBeforeInput}
+        onPaste={(e) => {
+          // Aplicar formatação após colar
+          setTimeout(() => applyAllFormatting(), 10);
+        }}
         className="w-full p-4 min-h-[200px] focus:outline-none bg-white rich-editor"
         style={{
           lineHeight: "1.4", // Reduzido de 1.7 para 1.4
