@@ -102,7 +102,7 @@ export default function EnhancedRichTextEditor({
     { value: "20", label: "20px" },
   ];
 
-  // Fun��ão para salvar seleção atual
+  // Função para salvar seleção atual
   const saveCurrentSelection = () => {
     try {
       const selection = window.getSelection();
@@ -120,12 +120,24 @@ export default function EnhancedRichTextEditor({
 
   // Função para restaurar seleção salva
   const restoreSelection = () => {
-    if (savedSelectionRef.current) {
-      const selection = window.getSelection();
-      if (selection) {
-        selection.removeAllRanges();
-        selection.addRange(savedSelectionRef.current);
+    try {
+      if (savedSelectionRef.current) {
+        const selection = window.getSelection();
+        if (selection) {
+          selection.removeAllRanges();
+          // Verificar se a seleção salva ainda é válida
+          if (savedSelectionRef.current.startContainer.isConnected) {
+            selection.addRange(savedSelectionRef.current);
+          } else {
+            // Se a seleção não é mais válida, limpar
+            savedSelectionRef.current = null;
+          }
+        }
       }
+    } catch (error) {
+      console.warn("Error restoring selection:", error);
+      // Limpar seleção inválida
+      savedSelectionRef.current = null;
     }
   };
 
@@ -438,7 +450,7 @@ export default function EnhancedRichTextEditor({
   };
 
   const handleEditorKeyUp = (e: React.KeyboardEvent) => {
-    // Salvar seleç��o após navegação com teclado
+    // Salvar seleção após navegação com teclado
     setTimeout(() => {
       saveCurrentSelection();
       // Se foi uma tecla de caractere, aplicar cor e tamanho
