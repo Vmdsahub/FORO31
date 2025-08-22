@@ -56,35 +56,33 @@ export default function EnhancedRichTextEditor({
   const syncBrowserStateWithButtons = () => {
     try {
       const selection = window.getSelection();
-      // Só sincronizar se não há seleção ativa (para não interferir com seleções do usuário)
-      if (!selection || selection.isCollapsed) {
-        // Verifica estado atual do browser
-        const browserBold = document.queryCommandState("bold");
-        const browserItalic = document.queryCommandState("italic");
-        const browserUnderline = document.queryCommandState("underline");
 
-        // Salvar posição atual antes de fazer mudanças
-        const currentRange = selection && selection.rangeCount > 0 ? selection.getRangeAt(0).cloneRange() : null;
+      // Verifica estado atual do browser
+      const browserBold = document.queryCommandState("bold");
+      const browserItalic = document.queryCommandState("italic");
+      const browserUnderline = document.queryCommandState("underline");
 
-        // Se browser state não corresponde aos botões, corrige
-        if (browserBold !== isBold) {
-          document.execCommand("bold", false);
-        }
-        if (browserItalic !== isItalic) {
-          document.execCommand("italic", false);
-        }
-        if (browserUnderline !== isUnderline) {
-          document.execCommand("underline", false);
-        }
+      // Salvar posição atual antes de fazer mudanças
+      const currentRange = selection && selection.rangeCount > 0 ? selection.getRangeAt(0).cloneRange() : null;
 
-        // Restaurar posição do cursor após mudanças
-        if (currentRange && selection) {
-          try {
-            selection.removeAllRanges();
-            selection.addRange(currentRange);
-          } catch (error) {
-            console.warn("Error restoring cursor position:", error);
-          }
+      // Se browser state não corresponde aos botões, corrige SEMPRE
+      if (browserBold !== isBold) {
+        document.execCommand("bold", false);
+      }
+      if (browserItalic !== isItalic) {
+        document.execCommand("italic", false);
+      }
+      if (browserUnderline !== isUnderline) {
+        document.execCommand("underline", false);
+      }
+
+      // Restaurar posição do cursor após mudanças
+      if (currentRange && selection) {
+        try {
+          selection.removeAllRanges();
+          selection.addRange(currentRange);
+        } catch (error) {
+          console.warn("Error restoring cursor position:", error);
         }
       }
     } catch (error) {
