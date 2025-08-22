@@ -375,45 +375,35 @@ export default function EnhancedRichTextEditor({
     }
   };
 
-  // Aplicar cor atual quando necessário
-  const applyCurrentColor = () => {
-    if (currentColor && currentColor !== "#000000") {
-      document.execCommand("styleWithCSS", false, "true");
-      document.execCommand("foreColor", false, currentColor);
+  // Aplicar tamanho da fonte
+  const applyFontSize = (size: string) => {
+    document.execCommand("styleWithCSS", false, "true");
+
+    // Converter tamanho para um valor válido de execCommand (1-7)
+    let sizeValue = "3"; // padrão médio
+
+    switch (size) {
+      case "10":
+        sizeValue = "1";
+        break;
+      case "12":
+        sizeValue = "2";
+        break;
+      case "14":
+        sizeValue = "3";
+        break;
+      case "16":
+        sizeValue = "4";
+        break;
+      case "18":
+        sizeValue = "5";
+        break;
+      case "20":
+        sizeValue = "6";
+        break;
     }
-  };
 
-  // Aplicar tamanho da fonte atual quando necessário
-  const applyCurrentFontSize = () => {
-    if (fontSize && fontSize !== "16") {
-      document.execCommand("styleWithCSS", false, "true");
-
-      // Converter tamanho para um valor válido de execCommand (1-7)
-      let sizeValue = "3"; // padrão médio
-
-      switch (fontSize) {
-        case "10":
-          sizeValue = "1";
-          break;
-        case "12":
-          sizeValue = "2";
-          break;
-        case "14":
-          sizeValue = "3";
-          break;
-        case "16":
-          sizeValue = "4";
-          break;
-        case "18":
-          sizeValue = "5";
-          break;
-        case "20":
-          sizeValue = "6";
-          break;
-      }
-
-      document.execCommand("fontSize", false, sizeValue);
-    }
+    document.execCommand("fontSize", false, sizeValue);
   };
 
   const handleEditorFocus = () => {
@@ -429,14 +419,14 @@ export default function EnhancedRichTextEditor({
   const handleEditorKeyDown = (e: React.KeyboardEvent) => {
     // Para teclas que inserem texto, aplicar formatação imediatamente
     if (e.key.length === 1 || e.key === 'Enter' || e.key === ' ') {
-      applyFormattingBeforeInput();
+      applyAllFormatting();
     }
   };
 
-  // Função para aplicar formatação antes do input
-  const applyFormattingBeforeInput = () => {
+  // Função para aplicar toda a formatação atual
+  const applyAllFormatting = () => {
     try {
-      // Aplicar formatações ativas
+      // Aplicar formatações básicas apenas se ativas
       if (isBold && !document.queryCommandState("bold")) {
         document.execCommand("bold", false);
       }
@@ -447,10 +437,15 @@ export default function EnhancedRichTextEditor({
         document.execCommand("underline", false);
       }
 
-      // Aplicar cor atual
+      // Aplicar cor se diferente do padrão
       if (currentColor && currentColor !== "#000000") {
         document.execCommand("styleWithCSS", false, "true");
         document.execCommand("foreColor", false, currentColor);
+      }
+
+      // Aplicar tamanho da fonte se diferente do padrão
+      if (fontSize && fontSize !== "16") {
+        applyFontSize(fontSize);
       }
     } catch (error) {
       console.warn("Error applying formatting:", error);
@@ -474,7 +469,7 @@ export default function EnhancedRichTextEditor({
   // Handler para beforeinput - mais imediato que keydown
   const handleBeforeInput = (e: React.FormEvent) => {
     // Aplicar formatação antes de qualquer input
-    applyFormattingBeforeInput();
+    applyAllFormatting();
   };
 
   const execCommand = (command: string, value?: string) => {
@@ -526,10 +521,20 @@ export default function EnhancedRichTextEditor({
   const handleFontSizeChange = (newSize: string) => {
     setFontSize(newSize);
 
-    // Focus no editor
+    // Restaurar seleção se existe
+    if (savedSelectionRef.current) {
+      restoreSelection();
+    }
+
+    // Aplicar tamanho imediatamente
+    applyFontSize(newSize);
+
+    // Focar de volta no editor
     if (editorRef.current) {
       editorRef.current.focus();
     }
+
+    handleInput();
   };
 
   const resetColor = () => {
