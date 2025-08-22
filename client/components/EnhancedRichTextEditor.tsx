@@ -444,10 +444,35 @@ export default function EnhancedRichTextEditor({
   const handleEditorKeyDown = (e: React.KeyboardEvent) => {
     // Para teclas que inserem texto, garantir que cor e tamanho estão aplicados
     if (e.key.length === 1) {
+      // FORÇAR estado dos botões IMEDIATAMENTE antes da digitação
       setTimeout(() => {
+        forceButtonStateOnInput();
         applyCurrentColor();
         applyCurrentFontSize();
       }, 0);
+    }
+  };
+
+  // Função para forçar estado dos botões no momento da digitação
+  const forceButtonStateOnInput = () => {
+    try {
+      // Verificar estado atual do browser
+      const browserBold = document.queryCommandState("bold");
+      const browserItalic = document.queryCommandState("italic");
+      const browserUnderline = document.queryCommandState("underline");
+
+      // FORÇAR correspondência com os botões (sem preservar seleção)
+      if (browserBold !== isBold) {
+        document.execCommand("bold", false);
+      }
+      if (browserItalic !== isItalic) {
+        document.execCommand("italic", false);
+      }
+      if (browserUnderline !== isUnderline) {
+        document.execCommand("underline", false);
+      }
+    } catch (error) {
+      console.warn("Error forcing button state:", error);
     }
   };
 
