@@ -1261,7 +1261,7 @@ export default function EnhancedRichTextEditor({
   };
 
   return (
-    <div className="border border-gray-200 rounded-lg bg-white">
+    <div className={`border border-gray-200 rounded-lg bg-white ${isEditMode ? 'w-full' : ''}`}>
       {/* Toolbar */}
       <div className="flex items-center gap-2 p-3 border-b border-gray-200 bg-gray-50 flex-wrap">
         <Button
@@ -1773,7 +1773,7 @@ export default function EnhancedRichTextEditor({
               {" "}
               upload ultra-seguro com validação ClamAV-style
             </span>
-            . Upload de mídia é automaticamente inserido no conteúdo.
+            . Upload de mídia �� automaticamente inserido no conteúdo.
             {isEditMode ? (
               <span className="text-orange-600">
                 {" "}
