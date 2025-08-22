@@ -273,10 +273,10 @@ export default function CreateTopicModal({
               onChange={(e) => handleInputChange("title", e.target.value)}
               className="border-gray-300 focus:border-gray-500 focus:ring-gray-500 bg-white"
               required
-              maxLength={100}
+              maxLength={80}
             />
             <p className="text-xs text-gray-500">
-              {formData.title.length}/100 caracteres
+              {formData.title.length}/80 caracteres
             </p>
           </div>
 
