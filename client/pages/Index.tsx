@@ -303,7 +303,7 @@ export default function Index(props: IndexProps) {
 
       if (response.ok) {
         toast.success("Artigo criado com sucesso!");
-        setNewNewsletter({ title: "", content: "", readTime: "" });
+        setNewNewsletter({ title: "", content: "" });
         setIsNewsletterModalOpen(false);
         // Refresh newsletters
         if (onNewsletterRefresh) {
@@ -571,7 +571,7 @@ export default function Index(props: IndexProps) {
                   title={
                     user?.name === "Vitoca"
                       ? "Avançar para semanas mais recentes (Admin)"
-                      : "Avançar de volta até a semana atual"
+                      : "Avançar de volta at�� a semana atual"
                   }
                 >
                   <svg
