@@ -37,7 +37,6 @@ export default function EnhancedRichTextEditor({
   isEditMode = true, // Default to edit mode (creation/editing)
 }: EnhancedRichTextEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
-  const colorPickerRef = useRef<HTMLDivElement>(null);
   const [modalImage, setModalImage] = useState<{
     src: string;
     alt: string;
@@ -46,25 +45,66 @@ export default function EnhancedRichTextEditor({
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [currentColor, setCurrentColor] = useState("#000000");
   const savedSelectionRef = useRef<Range | null>(null);
-  const colorPickerTriggerRef = useRef<HTMLButtonElement>(null);
   const [fontSize, setFontSize] = useState("16");
   const [isBold, setIsBold] = useState(false);
   const [isItalic, setIsItalic] = useState(false);
   const [isUnderline, setIsUnderline] = useState(false);
 
-  // Função para detectar estado atual de formatação
-  const updateFormattingState = () => {
+  // Função para sincronizar estado do browser com os botões
+  const syncBrowserStateWithButtons = () => {
     try {
-      const isBoldActive = document.queryCommandState("bold");
-      const isItalicActive = document.queryCommandState("italic");
-      const isUnderlineActive = document.queryCommandState("underline");
+      const selection = window.getSelection();
 
-      setIsBold(isBoldActive);
-      setIsItalic(isItalicActive);
-      setIsUnderline(isUnderlineActive);
+      // Verifica estado atual do browser
+      const browserBold = document.queryCommandState("bold");
+      const browserItalic = document.queryCommandState("italic");
+      const browserUnderline = document.queryCommandState("underline");
+
+      // Salvar posição atual antes de fazer mudanças
+      const currentRange =
+        selection && selection.rangeCount > 0
+          ? selection.getRangeAt(0).cloneRange()
+          : null;
+
+      // Verificar se é apenas cursor (sem seleção) ou se há texto selecionado
+      const isJustCursor = !selection || selection.isCollapsed;
+
+      if (isJustCursor) {
+        // CURSOR: Forçar correspondência total com botões
+        if (browserBold !== isBold) {
+          document.execCommand("bold", false);
+        }
+        if (browserItalic !== isItalic) {
+          document.execCommand("italic", false);
+        }
+        if (browserUnderline !== isUnderline) {
+          document.execCommand("underline", false);
+        }
+      } else {
+        // SELEÇÃO: Apenas aplicar formatação quando botão ativo + browser sem formatação
+        // (preservar formatação existente em seleções)
+        if (isBold && !browserBold) {
+          document.execCommand("bold", false);
+        }
+        if (isItalic && !browserItalic) {
+          document.execCommand("italic", false);
+        }
+        if (isUnderline && !browserUnderline) {
+          document.execCommand("underline", false);
+        }
+      }
+
+      // Restaurar posição do cursor após mudanças
+      if (currentRange && selection) {
+        try {
+          selection.removeAllRanges();
+          selection.addRange(currentRange);
+        } catch (error) {
+          console.warn("Error restoring cursor position:", error);
+        }
+      }
     } catch (error) {
-      // Fallback se queryCommandState falhar
-      console.warn("Error detecting formatting state:", error);
+      console.warn("Error syncing browser state:", error);
     }
   };
 
@@ -80,20 +120,43 @@ export default function EnhancedRichTextEditor({
 
   // Função para salvar seleção atual
   const saveCurrentSelection = () => {
-    const selection = window.getSelection();
-    if (selection && selection.rangeCount > 0) {
-      savedSelectionRef.current = selection.getRangeAt(0).cloneRange();
+    try {
+      const selection = window.getSelection();
+      if (selection && selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        // Verificar se a seleção está dentro do editor
+        if (
+          editorRef.current &&
+          editorRef.current.contains(range.commonAncestorContainer)
+        ) {
+          savedSelectionRef.current = range.cloneRange();
+        }
+      }
+    } catch (error) {
+      console.warn("Error saving selection:", error);
     }
   };
 
   // Função para restaurar seleção salva
   const restoreSelection = () => {
-    if (savedSelectionRef.current) {
-      const selection = window.getSelection();
-      if (selection) {
-        selection.removeAllRanges();
-        selection.addRange(savedSelectionRef.current);
+    try {
+      if (savedSelectionRef.current) {
+        const selection = window.getSelection();
+        if (selection) {
+          selection.removeAllRanges();
+          // Verificar se a seleção salva ainda é válida
+          if (savedSelectionRef.current.startContainer.isConnected) {
+            selection.addRange(savedSelectionRef.current);
+          } else {
+            // Se a seleção não é mais válida, limpar
+            savedSelectionRef.current = null;
+          }
+        }
       }
+    } catch (error) {
+      console.warn("Error restoring selection:", error);
+      // Limpar seleção inválida
+      savedSelectionRef.current = null;
     }
   };
 
@@ -327,8 +390,6 @@ export default function EnhancedRichTextEditor({
       const rawContent = editorRef.current.innerHTML;
       const cleanedContent = cleanHTML(rawContent);
       onChange(cleanedContent);
-      // Atualizar estado dos botões após mudança no conteúdo
-      setTimeout(() => updateFormattingState(), 10);
     }
   };
 
@@ -380,8 +441,8 @@ export default function EnhancedRichTextEditor({
       // Aplicar cor e tamanho atuais quando focar no editor
       applyCurrentColor();
       applyCurrentFontSize();
-      // Atualizar estado dos botões de formatação
-      updateFormattingState();
+      // Sincronizar estado do browser com os botões
+      syncBrowserStateWithButtons();
     }, 50);
   };
 
@@ -389,10 +450,35 @@ export default function EnhancedRichTextEditor({
   const handleEditorKeyDown = (e: React.KeyboardEvent) => {
     // Para teclas que inserem texto, garantir que cor e tamanho estão aplicados
     if (e.key.length === 1) {
+      // FORÇAR estado dos botões IMEDIATAMENTE antes da digitação
       setTimeout(() => {
+        forceButtonStateOnInput();
         applyCurrentColor();
         applyCurrentFontSize();
       }, 0);
+    }
+  };
+
+  // Função para forçar estado dos botões no momento da digitação
+  const forceButtonStateOnInput = () => {
+    try {
+      // Verificar estado atual do browser
+      const browserBold = document.queryCommandState("bold");
+      const browserItalic = document.queryCommandState("italic");
+      const browserUnderline = document.queryCommandState("underline");
+
+      // FORÇAR correspondência com os botões (sem preservar seleção)
+      if (browserBold !== isBold) {
+        document.execCommand("bold", false);
+      }
+      if (browserItalic !== isItalic) {
+        document.execCommand("italic", false);
+      }
+      if (browserUnderline !== isUnderline) {
+        document.execCommand("underline", false);
+      }
+    } catch (error) {
+      console.warn("Error forcing button state:", error);
     }
   };
 
@@ -402,8 +488,8 @@ export default function EnhancedRichTextEditor({
       saveCurrentSelection();
       applyCurrentColor();
       applyCurrentFontSize();
-      // Atualizar estado dos botões de formatação
-      updateFormattingState();
+      // Sincronizar estado do browser com os botões
+      syncBrowserStateWithButtons();
     }, 10);
   };
 
@@ -411,14 +497,20 @@ export default function EnhancedRichTextEditor({
     // Salvar seleção após navegação com teclado
     setTimeout(() => {
       saveCurrentSelection();
-      // Atualizar estado dos botões sempre após keyUp
-      updateFormattingState();
       // Se foi uma tecla de caractere, aplicar cor e tamanho
       if (e.key.length === 1) {
         applyCurrentColor();
         applyCurrentFontSize();
       }
+      // Sempre sincronizar estado do browser com os botões
+      syncBrowserStateWithButtons();
     }, 10);
+  };
+
+  // Handler para beforeinput - mais imediato que keydown
+  const handleBeforeInput = () => {
+    // Forçar estado correto ANTES de qualquer input
+    forceButtonStateOnInput();
   };
 
   const execCommand = (command: string, value?: string) => {
@@ -451,23 +543,20 @@ export default function EnhancedRichTextEditor({
 
   const handleBold = () => {
     document.execCommand("bold", false);
+    setIsBold(!isBold); // Controle manual do estado
     handleInput();
-    // Atualizar estado após comando
-    setTimeout(() => updateFormattingState(), 10);
   };
 
   const handleItalic = () => {
     document.execCommand("italic", false);
+    setIsItalic(!isItalic); // Controle manual do estado
     handleInput();
-    // Atualizar estado após comando
-    setTimeout(() => updateFormattingState(), 10);
   };
 
   const handleUnderline = () => {
     document.execCommand("underline", false);
+    setIsUnderline(!isUnderline); // Controle manual do estado
     handleInput();
-    // Atualizar estado após comando
-    setTimeout(() => updateFormattingState(), 10);
   };
 
   const handleFontSizeChange = (newSize: string) => {
@@ -481,19 +570,9 @@ export default function EnhancedRichTextEditor({
 
   const resetColor = () => {
     setCurrentColor("#000000");
-    if (savedSelectionRef.current) {
-      restoreSelection();
-      document.execCommand("styleWithCSS", false, "true");
-      document.execCommand("foreColor", false, "#000000");
-      saveCurrentSelection();
-      handleInput();
-    }
-    setTimeout(() => {
-      if (editorRef.current) {
-        editorRef.current.focus();
-        applyCurrentColor();
-      }
-    }, 50);
+    document.execCommand("styleWithCSS", false, "true");
+    document.execCommand("foreColor", false, "#000000");
+    handleInput();
   };
 
   const handleLink = () => {
@@ -505,33 +584,18 @@ export default function EnhancedRichTextEditor({
 
   const handleColorChange = (color: string) => {
     setCurrentColor(color);
+    // Aplicar cor diretamente como outros comandos
+    document.execCommand("styleWithCSS", false, "true");
+    document.execCommand("foreColor", false, color);
+    handleInput();
+  };
 
-    // Aplicar cor imediatamente se há seleção salva
-    if (savedSelectionRef.current) {
-      restoreSelection();
-      document.execCommand("styleWithCSS", false, "true");
-      document.execCommand("foreColor", false, color);
-      saveCurrentSelection();
-      handleInput();
-    }
-
-    // Garantir que a próxima digitação use esta cor
-    setTimeout(() => {
-      if (editorRef.current) {
-        editorRef.current.focus();
-        applyCurrentColor();
-      }
-    }, 50);
+  const handleColorPicker = () => {
+    setShowColorPicker(!showColorPicker);
   };
 
   const closeColorPicker = () => {
     setShowColorPicker(false);
-    // Restaurar foco no editor
-    setTimeout(() => {
-      if (editorRef.current) {
-        editorRef.current.focus();
-      }
-    }, 50);
   };
 
   const handleSecureUploadSuccess = (fileInfo: UploadedFileInfo) => {
@@ -1203,28 +1267,18 @@ export default function EnhancedRichTextEditor({
         {/* Color Picker */}
         <Popover
           open={showColorPicker}
-          onOpenChange={(open) => {
-            // Controle manual - só fecha via closeColorPicker()
-            if (!open) {
-              return; // Bloquear fechamento automático
-            }
-          }}
+          onOpenChange={setShowColorPicker}
           modal={false}
         >
           <PopoverTrigger asChild>
             <Button
-              ref={colorPickerTriggerRef}
               type="button"
               variant="outline"
               size="sm"
               className="h-8 px-2 hover:bg-gray-100"
               title="Cor do texto"
               onMouseDown={(e) => e.preventDefault()}
-              onClick={(e) => {
-                e.stopPropagation();
-                saveCurrentSelection();
-                setShowColorPicker(!showColorPicker);
-              }}
+              onClick={handleColorPicker}
             >
               <div className="flex items-center gap-1">
                 <svg
@@ -1246,37 +1300,12 @@ export default function EnhancedRichTextEditor({
             className="w-auto p-0"
             side="bottom"
             align="start"
-            onEscapeKeyDown={(e) => {
-              e.preventDefault();
-              closeColorPicker();
-            }}
-            onPointerDownOutside={(e) => {
-              const target = e.target as Element;
-              const colorPickerElement = colorPickerRef.current;
-              const triggerElement = colorPickerTriggerRef.current;
-
-              // Não fechar se clicou dentro do color picker, trigger, ou elementos react-colorful
-              if (
-                colorPickerElement?.contains(target) ||
-                triggerElement?.contains(target) ||
-                target.closest(".react-colorful") ||
-                target.closest("[data-radix-popper-content]")
-              ) {
-                e.preventDefault();
-                return;
-              }
-
-              // Só fechar se clicou realmente fora
-              closeColorPicker();
-            }}
-            onInteractOutside={(e) => {
-              e.preventDefault();
-            }}
-            onFocusOutside={(e) => {
-              e.preventDefault();
-            }}
+            onEscapeKeyDown={closeColorPicker}
+            onPointerDownOutside={closeColorPicker}
+            onInteractOutside={closeColorPicker}
+            onFocusOutside={closeColorPicker}
           >
-            <div ref={colorPickerRef} className="color-picker-container">
+            <div className="color-picker-container">
               <HexColorPicker
                 color={currentColor}
                 onChange={handleColorChange}
@@ -1345,6 +1374,7 @@ export default function EnhancedRichTextEditor({
         onClick={handleEditorClick}
         onKeyUp={handleEditorKeyUp}
         onKeyDown={handleEditorKeyDown}
+        onBeforeInput={handleBeforeInput}
         className="w-full p-4 min-h-[200px] focus:outline-none bg-white rich-editor"
         style={{
           lineHeight: "1.4", // Reduzido de 1.7 para 1.4
