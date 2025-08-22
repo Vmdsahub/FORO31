@@ -1368,6 +1368,7 @@ export default function EnhancedRichTextEditor({
         onClick={handleEditorClick}
         onKeyUp={handleEditorKeyUp}
         onKeyDown={handleEditorKeyDown}
+        onBeforeInput={handleBeforeInput}
         className="w-full p-4 min-h-[200px] focus:outline-none bg-white rich-editor"
         style={{
           lineHeight: "1.4", // Reduzido de 1.7 para 1.4
