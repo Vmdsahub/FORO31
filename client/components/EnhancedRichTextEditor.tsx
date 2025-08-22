@@ -1258,31 +1258,9 @@ export default function EnhancedRichTextEditor({
               e.preventDefault();
               closeColorPicker();
             }}
-            onPointerDownOutside={(e) => {
-              const target = e.target as Element;
-              const colorPickerElement = colorPickerRef.current;
-              const triggerElement = colorPickerTriggerRef.current;
-
-              // Não fechar se clicou dentro do color picker, trigger, ou elementos react-colorful
-              if (
-                colorPickerElement?.contains(target) ||
-                triggerElement?.contains(target) ||
-                target.closest(".react-colorful") ||
-                target.closest("[data-radix-popper-content]")
-              ) {
-                e.preventDefault();
-                return;
-              }
-
-              // Só fechar se clicou realmente fora
-              closeColorPicker();
-            }}
-            onInteractOutside={(e) => {
-              e.preventDefault();
-            }}
-            onFocusOutside={(e) => {
-              e.preventDefault();
-            }}
+            onPointerDownOutside={closeColorPicker}
+            onInteractOutside={closeColorPicker}
+            onFocusOutside={closeColorPicker}
           >
             <div ref={colorPickerRef} className="color-picker-container">
               <HexColorPicker
