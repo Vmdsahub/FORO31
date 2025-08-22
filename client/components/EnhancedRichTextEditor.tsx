@@ -422,7 +422,7 @@ export default function EnhancedRichTextEditor({
     // Add delete buttons when user focuses on editor
     setTimeout(() => {
       addDeleteButtonsToExistingMedia();
-      // Salvar seleção atual
+      // Salvar sele��ão atual
       saveCurrentSelection();
       // Limpar formatação no estado inicial se todos os botões estão desativados
       if (
@@ -446,25 +446,38 @@ export default function EnhancedRichTextEditor({
       const selection = window.getSelection();
       if (!selection || !editorRef.current) return;
 
-      if (e.altKey) {
-        // Alt+Enter: Inserir <br> (quebra de linha simples)
-        document.execCommand("insertHTML", false, "<br>");
-      } else {
-        // Enter normal: Criar nova linha
-        // Verificar se estamos no final de uma linha
+      try {
         const range = selection.getRangeAt(0);
-        const currentNode = range.startContainer;
 
-        // Se estamos em uma div ou no final, criar nova div
-        if (
-          currentNode.nodeType === Node.TEXT_NODE &&
-          currentNode.textContent?.trim() === ""
-        ) {
-          document.execCommand("insertHTML", false, "<div><br></div>");
-        } else {
-          // Caso contrário, inserir quebra de linha simples
+        if (e.altKey) {
+          // Alt+Enter: Sempre inserir <br> (quebra de linha simples)
           document.execCommand("insertHTML", false, "<br>");
+        } else {
+          // Enter normal: Detectar contexto e inserir quebra apropriada
+          const currentNode = range.startContainer;
+          const editor = editorRef.current;
+
+          // Verificar se estamos no final do editor ou em linha vazia
+          const isAtEnd =
+            range.endOffset === (currentNode.textContent?.length || 0);
+          const isInEmptyDiv =
+            currentNode.parentElement?.tagName === "DIV" &&
+            currentNode.parentElement?.textContent?.trim() === "";
+          const isEmptyEditor = editor.textContent?.trim() === "";
+
+          // Se estamos no final do conteúdo, após uma imagem/vídeo, ou em div vazia
+          if (isAtEnd || isInEmptyDiv || isEmptyEditor) {
+            // Inserir div com br para criar linha em branco
+            document.execCommand("insertHTML", false, "<div><br></div>");
+          } else {
+            // No meio do texto, inserir apenas br
+            document.execCommand("insertHTML", false, "<br>");
+          }
         }
+      } catch (error) {
+        console.warn("Error handling Enter key:", error);
+        // Fallback: sempre inserir br
+        document.execCommand("insertHTML", false, "<br>");
       }
 
       handleInput();
@@ -523,7 +536,7 @@ export default function EnhancedRichTextEditor({
         document.execCommand("italic", false); // Remove itálico
       }
 
-      // Aplicar/remover sublinhado conforme estado do botão
+      // Aplicar/remover sublinhado conforme estado do bot��o
       if (isUnderline && !browserUnderline) {
         document.execCommand("underline", false);
       } else if (!isUnderline && browserUnderline) {
@@ -897,29 +910,25 @@ export default function EnhancedRichTextEditor({
     // Insert the container at the end of the editor
     editor.appendChild(imageContainer);
 
-    // Position cursor after the image container and ensure text input is visible
+    // Position cursor after the image container naturally
     setTimeout(() => {
       const selection = window.getSelection();
       if (selection) {
-        // Create a div for text input after the image
-        const textDiv = document.createElement("div");
-        textDiv.innerHTML = "&nbsp;"; // Use non-breaking space instead of <br>
-        textDiv.style.minHeight = "1.2em"; // Ensure minimum height for text
-        editor.appendChild(textDiv);
+        // Simply add a line break for text input
+        const lineBreak = document.createElement("div");
+        lineBreak.innerHTML = "<br>";
+        editor.appendChild(lineBreak);
 
         const range = document.createRange();
-        range.setStart(textDiv, 0);
+        range.setStart(lineBreak, 0);
         range.collapse(true);
         selection.removeAllRanges();
         selection.addRange(range);
-
-        // Focus the text div specifically
-        textDiv.focus();
       }
 
       editor.focus();
       handleInput();
-    }, 50); // Increased timeout for better reliability
+    }, 50);
   };
 
   const insertVideoHtml = (src: string, name: string) => {
@@ -1173,30 +1182,25 @@ export default function EnhancedRichTextEditor({
 
     // No need for global video setup in edit mode
 
-    // Position cursor after the media container and ensure text input is visible
+    // Position cursor after the media container naturally
     setTimeout(() => {
       const selection = window.getSelection();
       if (selection) {
-        // Create a div for text input after the media
-        const textDiv = document.createElement("div");
-        textDiv.innerHTML = "&nbsp;"; // Use non-breaking space instead of <br>
-        textDiv.style.minHeight = "1.2em"; // Ensure minimum height for text
-        textDiv.contentEditable = "true"; // Make sure it's editable
-        editor.appendChild(textDiv);
+        // Simply add a line break for text input
+        const lineBreak = document.createElement("div");
+        lineBreak.innerHTML = "<br>";
+        editor.appendChild(lineBreak);
 
         const range = document.createRange();
-        range.setStart(textDiv, 0);
+        range.setStart(lineBreak, 0);
         range.collapse(true);
         selection.removeAllRanges();
         selection.addRange(range);
-
-        // Focus the text div specifically
-        textDiv.focus();
       }
 
       editor.focus();
       handleInput();
-    }, 50); // Increased timeout for better reliability
+    }, 50);
   };
 
   const insertAudioHtml = (src: string, name: string, size?: number) => {
@@ -1259,7 +1263,9 @@ export default function EnhancedRichTextEditor({
   };
 
   return (
-    <div className="border border-gray-200 rounded-lg bg-white">
+    <div
+      className={`border border-gray-200 rounded-lg bg-white ${isEditMode ? "w-full" : ""}`}
+    >
       {/* Toolbar */}
       <div className="flex items-center gap-2 p-3 border-b border-gray-200 bg-gray-50 flex-wrap">
         <Button
@@ -1456,7 +1462,7 @@ export default function EnhancedRichTextEditor({
           // Sincronizar formatação após colar
           setTimeout(() => syncFormattingWithButtons(), 10);
         }}
-        className="w-full p-4 min-h-[200px] focus:outline-none bg-white rich-editor"
+        className={`w-full p-4 ${isEditMode ? "min-h-[150px]" : "min-h-[200px]"} focus:outline-none bg-white rich-editor`}
         style={{
           lineHeight: "1.6", // Melhor para legibilidade com quebras de linha
           fontSize: "16px", // Tamanho base padrão
@@ -1466,6 +1472,7 @@ export default function EnhancedRichTextEditor({
         }}
         suppressContentEditableWarning={true}
         data-placeholder={placeholder}
+        data-edit-mode={isEditMode}
       />
 
       {/* Enhanced CSS for better layout and text handling */}
@@ -1754,9 +1761,22 @@ export default function EnhancedRichTextEditor({
         .rich-editor > *:first-child {
           margin-top: 0;
         }
-        
+
         .rich-editor > *:last-child {
           margin-bottom: 0;
+        }
+
+        /* Specific styling for edit mode */
+        .rich-editor[data-edit-mode="true"] {
+          background: white;
+          border: none;
+          min-height: 150px;
+        }
+
+        .rich-editor[data-edit-mode="true"]:focus {
+          outline: none;
+          box-shadow: none;
+          border: none;
         }
       `}</style>
 
