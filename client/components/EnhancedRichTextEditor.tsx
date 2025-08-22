@@ -349,6 +349,16 @@ export default function EnhancedRichTextEditor({
     if (editorRef.current) {
       const rawContent = editorRef.current.innerHTML;
       const cleanedContent = cleanHTML(rawContent);
+
+      // Debug logging for line breaks
+      if (rawContent.includes('<br>') || rawContent.includes('<div>')) {
+        console.log('📝 Line breaks detected in editor:', {
+          raw: rawContent,
+          cleaned: cleanedContent,
+          hasBreaks: cleanedContent.includes('<br>') || cleanedContent.includes('<div>')
+        });
+      }
+
       onChange(cleanedContent);
     }
   };
