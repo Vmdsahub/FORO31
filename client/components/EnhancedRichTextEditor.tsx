@@ -528,10 +528,22 @@ export default function EnhancedRichTextEditor({
 
   const closeColorPicker = () => {
     setShowColorPicker(false);
-    // Restaurar foco no editor
+    // Restaurar foco no editor e posição do cursor
     setTimeout(() => {
       if (editorRef.current) {
         editorRef.current.focus();
+        // Restaurar seleção salva se existir
+        if (savedSelectionRef.current) {
+          try {
+            const selection = window.getSelection();
+            if (selection) {
+              selection.removeAllRanges();
+              selection.addRange(savedSelectionRef.current);
+            }
+          } catch (error) {
+            console.warn("Error restoring selection:", error);
+          }
+        }
       }
     }, 50);
   };
