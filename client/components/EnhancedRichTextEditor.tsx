@@ -1282,7 +1282,10 @@ export default function EnhancedRichTextEditor({
               onMouseDown={(e) => e.preventDefault()}
               onClick={(e) => {
                 e.stopPropagation();
-                saveCurrentSelection();
+                // Salvar seleção atual antes de abrir o color picker
+                if (editorRef.current && document.activeElement === editorRef.current) {
+                  saveCurrentSelection();
+                }
                 setShowColorPicker(!showColorPicker);
               }}
             >
