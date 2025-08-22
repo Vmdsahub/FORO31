@@ -397,12 +397,24 @@ export default function TopicView() {
             <div className="flex items-center gap-3">
               {user && (
                 <>
+                  {/* 1. Botão Editar - apenas para o autor do tópico */}
+                  {user.id === topic.authorId && !isEditing && (
+                    <button
+                      onClick={handleEditTopic}
+                      className="text-gray-500 hover:text-black transition-colors"
+                      title="Editar tópico"
+                    >
+                      Editar
+                    </button>
+                  )}
+
+                  {/* 2. Botão Salvar */}
                   <button
                     onClick={handleSaveTopic}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-md transition-colors ${
+                    className={`flex items-center gap-2 transition-colors ${
                       savedTopicIds.includes(topic.id)
-                        ? "bg-yellow-50 text-yellow-600 hover:bg-yellow-100"
-                        : "bg-gray-50 text-gray-600 hover:bg-gray-100"
+                        ? "text-yellow-600 hover:text-yellow-700"
+                        : "text-gray-500 hover:text-black"
                     }`}
                     title={
                       savedTopicIds.includes(topic.id)
@@ -428,37 +440,6 @@ export default function TopicView() {
                     </svg>
                     {savedTopicIds.includes(topic.id) ? "Salvo" : "Salvar"}
                   </button>
-
-                  {/* Botão Editar - apenas para o autor do tópico */}
-                  {user.id === topic.authorId && !isEditing && (
-                    <button
-                      onClick={handleEditTopic}
-                      className="flex items-center gap-2 px-3 py-2 rounded-md bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
-                      title="Editar tópico"
-                    >
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                      >
-                        <path
-                          d="M12 20h9"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                        <path
-                          d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                      Editar
-                    </button>
-                  )}
                 </>
               )}
 
@@ -466,7 +447,7 @@ export default function TopicView() {
               {user && user.id !== topic.authorId && (
                 <button
                   onClick={() => setShowReportModal(true)}
-                  className="flex items-center gap-1 px-2 py-2 rounded-md bg-gray-50 text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors"
+                  className="flex items-center gap-1 text-gray-500 hover:text-red-600 transition-colors"
                   title="Denunciar tópico"
                 >
                   <svg
@@ -481,6 +462,7 @@ export default function TopicView() {
                 </button>
               )}
 
+              {/* 3. Botão Like */}
               <button
                 onClick={() => {
                   handleLikeTopic();
@@ -496,7 +478,7 @@ export default function TopicView() {
                   }
                 }}
                 id={`topic-heart-${topic.id}`}
-                className={`heart-button flex items-center gap-2 px-3 py-2 transition-all text-gray-600 hover:text-gray-800`}
+                className={`heart-button flex items-center gap-2 transition-all text-gray-600 hover:text-gray-800`}
               >
                 <span
                   className={`transition-all ${
