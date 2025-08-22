@@ -544,30 +544,10 @@ export default function EnhancedRichTextEditor({
 
   const handleColorChange = (color: string) => {
     setCurrentColor(color);
-
-    // Aplicar cor imediatamente se há seleção salva
-    if (savedSelectionRef.current) {
-      try {
-        restoreSelection();
-        document.execCommand("styleWithCSS", false, "true");
-        document.execCommand("foreColor", false, color);
-        saveCurrentSelection();
-        handleInput();
-      } catch (error) {
-        console.warn("Error applying color:", error);
-      }
-    }
-
-    // Garantir que a próxima digitação use esta cor sem perder posição
-    setTimeout(() => {
-      if (editorRef.current) {
-        // Só focar se não há seleção salva ou se perdeu o foco
-        if (!savedSelectionRef.current || document.activeElement !== editorRef.current) {
-          editorRef.current.focus();
-        }
-        applyCurrentColor();
-      }
-    }, 10); // Reduzido de 50ms para 10ms para ser mais responsivo
+    // Aplicar cor diretamente como outros comandos
+    document.execCommand("styleWithCSS", false, "true");
+    document.execCommand("foreColor", false, color);
+    handleInput();
   };
 
   const handleColorPicker = () => {
@@ -1689,7 +1669,7 @@ export default function EnhancedRichTextEditor({
               {" "}
               upload ultra-seguro com validação ClamAV-style
             </span>
-            . Upload de mídia �� automaticamente inserido no conteúdo.
+            . Upload de mídia é automaticamente inserido no conteúdo.
             {isEditMode ? (
               <span className="text-orange-600">
                 {" "}
