@@ -21,7 +21,7 @@ const userStats: Map<string, { points: number; badges: string[] }> = new Map(); 
 
 // Validation schemas
 const createTopicSchema = z.object({
-  title: z.string().min(1).max(100),
+  title: z.string().min(1).max(40),
   description: z.string().min(1).max(200),
   content: z.string().min(1).max(50000), // Increased limit for rich content with HTML/images
   category: z.string().min(1),
@@ -34,7 +34,7 @@ const createCommentSchema = z.object({
 });
 
 const editTopicSchema = z.object({
-  title: z.string().min(1).max(100).optional(),
+  title: z.string().min(1).max(40).optional(),
   description: z.string().min(1).max(200).optional(),
   content: z.string().min(1).max(50000).optional(),
   category: z.string().min(1).optional(),
@@ -910,17 +910,20 @@ export const handleDeleteTopic: RequestHandler = (req, res) => {
     return res.status(401).json({ message: "Autenticação necessária" });
   }
 
-  if (req.user.role !== "admin") {
-    return res
-      .status(403)
-      .json({ message: "Apenas administradores podem excluir tópicos" });
-  }
-
   const { topicId } = req.params;
   const topic = topics.get(topicId);
 
   if (!topic) {
     return res.status(404).json({ message: "Tópico não encontrado" });
+  }
+
+  // Allow topic author or admin to delete the topic
+  if (req.user.role !== "admin" && req.user.id !== topic.authorId) {
+    return res
+      .status(403)
+      .json({
+        message: "Apenas o autor do tópico ou administradores podem excluí-lo",
+      });
   }
 
   topics.delete(topicId);

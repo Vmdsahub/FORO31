@@ -602,8 +602,15 @@ export default function Index(props: IndexProps) {
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <h3 className="text-xl font-semibold text-black mb-3">
-                          {topic.title}
+                        <h3
+                          className="text-xl font-semibold text-black mb-3 break-words leading-tight"
+                          title={
+                            topic.title.length > 40 ? topic.title : undefined
+                          }
+                        >
+                          {topic.title.length > 40
+                            ? `${topic.title.substring(0, 40)}...`
+                            : topic.title}
                         </h3>
                         <div className="text-sm text-gray-500">
                           {topic.readTime} de leitura
@@ -1336,8 +1343,17 @@ export default function Index(props: IndexProps) {
                                   </span>
                                 )}
                               </div>
-                              <h3 className="font-semibold text-black hover:text-blue-600 cursor-pointer truncate transition-colors duration-200">
-                                {topic.title}
+                              <h3
+                                className="font-semibold text-black hover:text-blue-600 cursor-pointer break-words leading-tight transition-colors duration-200"
+                                title={
+                                  topic.title.length > 40
+                                    ? topic.title
+                                    : undefined
+                                }
+                              >
+                                {topic.title.length > 40
+                                  ? `${topic.title.substring(0, 40)}...`
+                                  : topic.title}
                               </h3>
                               <div className="flex items-center justify-between mt-2">
                                 <div className="text-xs text-gray-500">
