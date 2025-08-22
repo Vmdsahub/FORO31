@@ -24,7 +24,7 @@ function initializeDemo() {
     const currentWeekInfo = getCurrentWeekInfo();
     const exampleArticle: NewsletterArticle = {
       id: "demo_" + Date.now(),
-      title: "Sistema de Newsletter Renovado",
+      title: "Sistema de Newsletter Completamente Renovado - Funcionalidades Avançadas e Interface Moderna",
       content: `<h2>🎉 Sistema Completamente Renovado!</h2>
 
 <p>O IA HUB agora possui um sistema de newsletter totalmente reformulado:</p>
@@ -71,7 +71,7 @@ initializeDemo();
 
 // Validation schema
 const createArticleSchema = z.object({
-  title: z.string().min(1, "Título é obrigatório").max(40, "Título deve ter no máximo 40 caracteres"),
+  title: z.string().min(1, "Título é obrigatório").max(100, "Título deve ter no máximo 100 caracteres"),
   content: z.string().min(1, "Conteúdo é obrigatório"),
   targetWeek: z.number().optional(), // Semana específica (opcional)
   targetYear: z.number().optional(), // Ano específico (opcional)
