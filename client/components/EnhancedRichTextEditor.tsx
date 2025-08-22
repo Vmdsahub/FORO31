@@ -543,7 +543,7 @@ export default function EnhancedRichTextEditor({
         document.execCommand("underline", false); // Remove sublinhado
       }
 
-      // Aplicar cor apenas se diferente do padrão
+      // Aplicar cor apenas se diferente do padr��o
       if (currentColor && currentColor !== "#000000") {
         document.execCommand("styleWithCSS", false, "true");
         document.execCommand("foreColor", false, currentColor);
@@ -1342,7 +1342,7 @@ export default function EnhancedRichTextEditor({
           </svg>
         </Button>
 
-        <div className="w-px h-6 bg-gray-300 mx-1" />
+        <div className="separator" />
 
         {/* Color Picker */}
         <Popover
@@ -1432,7 +1432,7 @@ export default function EnhancedRichTextEditor({
           </PopoverContent>
         </Popover>
 
-        <div className="w-px h-6 bg-gray-300 mx-1" />
+        <div className="separator" />
 
         {/* Secure Upload Widget - único botão de upload */}
         <SecureUploadWidget
@@ -1575,7 +1575,7 @@ export default function EnhancedRichTextEditor({
           cursor: text !important;
         }
 
-        /* Proteção específica para o color picker */
+        /* Prote��ão específica para o color picker */
         .color-picker-container {
           isolation: isolate;
           contain: layout style;
