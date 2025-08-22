@@ -268,17 +268,17 @@ export default function Index(props: IndexProps) {
       return;
     }
 
-    if (!newNewsletter.readTime.trim()) {
-      toast.error("Preencha o tempo de leitura");
+    if (newNewsletter.title.length > 40) {
+      toast.error("Título deve ter no máximo 40 caracteres");
       return;
     }
 
     try {
       // Se admin e há uma semana selecionada, usar essa semana. Senão, criar na semana atual
+      const cleanedContent = cleanContentForSaving(newNewsletter.content);
       const requestBody: any = {
         title: newNewsletter.title,
-        content: newNewsletter.content,
-        readTime: newNewsletter.readTime,
+        content: cleanedContent,
       };
 
       // Se admin está visualizando uma semana específica, criar artigo nessa semana
@@ -750,7 +750,7 @@ export default function Index(props: IndexProps) {
                               title: e.target.value,
                             })
                           }
-                          placeholder="Ex: GPT-4 vs Claude: An���lise Comparativa"
+                          placeholder="Ex: GPT-4 vs Claude: An��lise Comparativa"
                           className="border-gray-300 focus:border-gray-500 focus:ring-gray-500 bg-white"
                         />
                       </div>
