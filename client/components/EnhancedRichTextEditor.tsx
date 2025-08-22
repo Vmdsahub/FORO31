@@ -510,20 +510,27 @@ export default function EnhancedRichTextEditor({
 
     // Aplicar cor imediatamente se há seleção salva
     if (savedSelectionRef.current) {
-      restoreSelection();
-      document.execCommand("styleWithCSS", false, "true");
-      document.execCommand("foreColor", false, color);
-      saveCurrentSelection();
-      handleInput();
+      try {
+        restoreSelection();
+        document.execCommand("styleWithCSS", false, "true");
+        document.execCommand("foreColor", false, color);
+        saveCurrentSelection();
+        handleInput();
+      } catch (error) {
+        console.warn("Error applying color:", error);
+      }
     }
 
-    // Garantir que a próxima digitação use esta cor
+    // Garantir que a próxima digitação use esta cor sem perder posição
     setTimeout(() => {
       if (editorRef.current) {
-        editorRef.current.focus();
+        // Só focar se não há seleção salva ou se perdeu o foco
+        if (!savedSelectionRef.current || document.activeElement !== editorRef.current) {
+          editorRef.current.focus();
+        }
         applyCurrentColor();
       }
-    }, 50);
+    }, 10); // Reduzido de 50ms para 10ms para ser mais responsivo
   };
 
   const closeColorPicker = () => {
