@@ -353,8 +353,11 @@ export default function TopicView() {
                 />
               </div>
             ) : (
-              <h1 className="text-2xl font-bold text-black mb-4">
-                {topic.title}
+              <h1
+                className="text-2xl font-bold text-black mb-4 break-words leading-tight"
+                title={topic.title.length > 60 ? topic.title : undefined}
+              >
+                {topic.title.length > 60 ? `${topic.title.substring(0, 60)}...` : topic.title}
               </h1>
             )}
           </div>
