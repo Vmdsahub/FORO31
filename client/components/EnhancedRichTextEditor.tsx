@@ -1215,12 +1215,7 @@ export default function EnhancedRichTextEditor({
         {/* Color Picker */}
         <Popover
           open={showColorPicker}
-          onOpenChange={(open) => {
-            // Controle manual - só fecha via closeColorPicker()
-            if (!open) {
-              return; // Bloquear fechamento automático
-            }
-          }}
+          onOpenChange={setShowColorPicker}
           modal={false}
         >
           <PopoverTrigger asChild>
