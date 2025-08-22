@@ -1267,14 +1267,14 @@ export default function EnhancedRichTextEditor({
       className={`border border-gray-200 rounded-lg bg-white ${isEditMode ? "w-full" : ""}`}
     >
       {/* Toolbar */}
-      <div className="rich-text-toolbar">
+      <div className="flex items-center gap-2 p-3 border-b border-gray-200 bg-gray-50 flex-wrap">
         <Button
           type="button"
           variant={isBold ? "default" : "outline"}
           size="sm"
           onMouseDown={(e) => e.preventDefault()}
           onClick={handleBold}
-          className={isBold ? "bg-blue-500 text-white hover:bg-blue-600" : "hover:bg-gray-100"}
+          className={`h-8 px-2 hover:bg-gray-100 ${isBold ? "bg-blue-500 text-white hover:bg-blue-600" : ""}`}
           title="Negrito (Ctrl+B)"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -1288,7 +1288,7 @@ export default function EnhancedRichTextEditor({
           size="sm"
           onMouseDown={(e) => e.preventDefault()}
           onClick={handleItalic}
-          className={isItalic ? "bg-blue-500 text-white hover:bg-blue-600" : "hover:bg-gray-100"}
+          className={`h-8 px-2 hover:bg-gray-100 ${isItalic ? "bg-blue-500 text-white hover:bg-blue-600" : ""}`}
           title="Itálico (Ctrl+I)"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -1302,7 +1302,7 @@ export default function EnhancedRichTextEditor({
           size="sm"
           onMouseDown={(e) => e.preventDefault()}
           onClick={handleUnderline}
-          className={isUnderline ? "bg-blue-500 text-white hover:bg-blue-600" : "hover:bg-gray-100"}
+          className={`h-8 px-2 hover:bg-gray-100 ${isUnderline ? "bg-blue-500 text-white hover:bg-blue-600" : ""}`}
           title="Sublinhado"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -1312,7 +1312,7 @@ export default function EnhancedRichTextEditor({
 
         {/* Font Size Dropdown */}
         <Select value={fontSize} onValueChange={handleFontSizeChange}>
-          <SelectTrigger className="w-20 text-xs">
+          <SelectTrigger className="h-8 w-20 text-xs">
             <SelectValue placeholder="Fonte" />
           </SelectTrigger>
           <SelectContent>
@@ -1334,7 +1334,7 @@ export default function EnhancedRichTextEditor({
           size="sm"
           onMouseDown={(e) => e.preventDefault()}
           onClick={handleLink}
-          className="hover:bg-gray-100"
+          className="h-8 px-2 hover:bg-gray-100"
           title="Link"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -1342,7 +1342,7 @@ export default function EnhancedRichTextEditor({
           </svg>
         </Button>
 
-        <div className="separator" />
+        <div className="w-px h-6 bg-gray-300 mx-1" />
 
         {/* Color Picker */}
         <Popover
@@ -1355,7 +1355,7 @@ export default function EnhancedRichTextEditor({
               type="button"
               variant="outline"
               size="sm"
-              className="hover:bg-gray-100"
+              className="h-8 px-2 hover:bg-gray-100"
               title="Cor do texto"
               onMouseDown={(e) => {
                 e.preventDefault();
@@ -1432,7 +1432,7 @@ export default function EnhancedRichTextEditor({
           </PopoverContent>
         </Popover>
 
-        <div className="separator" />
+        <div className="w-px h-6 bg-gray-300 mx-1" />
 
         {/* Secure Upload Widget - único botão de upload */}
         <SecureUploadWidget
@@ -1477,43 +1477,6 @@ export default function EnhancedRichTextEditor({
 
       {/* Enhanced CSS for better layout and text handling */}
       <style>{`
-        /* Toolbar consistency fixes */
-        .rich-text-toolbar {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          padding: 12px;
-          border-bottom: 1px solid #e5e7eb;
-          background-color: #f9fafb;
-          flex-wrap: wrap;
-          min-height: 56px;
-        }
-
-        .rich-text-toolbar button {
-          height: 32px !important;
-          min-width: 32px;
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          border-radius: 6px;
-          font-size: 14px;
-        }
-
-        .rich-text-toolbar [data-radix-select-trigger] {
-          height: 32px !important;
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          border-radius: 6px;
-        }
-
-        .rich-text-toolbar .separator {
-          width: 1px;
-          height: 24px;
-          background-color: #d1d5db;
-          margin: 0 4px;
-        }
-
         /* Color picker styles */
         .color-picker-container {
           padding: 8px;
