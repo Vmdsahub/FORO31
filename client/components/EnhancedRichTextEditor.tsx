@@ -458,10 +458,12 @@ export default function EnhancedRichTextEditor({
           const editor = editorRef.current;
 
           // Verificar se estamos no final do editor ou em linha vazia
-          const isAtEnd = range.endOffset === (currentNode.textContent?.length || 0);
-          const isInEmptyDiv = currentNode.parentElement?.tagName === 'DIV' &&
-                               currentNode.parentElement?.textContent?.trim() === '';
-          const isEmptyEditor = editor.textContent?.trim() === '';
+          const isAtEnd =
+            range.endOffset === (currentNode.textContent?.length || 0);
+          const isInEmptyDiv =
+            currentNode.parentElement?.tagName === "DIV" &&
+            currentNode.parentElement?.textContent?.trim() === "";
+          const isEmptyEditor = editor.textContent?.trim() === "";
 
           // Se estamos no final do conteúdo, após uma imagem/vídeo, ou em div vazia
           if (isAtEnd || isInEmptyDiv || isEmptyEditor) {
@@ -1261,7 +1263,9 @@ export default function EnhancedRichTextEditor({
   };
 
   return (
-    <div className={`border border-gray-200 rounded-lg bg-white ${isEditMode ? 'w-full' : ''}`}>
+    <div
+      className={`border border-gray-200 rounded-lg bg-white ${isEditMode ? "w-full" : ""}`}
+    >
       {/* Toolbar */}
       <div className="flex items-center gap-2 p-3 border-b border-gray-200 bg-gray-50 flex-wrap">
         <Button
@@ -1458,7 +1462,7 @@ export default function EnhancedRichTextEditor({
           // Sincronizar formatação após colar
           setTimeout(() => syncFormattingWithButtons(), 10);
         }}
-        className={`w-full p-4 ${isEditMode ? 'min-h-[150px]' : 'min-h-[200px]'} focus:outline-none bg-white rich-editor`}
+        className={`w-full p-4 ${isEditMode ? "min-h-[150px]" : "min-h-[200px]"} focus:outline-none bg-white rich-editor`}
         style={{
           lineHeight: "1.6", // Melhor para legibilidade com quebras de linha
           fontSize: "16px", // Tamanho base padrão
