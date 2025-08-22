@@ -17,6 +17,13 @@ export function cleanContentForDisplay(content: string): string {
     .replace(/\s+/g, " ")
     .replace(/\s+>/g, ">");
 
+  // Preserve line breaks before removing delete buttons
+  // Normalize line break patterns first
+  cleanedContent = cleanedContent
+    .replace(/<div><br><\/div>/g, '<br>')
+    .replace(/<div><br\/><\/div>/g, '<br>')
+    .replace(/<div>\s*<\/div>/g, '<br>');
+
   // Remove ALL delete buttons (trash icon buttons) from content when displaying
   // Pattern 1: Remove buttons with delete title attributes
   cleanedContent = cleanedContent.replace(
@@ -78,6 +85,13 @@ export function cleanContentForSaving(content: string): string {
     // Clean up any extra spaces
     .replace(/\s+/g, " ")
     .replace(/\s+>/g, ">");
+
+  // Preserve line breaks before removing delete buttons
+  // Normalize line break patterns first
+  cleanedContent = cleanedContent
+    .replace(/<div><br><\/div>/g, '<br>')
+    .replace(/<div><br\/><\/div>/g, '<br>')
+    .replace(/<div>\s*<\/div>/g, '<br>');
 
   // Remove ALL delete buttons (trash icon buttons) before saving
   // Pattern 1: Remove buttons with delete title attributes
