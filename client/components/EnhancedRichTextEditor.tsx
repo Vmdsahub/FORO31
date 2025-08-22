@@ -280,6 +280,10 @@ export default function EnhancedRichTextEditor({
             editorRef.current.innerHTML = cleaned;
             onChange(cleaned);
           }
+          // Garantir que não há formatação residual se botões estão desativados
+          if (!isBold && !isItalic && !isUnderline && currentColor === "#000000" && fontSize === "16") {
+            clearAllFormatting();
+          }
         }
       }, 100);
     };
