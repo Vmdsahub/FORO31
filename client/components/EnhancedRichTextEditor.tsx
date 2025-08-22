@@ -403,12 +403,25 @@ export default function EnhancedRichTextEditor({
     if (e.key === 'Enter') {
       e.preventDefault();
 
+      const selection = window.getSelection();
+      if (!selection || !editorRef.current) return;
+
       if (e.altKey) {
         // Alt+Enter: Inserir <br> (quebra de linha simples)
-        document.execCommand('insertHTML', false, '<br><br>');
+        document.execCommand('insertHTML', false, '<br>');
       } else {
-        // Enter normal: Criar nova linha com div
-        document.execCommand('insertHTML', false, '<div><br></div>');
+        // Enter normal: Criar nova linha
+        // Verificar se estamos no final de uma linha
+        const range = selection.getRangeAt(0);
+        const currentNode = range.startContainer;
+
+        // Se estamos em uma div ou no final, criar nova div
+        if (currentNode.nodeType === Node.TEXT_NODE && currentNode.textContent?.trim() === '') {
+          document.execCommand('insertHTML', false, '<div><br></div>');
+        } else {
+          // Caso contrário, inserir quebra de linha simples
+          document.execCommand('insertHTML', false, '<br>');
+        }
       }
 
       handleInput();
