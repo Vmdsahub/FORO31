@@ -336,6 +336,7 @@ export default function TopicView() {
                   value={editContent}
                   onChange={setEditContent}
                   placeholder="Conteúdo do tópico..."
+                  isEditMode={true}
                 />
                 <div className="flex items-center gap-3">
                   <Button
