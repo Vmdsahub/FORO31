@@ -631,7 +631,7 @@ export default function EnhancedRichTextEditor({
   };
 
   const execCommandWithSelection = (command: string, value?: string) => {
-    // Salvar seleção atual
+    // Salvar seleç��o atual
     const selection = window.getSelection();
     if (selection && selection.rangeCount > 0) {
       const range = selection.getRangeAt(0);
@@ -1549,38 +1549,6 @@ export default function EnhancedRichTextEditor({
 
         .react-colorful__pointer {
           width: 18px !important;
-        }
-
-        /* Editable text areas after media */
-        .editable-text-area {
-          outline: none;
-          border: 1px solid transparent;
-          border-radius: 4px;
-          padding: 4px;
-          transition: all 0.2s ease;
-        }
-
-        .editable-text-area:hover {
-          border-color: #e5e7eb;
-          background-color: #f9fafb;
-        }
-
-        .editable-text-area:focus {
-          border-color: #3b82f6;
-          background-color: white;
-          box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
-        }
-
-        .editable-text-area:empty:before {
-          content: attr(data-placeholder);
-          color: #9ca3af;
-          font-style: italic;
-          pointer-events: none;
-        }
-
-        .editable-text-area:focus:before {
-          display: none;
-        }
           height: 18px !important;
         }
 
