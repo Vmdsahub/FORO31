@@ -394,8 +394,6 @@ export default function EnhancedRichTextEditor({
     // Salvar seleção após navegação com teclado
     setTimeout(() => {
       saveCurrentSelection();
-      // Atualizar estado dos botões sempre após keyUp
-      updateFormattingState();
       // Se foi uma tecla de caractere, aplicar cor e tamanho
       if (e.key.length === 1) {
         applyCurrentColor();
@@ -885,7 +883,7 @@ export default function EnhancedRichTextEditor({
           deleteButton.onclick = (e) => {
             e.preventDefault();
             e.stopPropagation();
-            if (confirm("Excluir este v��deo?")) {
+            if (confirm("Excluir este vídeo?")) {
               const container = videoPreview.closest(".image-container");
               videoPreview.remove();
 
@@ -1629,7 +1627,7 @@ export default function EnhancedRichTextEditor({
             {isEditMode ? (
               <span className="text-orange-600">
                 {" "}
-                Expansão de mídia disponível após publicar.
+                Expansão de mídia disponível ap��s publicar.
               </span>
             ) : (
               <span className="text-blue-600">
