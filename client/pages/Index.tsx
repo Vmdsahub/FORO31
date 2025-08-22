@@ -268,8 +268,8 @@ export default function Index(props: IndexProps) {
       return;
     }
 
-    if (newNewsletter.title.length > 40) {
-      toast.error("Título deve ter no máximo 40 caracteres");
+    if (newNewsletter.title.length > 100) {
+      toast.error("Título deve ter no máximo 100 caracteres");
       return;
     }
 
@@ -737,7 +737,7 @@ export default function Index(props: IndexProps) {
                           htmlFor="news-title"
                           className="text-gray-900 font-medium"
                         >
-                          Título do Artigo (máx. 40 caracteres)
+                          Título do Artigo (máx. 100 caracteres)
                         </Label>
                         <Input
                           id="news-title"
