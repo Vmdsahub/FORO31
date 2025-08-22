@@ -507,7 +507,7 @@ export default function TopicView() {
                 </button>
               )}
 
-              {/* 3. Botão Like */}
+              {/* 4. Botão Like */}
               <button
                 onClick={() => {
                   handleLikeTopic();
