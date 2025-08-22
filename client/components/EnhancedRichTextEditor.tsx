@@ -543,7 +543,7 @@ export default function EnhancedRichTextEditor({
         document.execCommand("underline", false); // Remove sublinhado
       }
 
-      // Aplicar cor apenas se diferente do padr��o
+      // Aplicar cor apenas se diferente do padrão
       if (currentColor && currentColor !== "#000000") {
         document.execCommand("styleWithCSS", false, "true");
         document.execCommand("foreColor", false, currentColor);
@@ -1274,7 +1274,7 @@ export default function EnhancedRichTextEditor({
           size="sm"
           onMouseDown={(e) => e.preventDefault()}
           onClick={handleBold}
-          className={`h-8 w-8 px-2 hover:bg-gray-100 flex items-center justify-center ${isBold ? "bg-blue-500 text-white hover:bg-blue-600" : ""}`}
+          className={isBold ? "bg-blue-500 text-white hover:bg-blue-600" : "hover:bg-gray-100"}
           title="Negrito (Ctrl+B)"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -1288,7 +1288,7 @@ export default function EnhancedRichTextEditor({
           size="sm"
           onMouseDown={(e) => e.preventDefault()}
           onClick={handleItalic}
-          className={`h-8 w-8 px-2 hover:bg-gray-100 flex items-center justify-center ${isItalic ? "bg-blue-500 text-white hover:bg-blue-600" : ""}`}
+          className={isItalic ? "bg-blue-500 text-white hover:bg-blue-600" : "hover:bg-gray-100"}
           title="Itálico (Ctrl+I)"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -1302,7 +1302,7 @@ export default function EnhancedRichTextEditor({
           size="sm"
           onMouseDown={(e) => e.preventDefault()}
           onClick={handleUnderline}
-          className={`h-8 w-8 px-2 hover:bg-gray-100 flex items-center justify-center ${isUnderline ? "bg-blue-500 text-white hover:bg-blue-600" : ""}`}
+          className={isUnderline ? "bg-blue-500 text-white hover:bg-blue-600" : "hover:bg-gray-100"}
           title="Sublinhado"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -1334,7 +1334,7 @@ export default function EnhancedRichTextEditor({
           size="sm"
           onMouseDown={(e) => e.preventDefault()}
           onClick={handleLink}
-          className="h-8 w-8 px-2 hover:bg-gray-100 flex items-center justify-center"
+          className="hover:bg-gray-100"
           title="Link"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -1355,7 +1355,7 @@ export default function EnhancedRichTextEditor({
               type="button"
               variant="outline"
               size="sm"
-              className="h-8 px-2 hover:bg-gray-100 flex items-center justify-center"
+              className="hover:bg-gray-100"
               title="Cor do texto"
               onMouseDown={(e) => {
                 e.preventDefault();
@@ -1575,7 +1575,7 @@ export default function EnhancedRichTextEditor({
           cursor: text !important;
         }
 
-        /* Prote��ão específica para o color picker */
+        /* Proteção específica para o color picker */
         .color-picker-container {
           isolation: isolate;
           contain: layout style;
