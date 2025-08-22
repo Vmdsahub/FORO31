@@ -739,7 +739,7 @@ export default function Index(props: IndexProps) {
                           htmlFor="news-title"
                           className="text-gray-900 font-medium"
                         >
-                          Título do Artigo
+                          Título do Artigo (máx. 40 caracteres)
                         </Label>
                         <Input
                           id="news-title"
