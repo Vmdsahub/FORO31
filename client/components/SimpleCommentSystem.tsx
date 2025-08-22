@@ -165,11 +165,7 @@ function CommentItem({
                 >
                   Salvar
                 </Button>
-                <Button
-                  onClick={handleCancelEdit}
-                  size="sm"
-                  variant="outline"
-                >
+                <Button onClick={handleCancelEdit} size="sm" variant="outline">
                   Cancelar
                 </Button>
               </div>
