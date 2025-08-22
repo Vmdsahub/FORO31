@@ -446,25 +446,36 @@ export default function EnhancedRichTextEditor({
       const selection = window.getSelection();
       if (!selection || !editorRef.current) return;
 
-      if (e.altKey) {
-        // Alt+Enter: Inserir <br> (quebra de linha simples)
-        document.execCommand("insertHTML", false, "<br>");
-      } else {
-        // Enter normal: Criar nova linha
-        // Verificar se estamos no final de uma linha
+      try {
         const range = selection.getRangeAt(0);
-        const currentNode = range.startContainer;
 
-        // Se estamos em uma div ou no final, criar nova div
-        if (
-          currentNode.nodeType === Node.TEXT_NODE &&
-          currentNode.textContent?.trim() === ""
-        ) {
-          document.execCommand("insertHTML", false, "<div><br></div>");
-        } else {
-          // Caso contrário, inserir quebra de linha simples
+        if (e.altKey) {
+          // Alt+Enter: Sempre inserir <br> (quebra de linha simples)
           document.execCommand("insertHTML", false, "<br>");
+        } else {
+          // Enter normal: Detectar contexto e inserir quebra apropriada
+          const currentNode = range.startContainer;
+          const editor = editorRef.current;
+
+          // Verificar se estamos no final do editor ou em linha vazia
+          const isAtEnd = range.endOffset === (currentNode.textContent?.length || 0);
+          const isInEmptyDiv = currentNode.parentElement?.tagName === 'DIV' &&
+                               currentNode.parentElement?.textContent?.trim() === '';
+          const isEmptyEditor = editor.textContent?.trim() === '';
+
+          // Se estamos no final do conteúdo, após uma imagem/vídeo, ou em div vazia
+          if (isAtEnd || isInEmptyDiv || isEmptyEditor) {
+            // Inserir div com br para criar linha em branco
+            document.execCommand("insertHTML", false, "<div><br></div>");
+          } else {
+            // No meio do texto, inserir apenas br
+            document.execCommand("insertHTML", false, "<br>");
+          }
         }
+      } catch (error) {
+        console.warn("Error handling Enter key:", error);
+        // Fallback: sempre inserir br
+        document.execCommand("insertHTML", false, "<br>");
       }
 
       handleInput();
