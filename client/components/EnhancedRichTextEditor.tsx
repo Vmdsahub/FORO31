@@ -407,6 +407,8 @@ export default function EnhancedRichTextEditor({
       saveCurrentSelection();
       applyCurrentColor();
       applyCurrentFontSize();
+      // Sincronizar estado do browser com os botões
+      syncBrowserStateWithButtons();
     }, 10);
   };
 
