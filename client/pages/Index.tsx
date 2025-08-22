@@ -753,6 +753,7 @@ export default function Index(props: IndexProps) {
                           }}
                           placeholder="Ex: GPT-4 vs Claude: An��lise Comparativa"
                           className="border-gray-300 focus:border-gray-500 focus:ring-gray-500 bg-white"
+                          maxLength={100}
                         />
                         <div className="text-xs text-gray-500 mt-1">
                           {newNewsletter.title.length}/100 caracteres
