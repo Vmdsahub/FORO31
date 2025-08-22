@@ -333,6 +333,30 @@
     max-width: 100% !important;
   }
 
+  /* Preserve line breaks in rendered content */
+  .prose br,
+  .text-gray-700 br,
+  .leading-relaxed br {
+    display: block !important;
+    content: "" !important;
+    margin-top: 0.5em !important;
+  }
+
+  /* Ensure divs create proper spacing */
+  .prose div,
+  .text-gray-700 div,
+  .leading-relaxed div {
+    display: block !important;
+  }
+
+  /* Better spacing for line breaks in content */
+  .prose div + div:empty,
+  .text-gray-700 div + div:empty,
+  .leading-relaxed div + div:empty {
+    height: 1.2em !important;
+    margin: 0 !important;
+  }
+
   .image-container img,
   .image-container .video-preview,
   .video-preview {
