@@ -1312,7 +1312,7 @@ export default function EnhancedRichTextEditor({
 
         {/* Font Size Dropdown */}
         <Select value={fontSize} onValueChange={handleFontSizeChange}>
-          <SelectTrigger className="h-8 w-20 text-xs flex items-center justify-center">
+          <SelectTrigger className="w-20 text-xs">
             <SelectValue placeholder="Fonte" />
           </SelectTrigger>
           <SelectContent>
