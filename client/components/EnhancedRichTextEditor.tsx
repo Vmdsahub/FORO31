@@ -387,8 +387,6 @@ export default function EnhancedRichTextEditor({
       saveCurrentSelection();
       applyCurrentColor();
       applyCurrentFontSize();
-      // Atualizar estado dos botões de formatação
-      updateFormattingState();
     }, 10);
   };
 
@@ -887,7 +885,7 @@ export default function EnhancedRichTextEditor({
           deleteButton.onclick = (e) => {
             e.preventDefault();
             e.stopPropagation();
-            if (confirm("Excluir este vídeo?")) {
+            if (confirm("Excluir este v��deo?")) {
               const container = videoPreview.closest(".image-container");
               videoPreview.remove();
 
