@@ -456,10 +456,8 @@ export default function EnhancedRichTextEditor({
         applyCurrentColor();
         applyCurrentFontSize();
       }
-      // Sincronizar estado apenas para teclas de navegação (não para seleção)
-      if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key)) {
-        syncBrowserStateWithButtons();
-      }
+      // Sempre sincronizar estado do browser com os botões
+      syncBrowserStateWithButtons();
     }, 10);
   };
 
