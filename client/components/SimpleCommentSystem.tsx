@@ -186,7 +186,7 @@ function CommentItem({
             {canDelete && (
               <button
                 onClick={handleDelete}
-                className="flex items-center gap-1 text-xs px-2 py-1 rounded transition-colors text-red-600 hover:bg-red-50"
+                className="flex items-center gap-1 text-xs text-gray-500 hover:text-black transition-colors"
                 title={`Excluir comentário ${isAdmin ? "(Admin)" : isTopicOwner ? "(Dono do post)" : "(Seu comentário)"}`}
               >
                 <svg
@@ -206,7 +206,7 @@ function CommentItem({
                 {isCommentOwner && !isEditing && (
                   <button
                     onClick={handleEdit}
-                    className="text-xs text-blue-600 hover:text-blue-800 px-2 py-1 rounded transition-colors"
+                    className="text-xs text-gray-500 hover:text-black transition-colors"
                     title="Editar comentário"
                   >
                     Editar
@@ -216,7 +216,7 @@ function CommentItem({
                 {/* 3. Botão Citar */}
                 <button
                   onClick={() => onQuote(comment)}
-                  className="text-xs text-gray-500 hover:text-black px-2 py-1 rounded transition-colors"
+                  className="text-xs text-gray-500 hover:text-black transition-colors"
                   title="Citar comentário"
                 >
                   Citar
@@ -225,7 +225,7 @@ function CommentItem({
                 {user.id !== comment.authorId && (
                   <button
                     onClick={() => onReport(comment)}
-                    className="text-xs text-gray-500 hover:text-red-600 px-2 py-1 rounded transition-colors"
+                    className="text-xs text-gray-500 hover:text-red-600 transition-colors"
                     title="Denunciar comentário"
                   >
                     !
