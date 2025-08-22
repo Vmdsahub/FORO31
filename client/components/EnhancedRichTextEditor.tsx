@@ -63,14 +63,15 @@ export default function EnhancedRichTextEditor({
       // Salvar posição atual antes de fazer mudanças
       const currentRange = selection && selection.rangeCount > 0 ? selection.getRangeAt(0).cloneRange() : null;
 
-      // Se browser state não corresponde aos botões, corrige SEMPRE
-      if (browserBold !== isBold) {
+      // APENAS aplicar formatação quando botão está ATIVO mas browser não tem
+      // NUNCA remover formatação existente quando botão está INATIVO
+      if (isBold && !browserBold) {
         document.execCommand("bold", false);
       }
-      if (browserItalic !== isItalic) {
+      if (isItalic && !browserItalic) {
         document.execCommand("italic", false);
       }
-      if (browserUnderline !== isUnderline) {
+      if (isUnderline && !browserUnderline) {
         document.execCommand("underline", false);
       }
 
