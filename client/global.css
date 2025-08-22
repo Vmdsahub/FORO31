@@ -325,6 +325,13 @@
     scrollbar-width: none !important;
   }
 
+  /* Force word break for long text content */
+  .prose, .text-content {
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    hyphens: auto !important;
+  }
+
   /* Global styling for image containers in posts and comments */
   .image-container {
     margin: 8px 0 !important;
