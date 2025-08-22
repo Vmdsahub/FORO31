@@ -21,7 +21,7 @@ const userStats: Map<string, { points: number; badges: string[] }> = new Map(); 
 
 // Validation schemas
 const createTopicSchema = z.object({
-  title: z.string().min(1).max(100),
+  title: z.string().min(1).max(80),
   description: z.string().min(1).max(200),
   content: z.string().min(1).max(50000), // Increased limit for rich content with HTML/images
   category: z.string().min(1),
