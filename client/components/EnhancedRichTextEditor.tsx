@@ -300,25 +300,33 @@ export default function EnhancedRichTextEditor({
     };
   }, [placeholder]);
 
-  // Função para limpar e otimizar HTML
+  // Função para limpar e otimizar HTML preservando quebras de linha
   const cleanHTML = (html: string): string => {
     // Criar um elemento temporário para manipular o HTML
     const temp = document.createElement("div");
     temp.innerHTML = html;
 
-    // Remover elementos font vazios
+    // Remover elementos font vazios (preservar os que têm conteúdo)
     const fontElements = temp.querySelectorAll("font");
     fontElements.forEach((font) => {
-      if (!font.textContent?.trim()) {
+      if (!font.textContent?.trim() && !font.querySelector("br")) {
         font.remove();
       }
     });
 
-    // Remover spans vazios
+    // Remover spans vazios (mas preservar spans com <br>)
     const spanElements = temp.querySelectorAll("span");
     spanElements.forEach((span) => {
-      if (!span.textContent?.trim() && !span.querySelector("img, video")) {
+      if (!span.textContent?.trim() && !span.querySelector("img, video, br")) {
         span.remove();
+      }
+    });
+
+    // Remover divs vazias (mas preservar divs com apenas <br> para quebras de linha)
+    const divElements = temp.querySelectorAll("div");
+    divElements.forEach((div) => {
+      if (!div.textContent?.trim() && !div.querySelector("img, video, br") && div.innerHTML.trim() !== "<br>") {
+        div.remove();
       }
     });
 
@@ -1514,10 +1522,28 @@ export default function EnhancedRichTextEditor({
           box-shadow: none !important;
         }
 
-        /* Ensure text divs after media are properly editable */
+        /* Ensure text divs after media are properly editable and preserve line breaks */
         .rich-editor div:not(.image-container):not(.video-preview) {
           min-height: 1.2em;
-          line-height: 1.7;
+          line-height: 1.6;
+          margin-bottom: 0;
+        }
+
+        /* Preserve line breaks in rich editor */
+        .rich-editor br {
+          display: block;
+          content: "";
+          margin-top: 0;
+        }
+
+        /* Ensure divs create proper line breaks */
+        .rich-editor div {
+          display: block;
+        }
+
+        /* Better spacing for consecutive divs */
+        .rich-editor div + div {
+          margin-top: 0;
         }
 
         /* Prevent ALL interactions with media elements in rich editor */
