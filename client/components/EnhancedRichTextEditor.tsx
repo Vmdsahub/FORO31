@@ -391,8 +391,24 @@ export default function EnhancedRichTextEditor({
 
   // Handler para quando usuário começa a digitar
   const handleEditorKeyDown = (e: React.KeyboardEvent) => {
-    // Para teclas que inserem texto, aplicar formatação imediatamente
-    if (e.key.length === 1 || e.key === 'Enter' || e.key === ' ') {
+    // Tratamento especial para Enter
+    if (e.key === 'Enter') {
+      e.preventDefault();
+
+      if (e.altKey) {
+        // Alt+Enter: Inserir <br> (quebra de linha simples)
+        document.execCommand('insertHTML', false, '<br><br>');
+      } else {
+        // Enter normal: Criar nova linha com div
+        document.execCommand('insertHTML', false, '<div><br></div>');
+      }
+
+      handleInput();
+      return;
+    }
+
+    // Para outras teclas que inserem texto, aplicar formatação imediatamente
+    if (e.key.length === 1 || e.key === ' ') {
       syncFormattingWithButtons();
     }
   };
@@ -1378,7 +1394,7 @@ export default function EnhancedRichTextEditor({
         }}
         className="w-full p-4 min-h-[200px] focus:outline-none bg-white rich-editor"
         style={{
-          lineHeight: "1.4", // Reduzido de 1.7 para 1.4
+          lineHeight: "1.6", // Melhor para legibilidade com quebras de linha
           fontSize: "16px", // Tamanho base padrão
           wordWrap: "break-word",
           overflowWrap: "break-word",
