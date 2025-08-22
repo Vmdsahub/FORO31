@@ -373,6 +373,10 @@ export default function EnhancedRichTextEditor({
       addDeleteButtonsToExistingMedia();
       // Salvar seleção atual
       saveCurrentSelection();
+      // Limpar formatação no estado inicial se todos os botões estão desativados
+      if (!isBold && !isItalic && !isUnderline && currentColor === "#000000" && fontSize === "16") {
+        clearAllFormatting();
+      }
     }, 50);
   };
 
@@ -381,6 +385,31 @@ export default function EnhancedRichTextEditor({
     // Para teclas que inserem texto, aplicar formatação imediatamente
     if (e.key.length === 1 || e.key === 'Enter' || e.key === ' ') {
       syncFormattingWithButtons();
+    }
+  };
+
+  // Função para limpar toda a formatação
+  const clearAllFormatting = () => {
+    try {
+      // Remover toda a formatação básica
+      if (document.queryCommandState("bold")) {
+        document.execCommand("bold", false);
+      }
+      if (document.queryCommandState("italic")) {
+        document.execCommand("italic", false);
+      }
+      if (document.queryCommandState("underline")) {
+        document.execCommand("underline", false);
+      }
+
+      // Resetar cor para padrão
+      document.execCommand("styleWithCSS", false, "true");
+      document.execCommand("foreColor", false, "#000000");
+
+      // Resetar tamanho da fonte
+      applyFontSize("16");
+    } catch (error) {
+      console.warn("Error clearing formatting:", error);
     }
   };
 
