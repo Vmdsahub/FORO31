@@ -613,9 +613,6 @@ export default function Index(props: IndexProps) {
                             ? `${topic.title.substring(0, 40)}...`
                             : topic.title}
                         </h3>
-                        <div className="text-sm text-gray-500">
-                          {topic.readTime} de leitura
-                        </div>
                       </div>
                       <div
                         className={`transform transition-transform duration-300 ease-in-out ${expandedNewsletter === topic.id ? "rotate-180" : ""}`}
