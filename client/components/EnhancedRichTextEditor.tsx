@@ -1274,7 +1274,7 @@ export default function EnhancedRichTextEditor({
           size="sm"
           onMouseDown={(e) => e.preventDefault()}
           onClick={handleBold}
-          className={`h-8 px-2 hover:bg-gray-100 ${isBold ? "bg-blue-500 text-white hover:bg-blue-600" : ""}`}
+          className={`h-8 w-8 px-2 hover:bg-gray-100 flex items-center justify-center ${isBold ? "bg-blue-500 text-white hover:bg-blue-600" : ""}`}
           title="Negrito (Ctrl+B)"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -1288,7 +1288,7 @@ export default function EnhancedRichTextEditor({
           size="sm"
           onMouseDown={(e) => e.preventDefault()}
           onClick={handleItalic}
-          className={`h-8 px-2 hover:bg-gray-100 ${isItalic ? "bg-blue-500 text-white hover:bg-blue-600" : ""}`}
+          className={`h-8 w-8 px-2 hover:bg-gray-100 flex items-center justify-center ${isItalic ? "bg-blue-500 text-white hover:bg-blue-600" : ""}`}
           title="Itálico (Ctrl+I)"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -1302,7 +1302,7 @@ export default function EnhancedRichTextEditor({
           size="sm"
           onMouseDown={(e) => e.preventDefault()}
           onClick={handleUnderline}
-          className={`h-8 px-2 hover:bg-gray-100 ${isUnderline ? "bg-blue-500 text-white hover:bg-blue-600" : ""}`}
+          className={`h-8 w-8 px-2 hover:bg-gray-100 flex items-center justify-center ${isUnderline ? "bg-blue-500 text-white hover:bg-blue-600" : ""}`}
           title="Sublinhado"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -1312,7 +1312,7 @@ export default function EnhancedRichTextEditor({
 
         {/* Font Size Dropdown */}
         <Select value={fontSize} onValueChange={handleFontSizeChange}>
-          <SelectTrigger className="h-8 w-20 text-xs">
+          <SelectTrigger className="h-8 w-20 text-xs flex items-center justify-center">
             <SelectValue placeholder="Fonte" />
           </SelectTrigger>
           <SelectContent>
@@ -1334,7 +1334,7 @@ export default function EnhancedRichTextEditor({
           size="sm"
           onMouseDown={(e) => e.preventDefault()}
           onClick={handleLink}
-          className="h-8 px-2 hover:bg-gray-100"
+          className="h-8 w-8 px-2 hover:bg-gray-100 flex items-center justify-center"
           title="Link"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -1355,7 +1355,7 @@ export default function EnhancedRichTextEditor({
               type="button"
               variant="outline"
               size="sm"
-              className="h-8 px-2 hover:bg-gray-100"
+              className="h-8 px-2 hover:bg-gray-100 flex items-center justify-center"
               title="Cor do texto"
               onMouseDown={(e) => {
                 e.preventDefault();
