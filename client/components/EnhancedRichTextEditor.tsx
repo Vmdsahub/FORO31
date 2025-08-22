@@ -534,7 +534,7 @@ export default function EnhancedRichTextEditor({
         document.execCommand("italic", false); // Remove itálico
       }
 
-      // Aplicar/remover sublinhado conforme estado do botão
+      // Aplicar/remover sublinhado conforme estado do bot��o
       if (isUnderline && !browserUnderline) {
         document.execCommand("underline", false);
       } else if (!isUnderline && browserUnderline) {
@@ -1458,7 +1458,7 @@ export default function EnhancedRichTextEditor({
           // Sincronizar formatação após colar
           setTimeout(() => syncFormattingWithButtons(), 10);
         }}
-        className="w-full p-4 min-h-[200px] focus:outline-none bg-white rich-editor"
+        className={`w-full p-4 ${isEditMode ? 'min-h-[150px]' : 'min-h-[200px]'} focus:outline-none bg-white rich-editor`}
         style={{
           lineHeight: "1.6", // Melhor para legibilidade com quebras de linha
           fontSize: "16px", // Tamanho base padrão
