@@ -432,9 +432,8 @@ export default function EnhancedRichTextEditor({
 
   const handleBold = () => {
     document.execCommand("bold", false);
+    setIsBold(!isBold); // Controle manual do estado
     handleInput();
-    // Atualizar estado após comando
-    setTimeout(() => updateFormattingState(), 10);
   };
 
   const handleItalic = () => {
@@ -1627,7 +1626,7 @@ export default function EnhancedRichTextEditor({
             {isEditMode ? (
               <span className="text-orange-600">
                 {" "}
-                Expansão de mídia disponível ap��s publicar.
+                Expansão de mídia disponível após publicar.
               </span>
             ) : (
               <span className="text-blue-600">
