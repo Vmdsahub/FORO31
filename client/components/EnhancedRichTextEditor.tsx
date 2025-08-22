@@ -1468,6 +1468,7 @@ export default function EnhancedRichTextEditor({
         }}
         suppressContentEditableWarning={true}
         data-placeholder={placeholder}
+        data-edit-mode={isEditMode}
       />
 
       {/* Enhanced CSS for better layout and text handling */}
