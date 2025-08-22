@@ -744,12 +744,15 @@ export default function Index(props: IndexProps) {
                         <Input
                           id="news-title"
                           value={newNewsletter.title}
-                          onChange={(e) =>
-                            setNewNewsletter({
-                              ...newNewsletter,
-                              title: e.target.value,
-                            })
-                          }
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (value.length <= 40) {
+                              setNewNewsletter({
+                                ...newNewsletter,
+                                title: value,
+                              });
+                            }
+                          }}
                           placeholder="Ex: GPT-4 vs Claude: An��lise Comparativa"
                           className="border-gray-300 focus:border-gray-500 focus:ring-gray-500 bg-white"
                         />
