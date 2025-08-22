@@ -1267,7 +1267,7 @@ export default function EnhancedRichTextEditor({
       className={`border border-gray-200 rounded-lg bg-white ${isEditMode ? "w-full" : ""}`}
     >
       {/* Toolbar */}
-      <div className="flex items-center gap-2 p-3 border-b border-gray-200 bg-gray-50 flex-wrap min-h-[56px]">
+      <div className="rich-text-toolbar">
         <Button
           type="button"
           variant={isBold ? "default" : "outline"}
