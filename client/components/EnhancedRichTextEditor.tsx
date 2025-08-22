@@ -912,10 +912,16 @@ export default function EnhancedRichTextEditor({
     setTimeout(() => {
       const selection = window.getSelection();
       if (selection) {
-        // Create a div for text input after the image
+        // Create a div for text input after the image with better visibility
         const textDiv = document.createElement("div");
-        textDiv.innerHTML = "&nbsp;"; // Use non-breaking space instead of <br>
-        textDiv.style.minHeight = "1.2em"; // Ensure minimum height for text
+        textDiv.innerHTML = "<br>"; // Use br for better line break handling
+        textDiv.style.cssText = "min-height: 1.5em; line-height: 1.5; margin-top: 8px; cursor: text;";
+        textDiv.contentEditable = "true";
+        textDiv.className = "editable-text-area";
+
+        // Add placeholder behavior
+        textDiv.setAttribute("data-placeholder", "Digite aqui...");
+
         editor.appendChild(textDiv);
 
         const range = document.createRange();
@@ -924,13 +930,16 @@ export default function EnhancedRichTextEditor({
         selection.removeAllRanges();
         selection.addRange(range);
 
-        // Focus the text div specifically
+        // Focus the text div specifically and make sure it's visible
         textDiv.focus();
+
+        // Scroll into view if needed
+        textDiv.scrollIntoView({ behavior: "smooth", block: "nearest" });
       }
 
       editor.focus();
       handleInput();
-    }, 50); // Increased timeout for better reliability
+    }, 100); // Increased timeout for better reliability
   };
 
   const insertVideoHtml = (src: string, name: string) => {
