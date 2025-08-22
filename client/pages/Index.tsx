@@ -761,19 +761,19 @@ export default function Index(props: IndexProps) {
                         >
                           Conteúdo do Artigo
                         </Label>
-                        <Textarea
-                          id="news-content"
-                          value={newNewsletter.content}
-                          onChange={(e) =>
-                            setNewNewsletter({
-                              ...newNewsletter,
-                              content: e.target.value,
-                            })
-                          }
-                          placeholder="Escreva o conteúdo completo do artigo..."
-                          rows={8}
-                          className="border-gray-300 focus:border-gray-500 focus:ring-gray-500 bg-white"
-                        />
+                        <div className="border border-gray-300 rounded-md">
+                          <EnhancedRichTextEditor
+                            value={newNewsletter.content}
+                            onChange={(content) =>
+                              setNewNewsletter({
+                                ...newNewsletter,
+                                content,
+                              })
+                            }
+                            placeholder="Escreva o conteúdo completo do artigo..."
+                            isEditMode={true}
+                          />
+                        </div>
                       </div>
                       <div className="flex justify-end gap-3 pt-4">
                         <Button
