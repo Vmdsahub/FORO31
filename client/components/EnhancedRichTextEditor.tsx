@@ -50,7 +50,6 @@ export default function EnhancedRichTextEditor({
   const [isItalic, setIsItalic] = useState(false);
   const [isUnderline, setIsUnderline] = useState(false);
 
-
   // Tamanhos de fonte pré-determinados
   const fontSizes = [
     { value: "10", label: "10px" },
@@ -216,12 +215,26 @@ export default function EnhancedRichTextEditor({
         addDeleteButtonsToExistingMedia();
 
         // Limpar formatação inicial se todos os botões estão no estado padrão
-        if (!isBold && !isItalic && !isUnderline && currentColor === "#000000" && fontSize === "16") {
+        if (
+          !isBold &&
+          !isItalic &&
+          !isUnderline &&
+          currentColor === "#000000" &&
+          fontSize === "16"
+        ) {
           clearAllFormatting();
         }
       }, 100);
     }
-  }, [value, isEditMode, isBold, isItalic, isUnderline, currentColor, fontSize]);
+  }, [
+    value,
+    isEditMode,
+    isBold,
+    isItalic,
+    isUnderline,
+    currentColor,
+    fontSize,
+  ]);
 
   // Configure global functions - conditional based on edit mode
   useEffect(() => {
@@ -281,7 +294,13 @@ export default function EnhancedRichTextEditor({
             onChange(cleaned);
           }
           // Garantir que não há formatação residual se botões estão desativados
-          if (!isBold && !isItalic && !isUnderline && currentColor === "#000000" && fontSize === "16") {
+          if (
+            !isBold &&
+            !isItalic &&
+            !isUnderline &&
+            currentColor === "#000000" &&
+            fontSize === "16"
+          ) {
             clearAllFormatting();
           }
         }
@@ -325,7 +344,11 @@ export default function EnhancedRichTextEditor({
     // Remover divs vazias (mas preservar divs com apenas <br> para quebras de linha)
     const divElements = temp.querySelectorAll("div");
     divElements.forEach((div) => {
-      if (!div.textContent?.trim() && !div.querySelector("img, video, br") && div.innerHTML.trim() !== "<br>") {
+      if (
+        !div.textContent?.trim() &&
+        !div.querySelector("img, video, br") &&
+        div.innerHTML.trim() !== "<br>"
+      ) {
         div.remove();
       }
     });
@@ -351,11 +374,12 @@ export default function EnhancedRichTextEditor({
       const cleanedContent = cleanHTML(rawContent);
 
       // Debug logging for line breaks
-      if (rawContent.includes('<br>') || rawContent.includes('<div>')) {
-        console.log('📝 Line breaks detected in editor:', {
+      if (rawContent.includes("<br>") || rawContent.includes("<div>")) {
+        console.log("📝 Line breaks detected in editor:", {
           raw: rawContent,
           cleaned: cleanedContent,
-          hasBreaks: cleanedContent.includes('<br>') || cleanedContent.includes('<div>')
+          hasBreaks:
+            cleanedContent.includes("<br>") || cleanedContent.includes("<div>"),
         });
       }
 
@@ -401,7 +425,13 @@ export default function EnhancedRichTextEditor({
       // Salvar seleção atual
       saveCurrentSelection();
       // Limpar formatação no estado inicial se todos os botões estão desativados
-      if (!isBold && !isItalic && !isUnderline && currentColor === "#000000" && fontSize === "16") {
+      if (
+        !isBold &&
+        !isItalic &&
+        !isUnderline &&
+        currentColor === "#000000" &&
+        fontSize === "16"
+      ) {
         clearAllFormatting();
       }
     }, 50);
@@ -410,7 +440,7 @@ export default function EnhancedRichTextEditor({
   // Handler para quando usuário começa a digitar
   const handleEditorKeyDown = (e: React.KeyboardEvent) => {
     // Tratamento especial para Enter
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       e.preventDefault();
 
       const selection = window.getSelection();
@@ -418,7 +448,7 @@ export default function EnhancedRichTextEditor({
 
       if (e.altKey) {
         // Alt+Enter: Inserir <br> (quebra de linha simples)
-        document.execCommand('insertHTML', false, '<br>');
+        document.execCommand("insertHTML", false, "<br>");
       } else {
         // Enter normal: Criar nova linha
         // Verificar se estamos no final de uma linha
@@ -426,11 +456,14 @@ export default function EnhancedRichTextEditor({
         const currentNode = range.startContainer;
 
         // Se estamos em uma div ou no final, criar nova div
-        if (currentNode.nodeType === Node.TEXT_NODE && currentNode.textContent?.trim() === '') {
-          document.execCommand('insertHTML', false, '<div><br></div>');
+        if (
+          currentNode.nodeType === Node.TEXT_NODE &&
+          currentNode.textContent?.trim() === ""
+        ) {
+          document.execCommand("insertHTML", false, "<div><br></div>");
         } else {
           // Caso contrário, inserir quebra de linha simples
-          document.execCommand('insertHTML', false, '<br>');
+          document.execCommand("insertHTML", false, "<br>");
         }
       }
 
@@ -439,7 +472,7 @@ export default function EnhancedRichTextEditor({
     }
 
     // Para outras teclas que inserem texto, aplicar formatação imediatamente
-    if (e.key.length === 1 || e.key === ' ') {
+    if (e.key.length === 1 || e.key === " ") {
       syncFormattingWithButtons();
     }
   };

@@ -33,14 +33,14 @@ export default function SimpleMarkdownRenderer({
     let processedContent = cleanContentForDisplay(content);
 
     // Preserve line breaks: convert <div><br></div> to proper line breaks
-    processedContent = processedContent.replace(/<div><br><\/div>/g, '<br>');
-    processedContent = processedContent.replace(/<div><br\/><\/div>/g, '<br>');
+    processedContent = processedContent.replace(/<div><br><\/div>/g, "<br>");
+    processedContent = processedContent.replace(/<div><br\/><\/div>/g, "<br>");
 
     // Convert empty divs to line breaks
-    processedContent = processedContent.replace(/<div>\s*<\/div>/g, '<br>');
+    processedContent = processedContent.replace(/<div>\s*<\/div>/g, "<br>");
 
     // Ensure <br> tags are properly preserved
-    processedContent = processedContent.replace(/<br><br>/g, '<br><br>');
+    processedContent = processedContent.replace(/<br><br>/g, "<br><br>");
 
     // Replace image patterns with clickable images
     processedContent = processedContent.replace(

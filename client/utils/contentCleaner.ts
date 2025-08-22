@@ -20,9 +20,9 @@ export function cleanContentForDisplay(content: string): string {
   // Preserve line breaks before removing delete buttons
   // Normalize line break patterns first
   cleanedContent = cleanedContent
-    .replace(/<div><br><\/div>/g, '<br>')
-    .replace(/<div><br\/><\/div>/g, '<br>')
-    .replace(/<div>\s*<\/div>/g, '<br>');
+    .replace(/<div><br><\/div>/g, "<br>")
+    .replace(/<div><br\/><\/div>/g, "<br>")
+    .replace(/<div>\s*<\/div>/g, "<br>");
 
   // Remove ALL delete buttons (trash icon buttons) from content when displaying
   // Pattern 1: Remove buttons with delete title attributes
@@ -89,9 +89,9 @@ export function cleanContentForSaving(content: string): string {
   // Preserve line breaks before removing delete buttons
   // Normalize line break patterns first
   cleanedContent = cleanedContent
-    .replace(/<div><br><\/div>/g, '<br>')
-    .replace(/<div><br\/><\/div>/g, '<br>')
-    .replace(/<div>\s*<\/div>/g, '<br>');
+    .replace(/<div><br><\/div>/g, "<br>")
+    .replace(/<div><br\/><\/div>/g, "<br>")
+    .replace(/<div>\s*<\/div>/g, "<br>");
 
   // Remove ALL delete buttons (trash icon buttons) before saving
   // Pattern 1: Remove buttons with delete title attributes
