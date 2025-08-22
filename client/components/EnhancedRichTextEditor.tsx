@@ -1251,7 +1251,7 @@ export default function EnhancedRichTextEditor({
             onInteractOutside={closeColorPicker}
             onFocusOutside={closeColorPicker}
           >
-            <div ref={colorPickerRef} className="color-picker-container">
+            <div className="color-picker-container">
               <HexColorPicker
                 color={currentColor}
                 onChange={handleColorChange}
