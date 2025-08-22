@@ -1477,6 +1477,43 @@ export default function EnhancedRichTextEditor({
 
       {/* Enhanced CSS for better layout and text handling */}
       <style>{`
+        /* Toolbar consistency fixes */
+        .rich-text-toolbar {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 12px;
+          border-bottom: 1px solid #e5e7eb;
+          background-color: #f9fafb;
+          flex-wrap: wrap;
+          min-height: 56px;
+        }
+
+        .rich-text-toolbar button {
+          height: 32px !important;
+          min-width: 32px;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          border-radius: 6px;
+          font-size: 14px;
+        }
+
+        .rich-text-toolbar [data-radix-select-trigger] {
+          height: 32px !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          border-radius: 6px;
+        }
+
+        .rich-text-toolbar .separator {
+          width: 1px;
+          height: 24px;
+          background-color: #d1d5db;
+          margin: 0 4px;
+        }
+
         /* Color picker styles */
         .color-picker-container {
           padding: 8px;
