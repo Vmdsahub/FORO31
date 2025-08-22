@@ -175,13 +175,66 @@ function CommentItem({
               </div>
             </div>
           ) : (
-            <div className="text-gray-700 mb-8 text-sm leading-relaxed pr-24 pt-6">
+            <div className="text-gray-700 mb-8 text-sm leading-relaxed pr-6 pt-6">
               <MarkdownRenderer content={comment.content} />
             </div>
           )}
 
           {/* Ações no canto inferior direito */}
           <div className="absolute bottom-0 right-4 flex items-center gap-2">
+            {/* 1. Botão Delete/Lixo */}
+            {canDelete && (
+              <button
+                onClick={handleDelete}
+                className="flex items-center gap-1 text-xs px-2 py-1 rounded transition-colors text-red-600 hover:bg-red-50"
+                title={`Excluir comentário ${isAdmin ? "(Admin)" : isTopicOwner ? "(Dono do post)" : "(Seu comentário)"}`}
+              >
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+                </svg>
+              </button>
+            )}
+
+            {user && (
+              <>
+                {/* 2. Botão Editar - apenas para o autor do comentário */}
+                {isCommentOwner && !isEditing && (
+                  <button
+                    onClick={handleEdit}
+                    className="text-xs text-blue-600 hover:text-blue-800 px-2 py-1 rounded transition-colors"
+                    title="Editar comentário"
+                  >
+                    Editar
+                  </button>
+                )}
+
+                {/* 3. Botão Citar */}
+                <button
+                  onClick={() => onQuote(comment)}
+                  className="text-xs text-gray-500 hover:text-black px-2 py-1 rounded transition-colors"
+                  title="Citar comentário"
+                >
+                  Citar
+                </button>
+
+                {user.id !== comment.authorId && (
+                  <button
+                    onClick={() => onReport(comment)}
+                    className="text-xs text-gray-500 hover:text-red-600 px-2 py-1 rounded transition-colors"
+                    title="Denunciar comentário"
+                  >
+                    !
+                  </button>
+                )}
+              </>
+            )}
+
+            {/* 4. Botão Like */}
             <button
               onClick={() => {
                 onLike(comment.id);
@@ -207,56 +260,6 @@ function CommentItem({
               </span>
               {comment.likes}
             </button>
-
-            {user && (
-              <>
-                <button
-                  onClick={() => onQuote(comment)}
-                  className="text-xs text-gray-500 hover:text-black px-2 py-1 rounded transition-colors"
-                  title="Citar comentário"
-                >
-                  Citar
-                </button>
-
-                {/* Botão Editar - apenas para o autor do comentário */}
-                {isCommentOwner && !isEditing && (
-                  <button
-                    onClick={handleEdit}
-                    className="text-xs text-blue-600 hover:text-blue-800 px-2 py-1 rounded transition-colors"
-                    title="Editar comentário"
-                  >
-                    Editar
-                  </button>
-                )}
-
-                {user.id !== comment.authorId && (
-                  <button
-                    onClick={() => onReport(comment)}
-                    className="text-xs text-gray-500 hover:text-red-600 px-2 py-1 rounded transition-colors"
-                    title="Denunciar comentário"
-                  >
-                    !
-                  </button>
-                )}
-              </>
-            )}
-
-            {canDelete && (
-              <button
-                onClick={handleDelete}
-                className="flex items-center gap-1 text-xs px-2 py-1 rounded transition-colors text-red-600 hover:bg-red-50"
-                title={`Excluir comentário ${isAdmin ? "(Admin)" : isTopicOwner ? "(Dono do post)" : "(Seu comentário)"}`}
-              >
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
-                </svg>
-              </button>
-            )}
           </div>
         </div>
       </div>
