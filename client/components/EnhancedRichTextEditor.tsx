@@ -1218,7 +1218,6 @@ export default function EnhancedRichTextEditor({
         >
           <PopoverTrigger asChild>
             <Button
-              ref={colorPickerTriggerRef}
               type="button"
               variant="outline"
               size="sm"
