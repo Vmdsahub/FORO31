@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import EnhancedRichTextEditor from "@/components/EnhancedRichTextEditor";
+import { cleanContentForSaving } from "@/utils/contentCleaner";
 import {
   Dialog,
   DialogContent,
@@ -126,7 +128,6 @@ export default function Index(props: IndexProps) {
   const [newNewsletter, setNewNewsletter] = useState({
     title: "",
     content: "",
-    readTime: "",
   });
 
   // Buscar tópicos reais da API quando uma categoria é selecionada
@@ -749,7 +750,7 @@ export default function Index(props: IndexProps) {
                               title: e.target.value,
                             })
                           }
-                          placeholder="Ex: GPT-4 vs Claude: An��lise Comparativa"
+                          placeholder="Ex: GPT-4 vs Claude: An���lise Comparativa"
                           className="border-gray-300 focus:border-gray-500 focus:ring-gray-500 bg-white"
                         />
                       </div>
