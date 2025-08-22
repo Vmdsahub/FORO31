@@ -518,19 +518,9 @@ export default function EnhancedRichTextEditor({
 
   const resetColor = () => {
     setCurrentColor("#000000");
-    if (savedSelectionRef.current) {
-      restoreSelection();
-      document.execCommand("styleWithCSS", false, "true");
-      document.execCommand("foreColor", false, "#000000");
-      saveCurrentSelection();
-      handleInput();
-    }
-    setTimeout(() => {
-      if (editorRef.current) {
-        editorRef.current.focus();
-        applyCurrentColor();
-      }
-    }, 50);
+    document.execCommand("styleWithCSS", false, "true");
+    document.execCommand("foreColor", false, "#000000");
+    handleInput();
   };
 
   const handleLink = () => {
