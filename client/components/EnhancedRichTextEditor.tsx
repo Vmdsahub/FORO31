@@ -585,6 +585,8 @@ export default function EnhancedRichTextEditor({
             if (selection) {
               selection.removeAllRanges();
               selection.addRange(savedSelectionRef.current);
+              // Salvar novamente após restaurar para manter consistência
+              saveCurrentSelection();
             }
           } catch (error) {
             console.warn("Error restoring selection:", error);
