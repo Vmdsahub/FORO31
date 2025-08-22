@@ -148,14 +148,12 @@ function CommentItem({
           <div className="text-gray-700 mb-8 text-sm leading-relaxed pr-24 pt-6">
             {isEditing ? (
               <div className="space-y-3">
-                <div className="bg-white rounded-lg border-2 border-blue-200 p-1">
-                  <EnhancedRichTextEditor
-                    value={editContent}
-                    onChange={setEditContent}
-                    placeholder="Editar comentário..."
-                    isEditMode={true}
-                  />
-                </div>
+                <EnhancedRichTextEditor
+                  value={editContent}
+                  onChange={setEditContent}
+                  placeholder="Editar comentário..."
+                  isEditMode={true}
+                />
                 <div className="flex items-center gap-2">
                   <Button
                     onClick={handleSaveEdit}
