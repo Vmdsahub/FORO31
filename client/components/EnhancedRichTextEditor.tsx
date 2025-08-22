@@ -1249,10 +1249,7 @@ export default function EnhancedRichTextEditor({
             className="w-auto p-0"
             side="bottom"
             align="start"
-            onEscapeKeyDown={(e) => {
-              e.preventDefault();
-              closeColorPicker();
-            }}
+            onEscapeKeyDown={closeColorPicker}
             onPointerDownOutside={closeColorPicker}
             onInteractOutside={closeColorPicker}
             onFocusOutside={closeColorPicker}
