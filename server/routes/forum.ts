@@ -910,17 +910,18 @@ export const handleDeleteTopic: RequestHandler = (req, res) => {
     return res.status(401).json({ message: "Autenticação necessária" });
   }
 
-  if (req.user.role !== "admin") {
-    return res
-      .status(403)
-      .json({ message: "Apenas administradores podem excluir tópicos" });
-  }
-
   const { topicId } = req.params;
   const topic = topics.get(topicId);
 
   if (!topic) {
     return res.status(404).json({ message: "Tópico não encontrado" });
+  }
+
+  // Allow topic author or admin to delete the topic
+  if (req.user.role !== "admin" && req.user.id !== topic.authorId) {
+    return res
+      .status(403)
+      .json({ message: "Apenas o autor do tópico ou administradores podem excluí-lo" });
   }
 
   topics.delete(topicId);
