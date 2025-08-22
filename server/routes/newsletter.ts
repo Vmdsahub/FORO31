@@ -24,34 +24,35 @@ function initializeDemo() {
     const currentWeekInfo = getCurrentWeekInfo();
     const exampleArticle: NewsletterArticle = {
       id: "demo_" + Date.now(),
-      title: "Newsletter Semanal - Sistema Renovado (2025-2030)",
-      content: `🎉 Sistema de Newsletter Completamente Renovado!
+      title: "Sistema de Newsletter Renovado",
+      content: `<h2>🎉 Sistema Completamente Renovado!</h2>
 
-O IA HUB agora possui um sistema de newsletter totalmente reformulado:
+<p>O IA HUB agora possui um sistema de newsletter totalmente reformulado:</p>
 
-🗓️ **Sistema de Semanas Inteligente:**
-• Todas as semanas de 2025 a 2030 já estão pré-cadastradas
-• Navegação automática baseada na data real
-• Avanço automático toda semana (aos domingos)
+<h3>🗓️ Sistema de Semanas Inteligente:</h3>
+<ul>
+<li>Todas as semanas de 2025 a 2030 já estão pré-cadastradas</li>
+<li>Navegação automática baseada na data real</li>
+<li>Avanço automático toda semana (aos domingos)</li>
+</ul>
 
-👨‍💼 **Controles de Acesso:**
-• Usuários: navegam apenas para semanas com conteúdo
-• Admins: navegação livre para planejamento futuro
-• Semana atual sempre identificada automaticamente
+<h3>👨‍💼 Controles de Acesso:</h3>
+<ul>
+<li>Usuários: navegam apenas para semanas com conteúdo</li>
+<li>Admins: navegação livre para planejamento futuro</li>
+<li>Semana atual sempre identificada automaticamente</li>
+</ul>
 
-🔧 **Funcionalidades Técnicas:**
-• Cálculo ISO 8601 para semanas internacionais
-• Cache inteligente para performance
-• Interface responsiva e moderna
-• Persistência real de dados
+<h3>🔧 Funcionalidades Técnicas:</h3>
+<ul>
+<li>Cálculo ISO 8601 para semanas internacionais</li>
+<li>Cache inteligente para performance</li>
+<li>Interface responsiva e moderna</li>
+<li>Persistência real de dados</li>
+</ul>
 
-📅 **Testes Validados:**
-• 17 de março de 2028 → Semana 11 de 2028
-• 17 de junho de 2026 → Semana 25 de 2026
-• Sistema funciona corretamente para qualquer data
-
-Este é um sistema muito mais robusto e simples de usar!`,
-      readTime: "2 min",
+<p><strong>Este é um sistema muito mais robusto e simples de usar!</strong></p>`,
+      readTime: "",
       authorId: "system",
       authorName: "Sistema IA HUB",
       createdAt: new Date().toISOString(),
