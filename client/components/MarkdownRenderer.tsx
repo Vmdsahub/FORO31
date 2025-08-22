@@ -30,6 +30,16 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
     // First clean any edit-mode attributes from content
     let processedContent = cleanContentForDisplay(content);
 
+    // Preserve line breaks: convert <div><br></div> to proper line breaks
+    processedContent = processedContent.replace(/<div><br><\/div>/g, "<br>");
+    processedContent = processedContent.replace(/<div><br\/><\/div>/g, "<br>");
+
+    // Convert empty divs to line breaks
+    processedContent = processedContent.replace(/<div>\s*<\/div>/g, "<br>");
+
+    // Ensure <br> tags are properly preserved
+    processedContent = processedContent.replace(/<br><br>/g, "<br><br>");
+
     // Replace image patterns with clickable images
     processedContent = processedContent.replace(
       /!\[(.*?)\]\((.*?)\)/g,
@@ -118,11 +128,13 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
   return (
     <>
       <div
-        className="prose max-w-none text-gray-700 leading-relaxed"
+        className="max-w-none text-gray-700 leading-relaxed"
         dangerouslySetInnerHTML={{ __html: processContent() }}
         style={{
           wordBreak: "break-word",
           overflowWrap: "break-word",
+          whiteSpace: "pre-wrap",
+          lineHeight: "1.6",
         }}
       />
 

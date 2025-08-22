@@ -50,64 +50,6 @@ export default function EnhancedRichTextEditor({
   const [isItalic, setIsItalic] = useState(false);
   const [isUnderline, setIsUnderline] = useState(false);
 
-  // Função para sincronizar estado do browser com os botões
-  const syncBrowserStateWithButtons = () => {
-    try {
-      const selection = window.getSelection();
-
-      // Verifica estado atual do browser
-      const browserBold = document.queryCommandState("bold");
-      const browserItalic = document.queryCommandState("italic");
-      const browserUnderline = document.queryCommandState("underline");
-
-      // Salvar posição atual antes de fazer mudanças
-      const currentRange =
-        selection && selection.rangeCount > 0
-          ? selection.getRangeAt(0).cloneRange()
-          : null;
-
-      // Verificar se é apenas cursor (sem seleção) ou se há texto selecionado
-      const isJustCursor = !selection || selection.isCollapsed;
-
-      if (isJustCursor) {
-        // CURSOR: Forçar correspondência total com botões
-        if (browserBold !== isBold) {
-          document.execCommand("bold", false);
-        }
-        if (browserItalic !== isItalic) {
-          document.execCommand("italic", false);
-        }
-        if (browserUnderline !== isUnderline) {
-          document.execCommand("underline", false);
-        }
-      } else {
-        // SELEÇÃO: Apenas aplicar formatação quando botão ativo + browser sem formatação
-        // (preservar formatação existente em seleções)
-        if (isBold && !browserBold) {
-          document.execCommand("bold", false);
-        }
-        if (isItalic && !browserItalic) {
-          document.execCommand("italic", false);
-        }
-        if (isUnderline && !browserUnderline) {
-          document.execCommand("underline", false);
-        }
-      }
-
-      // Restaurar posição do cursor após mudanças
-      if (currentRange && selection) {
-        try {
-          selection.removeAllRanges();
-          selection.addRange(currentRange);
-        } catch (error) {
-          console.warn("Error restoring cursor position:", error);
-        }
-      }
-    } catch (error) {
-      console.warn("Error syncing browser state:", error);
-    }
-  };
-
   // Tamanhos de fonte pré-determinados
   const fontSizes = [
     { value: "10", label: "10px" },
@@ -271,9 +213,28 @@ export default function EnhancedRichTextEditor({
       // Add delete buttons to any existing media after content loads
       setTimeout(() => {
         addDeleteButtonsToExistingMedia();
+
+        // Limpar formatação inicial se todos os botões estão no estado padrão
+        if (
+          !isBold &&
+          !isItalic &&
+          !isUnderline &&
+          currentColor === "#000000" &&
+          fontSize === "16"
+        ) {
+          clearAllFormatting();
+        }
       }, 100);
     }
-  }, [value, isEditMode]);
+  }, [
+    value,
+    isEditMode,
+    isBold,
+    isItalic,
+    isUnderline,
+    currentColor,
+    fontSize,
+  ]);
 
   // Configure global functions - conditional based on edit mode
   useEffect(() => {
@@ -332,6 +293,16 @@ export default function EnhancedRichTextEditor({
             editorRef.current.innerHTML = cleaned;
             onChange(cleaned);
           }
+          // Garantir que não há formatação residual se botões estão desativados
+          if (
+            !isBold &&
+            !isItalic &&
+            !isUnderline &&
+            currentColor === "#000000" &&
+            fontSize === "16"
+          ) {
+            clearAllFormatting();
+          }
         }
       }, 100);
     };
@@ -348,25 +319,37 @@ export default function EnhancedRichTextEditor({
     };
   }, [placeholder]);
 
-  // Função para limpar e otimizar HTML
+  // Função para limpar e otimizar HTML preservando quebras de linha
   const cleanHTML = (html: string): string => {
     // Criar um elemento temporário para manipular o HTML
     const temp = document.createElement("div");
     temp.innerHTML = html;
 
-    // Remover elementos font vazios
+    // Remover elementos font vazios (preservar os que têm conteúdo)
     const fontElements = temp.querySelectorAll("font");
     fontElements.forEach((font) => {
-      if (!font.textContent?.trim()) {
+      if (!font.textContent?.trim() && !font.querySelector("br")) {
         font.remove();
       }
     });
 
-    // Remover spans vazios
+    // Remover spans vazios (mas preservar spans com <br>)
     const spanElements = temp.querySelectorAll("span");
     spanElements.forEach((span) => {
-      if (!span.textContent?.trim() && !span.querySelector("img, video")) {
+      if (!span.textContent?.trim() && !span.querySelector("img, video, br")) {
         span.remove();
+      }
+    });
+
+    // Remover divs vazias (mas preservar divs com apenas <br> para quebras de linha)
+    const divElements = temp.querySelectorAll("div");
+    divElements.forEach((div) => {
+      if (
+        !div.textContent?.trim() &&
+        !div.querySelector("img, video, br") &&
+        div.innerHTML.trim() !== "<br>"
+      ) {
+        div.remove();
       }
     });
 
@@ -389,107 +372,183 @@ export default function EnhancedRichTextEditor({
     if (editorRef.current) {
       const rawContent = editorRef.current.innerHTML;
       const cleanedContent = cleanHTML(rawContent);
+
+      // Debug logging for line breaks
+      if (rawContent.includes("<br>") || rawContent.includes("<div>")) {
+        console.log("📝 Line breaks detected in editor:", {
+          raw: rawContent,
+          cleaned: cleanedContent,
+          hasBreaks:
+            cleanedContent.includes("<br>") || cleanedContent.includes("<div>"),
+        });
+      }
+
       onChange(cleanedContent);
     }
   };
 
-  // Aplicar cor atual quando necessário
-  const applyCurrentColor = () => {
-    if (currentColor && currentColor !== "#000000") {
-      document.execCommand("styleWithCSS", false, "true");
-      document.execCommand("foreColor", false, currentColor);
+  // Aplicar tamanho da fonte
+  const applyFontSize = (size: string) => {
+    document.execCommand("styleWithCSS", false, "true");
+
+    // Converter tamanho para um valor válido de execCommand (1-7)
+    let sizeValue = "3"; // padrão médio
+
+    switch (size) {
+      case "10":
+        sizeValue = "1";
+        break;
+      case "12":
+        sizeValue = "2";
+        break;
+      case "14":
+        sizeValue = "3";
+        break;
+      case "16":
+        sizeValue = "4";
+        break;
+      case "18":
+        sizeValue = "5";
+        break;
+      case "20":
+        sizeValue = "6";
+        break;
     }
-  };
 
-  // Aplicar tamanho da fonte atual quando necessário
-  const applyCurrentFontSize = () => {
-    if (fontSize && fontSize !== "16") {
-      document.execCommand("styleWithCSS", false, "true");
-
-      // Converter tamanho para um valor válido de execCommand (1-7)
-      let sizeValue = "3"; // padrão médio
-
-      switch (fontSize) {
-        case "10":
-          sizeValue = "1";
-          break;
-        case "12":
-          sizeValue = "2";
-          break;
-        case "14":
-          sizeValue = "3";
-          break;
-        case "16":
-          sizeValue = "4";
-          break;
-        case "18":
-          sizeValue = "5";
-          break;
-        case "20":
-          sizeValue = "6";
-          break;
-      }
-
-      document.execCommand("fontSize", false, sizeValue);
-    }
+    document.execCommand("fontSize", false, sizeValue);
   };
 
   const handleEditorFocus = () => {
     // Add delete buttons when user focuses on editor
     setTimeout(() => {
       addDeleteButtonsToExistingMedia();
-      // Aplicar cor e tamanho atuais quando focar no editor
-      applyCurrentColor();
-      applyCurrentFontSize();
-      // Sincronizar estado do browser com os botões
-      syncBrowserStateWithButtons();
+      // Salvar seleção atual
+      saveCurrentSelection();
+      // Limpar formatação no estado inicial se todos os botões estão desativados
+      if (
+        !isBold &&
+        !isItalic &&
+        !isUnderline &&
+        currentColor === "#000000" &&
+        fontSize === "16"
+      ) {
+        clearAllFormatting();
+      }
     }, 50);
   };
 
   // Handler para quando usuário começa a digitar
   const handleEditorKeyDown = (e: React.KeyboardEvent) => {
-    // Para teclas que inserem texto, garantir que cor e tamanho estão aplicados
-    if (e.key.length === 1) {
-      // FORÇAR estado dos botões IMEDIATAMENTE antes da digitação
-      setTimeout(() => {
-        forceButtonStateOnInput();
-        applyCurrentColor();
-        applyCurrentFontSize();
-      }, 0);
+    // Tratamento especial para Enter
+    if (e.key === "Enter") {
+      e.preventDefault();
+
+      const selection = window.getSelection();
+      if (!selection || !editorRef.current) return;
+
+      if (e.altKey) {
+        // Alt+Enter: Inserir <br> (quebra de linha simples)
+        document.execCommand("insertHTML", false, "<br>");
+      } else {
+        // Enter normal: Criar nova linha
+        // Verificar se estamos no final de uma linha
+        const range = selection.getRangeAt(0);
+        const currentNode = range.startContainer;
+
+        // Se estamos em uma div ou no final, criar nova div
+        if (
+          currentNode.nodeType === Node.TEXT_NODE &&
+          currentNode.textContent?.trim() === ""
+        ) {
+          document.execCommand("insertHTML", false, "<div><br></div>");
+        } else {
+          // Caso contrário, inserir quebra de linha simples
+          document.execCommand("insertHTML", false, "<br>");
+        }
+      }
+
+      handleInput();
+      return;
+    }
+
+    // Para outras teclas que inserem texto, aplicar formatação imediatamente
+    if (e.key.length === 1 || e.key === " ") {
+      syncFormattingWithButtons();
     }
   };
 
-  // Função para forçar estado dos botões no momento da digitação
-  const forceButtonStateOnInput = () => {
+  // Função para limpar toda a formatação
+  const clearAllFormatting = () => {
     try {
-      // Verificar estado atual do browser
+      // Remover toda a formatação básica
+      if (document.queryCommandState("bold")) {
+        document.execCommand("bold", false);
+      }
+      if (document.queryCommandState("italic")) {
+        document.execCommand("italic", false);
+      }
+      if (document.queryCommandState("underline")) {
+        document.execCommand("underline", false);
+      }
+
+      // Resetar cor para padrão
+      document.execCommand("styleWithCSS", false, "true");
+      document.execCommand("foreColor", false, "#000000");
+
+      // Resetar tamanho da fonte
+      applyFontSize("16");
+    } catch (error) {
+      console.warn("Error clearing formatting:", error);
+    }
+  };
+
+  // Função para sincronizar formatação com estado dos botões
+  const syncFormattingWithButtons = () => {
+    try {
       const browserBold = document.queryCommandState("bold");
       const browserItalic = document.queryCommandState("italic");
       const browserUnderline = document.queryCommandState("underline");
 
-      // FORÇAR correspondência com os botões (sem preservar seleção)
-      if (browserBold !== isBold) {
+      // Aplicar/remover negrito conforme estado do botão
+      if (isBold && !browserBold) {
         document.execCommand("bold", false);
+      } else if (!isBold && browserBold) {
+        document.execCommand("bold", false); // Remove negrito
       }
-      if (browserItalic !== isItalic) {
+
+      // Aplicar/remover itálico conforme estado do botão
+      if (isItalic && !browserItalic) {
         document.execCommand("italic", false);
+      } else if (!isItalic && browserItalic) {
+        document.execCommand("italic", false); // Remove itálico
       }
-      if (browserUnderline !== isUnderline) {
+
+      // Aplicar/remover sublinhado conforme estado do botão
+      if (isUnderline && !browserUnderline) {
         document.execCommand("underline", false);
+      } else if (!isUnderline && browserUnderline) {
+        document.execCommand("underline", false); // Remove sublinhado
+      }
+
+      // Aplicar cor apenas se diferente do padrão
+      if (currentColor && currentColor !== "#000000") {
+        document.execCommand("styleWithCSS", false, "true");
+        document.execCommand("foreColor", false, currentColor);
+      }
+
+      // Aplicar tamanho da fonte se diferente do padrão
+      if (fontSize && fontSize !== "16") {
+        applyFontSize(fontSize);
       }
     } catch (error) {
-      console.warn("Error forcing button state:", error);
+      console.warn("Error syncing formatting:", error);
     }
   };
 
   const handleEditorClick = () => {
-    // Salvar seleção e aplicar cor e tamanho atuais
+    // Salvar seleção atual
     setTimeout(() => {
       saveCurrentSelection();
-      applyCurrentColor();
-      applyCurrentFontSize();
-      // Sincronizar estado do browser com os botões
-      syncBrowserStateWithButtons();
     }, 10);
   };
 
@@ -497,20 +556,13 @@ export default function EnhancedRichTextEditor({
     // Salvar seleção após navegação com teclado
     setTimeout(() => {
       saveCurrentSelection();
-      // Se foi uma tecla de caractere, aplicar cor e tamanho
-      if (e.key.length === 1) {
-        applyCurrentColor();
-        applyCurrentFontSize();
-      }
-      // Sempre sincronizar estado do browser com os botões
-      syncBrowserStateWithButtons();
     }, 10);
   };
 
   // Handler para beforeinput - mais imediato que keydown
-  const handleBeforeInput = () => {
-    // Forçar estado correto ANTES de qualquer input
-    forceButtonStateOnInput();
+  const handleBeforeInput = (e: React.FormEvent) => {
+    // Sincronizar formatação antes de qualquer input
+    syncFormattingWithButtons();
   };
 
   const execCommand = (command: string, value?: string) => {
@@ -562,10 +614,20 @@ export default function EnhancedRichTextEditor({
   const handleFontSizeChange = (newSize: string) => {
     setFontSize(newSize);
 
-    // Focus no editor
+    // Restaurar seleção se existe
+    if (savedSelectionRef.current) {
+      restoreSelection();
+    }
+
+    // Aplicar tamanho imediatamente
+    applyFontSize(newSize);
+
+    // Focar de volta no editor
     if (editorRef.current) {
       editorRef.current.focus();
     }
+
+    handleInput();
   };
 
   const resetColor = () => {
@@ -584,9 +646,21 @@ export default function EnhancedRichTextEditor({
 
   const handleColorChange = (color: string) => {
     setCurrentColor(color);
-    // Aplicar cor diretamente como outros comandos
+
+    // Restaurar seleção se existe
+    if (savedSelectionRef.current) {
+      restoreSelection();
+    }
+
+    // Aplicar cor imediatamente
     document.execCommand("styleWithCSS", false, "true");
     document.execCommand("foreColor", false, color);
+
+    // Focar de volta no editor
+    if (editorRef.current) {
+      editorRef.current.focus();
+    }
+
     handleInput();
   };
 
@@ -1277,7 +1351,10 @@ export default function EnhancedRichTextEditor({
               size="sm"
               className="h-8 px-2 hover:bg-gray-100"
               title="Cor do texto"
-              onMouseDown={(e) => e.preventDefault()}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                saveCurrentSelection();
+              }}
               onClick={handleColorPicker}
             >
               <div className="flex items-center gap-1">
@@ -1375,9 +1452,13 @@ export default function EnhancedRichTextEditor({
         onKeyUp={handleEditorKeyUp}
         onKeyDown={handleEditorKeyDown}
         onBeforeInput={handleBeforeInput}
+        onPaste={(e) => {
+          // Sincronizar formatação após colar
+          setTimeout(() => syncFormattingWithButtons(), 10);
+        }}
         className="w-full p-4 min-h-[200px] focus:outline-none bg-white rich-editor"
         style={{
-          lineHeight: "1.4", // Reduzido de 1.7 para 1.4
+          lineHeight: "1.6", // Melhor para legibilidade com quebras de linha
           fontSize: "16px", // Tamanho base padrão
           wordWrap: "break-word",
           overflowWrap: "break-word",
@@ -1497,10 +1578,28 @@ export default function EnhancedRichTextEditor({
           box-shadow: none !important;
         }
 
-        /* Ensure text divs after media are properly editable */
+        /* Ensure text divs after media are properly editable and preserve line breaks */
         .rich-editor div:not(.image-container):not(.video-preview) {
           min-height: 1.2em;
-          line-height: 1.7;
+          line-height: 1.6;
+          margin-bottom: 0;
+        }
+
+        /* Preserve line breaks in rich editor */
+        .rich-editor br {
+          display: block;
+          content: "";
+          margin-top: 0;
+        }
+
+        /* Ensure divs create proper line breaks */
+        .rich-editor div {
+          display: block;
+        }
+
+        /* Better spacing for consecutive divs */
+        .rich-editor div + div {
+          margin-top: 0;
         }
 
         /* Prevent ALL interactions with media elements in rich editor */
@@ -1676,7 +1775,7 @@ export default function EnhancedRichTextEditor({
             {isEditMode ? (
               <span className="text-orange-600">
                 {" "}
-                Expansão de mídia disponível após publicar.
+                Expans��o de mídia disponível após publicar.
               </span>
             ) : (
               <span className="text-blue-600">
