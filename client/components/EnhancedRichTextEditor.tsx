@@ -1756,9 +1756,22 @@ export default function EnhancedRichTextEditor({
         .rich-editor > *:first-child {
           margin-top: 0;
         }
-        
+
         .rich-editor > *:last-child {
           margin-bottom: 0;
+        }
+
+        /* Specific styling for edit mode */
+        .rich-editor[data-edit-mode="true"] {
+          background: white;
+          border: none;
+          min-height: 150px;
+        }
+
+        .rich-editor[data-edit-mode="true"]:focus {
+          outline: none;
+          box-shadow: none;
+          border: none;
         }
       `}</style>
 
@@ -1773,7 +1786,7 @@ export default function EnhancedRichTextEditor({
               {" "}
               upload ultra-seguro com validação ClamAV-style
             </span>
-            . Upload de mídia �� automaticamente inserido no conteúdo.
+            . Upload de mídia é automaticamente inserido no conteúdo.
             {isEditMode ? (
               <span className="text-orange-600">
                 {" "}
