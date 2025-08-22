@@ -189,7 +189,11 @@ export default function TopicView() {
     if (!topic) return;
     setEditTitle(topic.title);
     setEditDescription(topic.description);
-    setEditContent(topic.content);
+    // Limpar conteúdo antes de editar para evitar HTML bugado
+    const cleanContent = topic.content
+      .replace(/data-edit-mode="[^"]*"/g, '')
+      .replace(/data-has-delete="[^"]*"/g, '');
+    setEditContent(cleanContent);
     setEditCategory(topic.category);
     setIsEditing(true);
   };
