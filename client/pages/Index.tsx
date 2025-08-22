@@ -633,9 +633,10 @@ export default function Index(props: IndexProps) {
                   {expandedNewsletter === topic.id && (
                     <div className="border-t border-gray-100 bg-gray-50 animate-slide-up">
                       <div className="p-6">
-                        <div className="prose max-w-none text-gray-700 leading-relaxed whitespace-pre-line mb-4">
-                          {topic.content}
-                        </div>
+                        <div
+                          className="prose max-w-none text-gray-700 leading-relaxed mb-4"
+                          dangerouslySetInnerHTML={{ __html: topic.content }}
+                        />
                         {isAdmin && (
                           <div className="px-6 py-3 border-t border-gray-200 bg-gray-50">
                             <div className="flex gap-2">
