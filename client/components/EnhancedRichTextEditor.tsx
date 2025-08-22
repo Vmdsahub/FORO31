@@ -63,16 +63,32 @@ export default function EnhancedRichTextEditor({
       // Salvar posição atual antes de fazer mudanças
       const currentRange = selection && selection.rangeCount > 0 ? selection.getRangeAt(0).cloneRange() : null;
 
-      // APENAS aplicar formatação quando botão está ATIVO mas browser não tem
-      // NUNCA remover formatação existente quando botão está INATIVO
-      if (isBold && !browserBold) {
-        document.execCommand("bold", false);
-      }
-      if (isItalic && !browserItalic) {
-        document.execCommand("italic", false);
-      }
-      if (isUnderline && !browserUnderline) {
-        document.execCommand("underline", false);
+      // Verificar se é apenas cursor (sem seleção) ou se há texto selecionado
+      const isJustCursor = !selection || selection.isCollapsed;
+
+      if (isJustCursor) {
+        // CURSOR: Forçar correspondência total com botões
+        if (browserBold !== isBold) {
+          document.execCommand("bold", false);
+        }
+        if (browserItalic !== isItalic) {
+          document.execCommand("italic", false);
+        }
+        if (browserUnderline !== isUnderline) {
+          document.execCommand("underline", false);
+        }
+      } else {
+        // SELEÇÃO: Apenas aplicar formatação quando botão ativo + browser sem formatação
+        // (preservar formatação existente em seleções)
+        if (isBold && !browserBold) {
+          document.execCommand("bold", false);
+        }
+        if (isItalic && !browserItalic) {
+          document.execCommand("italic", false);
+        }
+        if (isUnderline && !browserUnderline) {
+          document.execCommand("underline", false);
+        }
       }
 
       // Restaurar posição do cursor após mudanças
