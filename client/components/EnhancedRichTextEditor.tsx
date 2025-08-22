@@ -380,25 +380,39 @@ export default function EnhancedRichTextEditor({
   const handleEditorKeyDown = (e: React.KeyboardEvent) => {
     // Para teclas que inserem texto, aplicar formatação imediatamente
     if (e.key.length === 1 || e.key === 'Enter' || e.key === ' ') {
-      applyAllFormatting();
+      syncFormattingWithButtons();
     }
   };
 
-  // Função para aplicar toda a formatação atual
-  const applyAllFormatting = () => {
+  // Função para sincronizar formatação com estado dos botões
+  const syncFormattingWithButtons = () => {
     try {
-      // Aplicar formatações básicas apenas se ativas
-      if (isBold && !document.queryCommandState("bold")) {
+      const browserBold = document.queryCommandState("bold");
+      const browserItalic = document.queryCommandState("italic");
+      const browserUnderline = document.queryCommandState("underline");
+
+      // Aplicar/remover negrito conforme estado do botão
+      if (isBold && !browserBold) {
         document.execCommand("bold", false);
-      }
-      if (isItalic && !document.queryCommandState("italic")) {
-        document.execCommand("italic", false);
-      }
-      if (isUnderline && !document.queryCommandState("underline")) {
-        document.execCommand("underline", false);
+      } else if (!isBold && browserBold) {
+        document.execCommand("bold", false); // Remove negrito
       }
 
-      // Aplicar cor se diferente do padrão
+      // Aplicar/remover itálico conforme estado do botão
+      if (isItalic && !browserItalic) {
+        document.execCommand("italic", false);
+      } else if (!isItalic && browserItalic) {
+        document.execCommand("italic", false); // Remove itálico
+      }
+
+      // Aplicar/remover sublinhado conforme estado do botão
+      if (isUnderline && !browserUnderline) {
+        document.execCommand("underline", false);
+      } else if (!isUnderline && browserUnderline) {
+        document.execCommand("underline", false); // Remove sublinhado
+      }
+
+      // Aplicar cor apenas se diferente do padrão
       if (currentColor && currentColor !== "#000000") {
         document.execCommand("styleWithCSS", false, "true");
         document.execCommand("foreColor", false, currentColor);
@@ -409,7 +423,7 @@ export default function EnhancedRichTextEditor({
         applyFontSize(fontSize);
       }
     } catch (error) {
-      console.warn("Error applying formatting:", error);
+      console.warn("Error syncing formatting:", error);
     }
   };
 
@@ -429,8 +443,8 @@ export default function EnhancedRichTextEditor({
 
   // Handler para beforeinput - mais imediato que keydown
   const handleBeforeInput = (e: React.FormEvent) => {
-    // Aplicar formatação antes de qualquer input
-    applyAllFormatting();
+    // Sincronizar formatação antes de qualquer input
+    syncFormattingWithButtons();
   };
 
   const execCommand = (command: string, value?: string) => {
@@ -1321,8 +1335,8 @@ export default function EnhancedRichTextEditor({
         onKeyDown={handleEditorKeyDown}
         onBeforeInput={handleBeforeInput}
         onPaste={(e) => {
-          // Aplicar formatação após colar
-          setTimeout(() => applyAllFormatting(), 10);
+          // Sincronizar formatação após colar
+          setTimeout(() => syncFormattingWithButtons(), 10);
         }}
         className="w-full p-4 min-h-[200px] focus:outline-none bg-white rich-editor"
         style={{
