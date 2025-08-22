@@ -293,7 +293,7 @@ export default function EnhancedRichTextEditor({
             editorRef.current.innerHTML = cleaned;
             onChange(cleaned);
           }
-          // Garantir que não há formatação residual se botões estão desativados
+          // Garantir que não h�� formatação residual se botões estão desativados
           if (
             !isBold &&
             !isItalic &&
@@ -422,18 +422,6 @@ export default function EnhancedRichTextEditor({
     // Add delete buttons when user focuses on editor
     setTimeout(() => {
       addDeleteButtonsToExistingMedia();
-
-      // Ensure all editable text areas are properly set up
-      if (editorRef.current) {
-        const editableAreas = editorRef.current.querySelectorAll('.editable-text-area');
-        editableAreas.forEach((area) => {
-          area.addEventListener('click', (e) => {
-            e.stopPropagation();
-            (e.target as HTMLElement).focus();
-          });
-        });
-      }
-
       // Salvar seleção atual
       saveCurrentSelection();
       // Limpar formatação no estado inicial se todos os botões estão desativados
@@ -631,7 +619,7 @@ export default function EnhancedRichTextEditor({
   };
 
   const execCommandWithSelection = (command: string, value?: string) => {
-    // Salvar seleç��o atual
+    // Salvar seleção atual
     const selection = window.getSelection();
     if (selection && selection.rangeCount > 0) {
       const range = selection.getRangeAt(0);
