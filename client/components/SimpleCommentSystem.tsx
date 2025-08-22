@@ -59,7 +59,11 @@ function CommentItem({
   const canDelete = isAdmin || isTopicOwner || isCommentOwner;
 
   const handleEdit = () => {
-    setEditContent(comment.content);
+    // Limpar conteúdo antes de editar para evitar HTML bugado
+    const cleanContent = comment.content
+      .replace(/data-edit-mode="[^"]*"/g, '')
+      .replace(/data-has-delete="[^"]*"/g, '');
+    setEditContent(cleanContent);
     setIsEditing(true);
   };
 
