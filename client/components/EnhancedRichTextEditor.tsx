@@ -61,7 +61,10 @@ export default function EnhancedRichTextEditor({
       const browserUnderline = document.queryCommandState("underline");
 
       // Salvar posição atual antes de fazer mudanças
-      const currentRange = selection && selection.rangeCount > 0 ? selection.getRangeAt(0).cloneRange() : null;
+      const currentRange =
+        selection && selection.rangeCount > 0
+          ? selection.getRangeAt(0).cloneRange()
+          : null;
 
       // Verificar se é apenas cursor (sem seleção) ou se há texto selecionado
       const isJustCursor = !selection || selection.isCollapsed;
@@ -122,7 +125,10 @@ export default function EnhancedRichTextEditor({
       if (selection && selection.rangeCount > 0) {
         const range = selection.getRangeAt(0);
         // Verificar se a seleção está dentro do editor
-        if (editorRef.current && editorRef.current.contains(range.commonAncestorContainer)) {
+        if (
+          editorRef.current &&
+          editorRef.current.contains(range.commonAncestorContainer)
+        ) {
           savedSelectionRef.current = range.cloneRange();
         }
       }
