@@ -744,7 +744,7 @@ export default function Index(props: IndexProps) {
                           value={newNewsletter.title}
                           onChange={(e) => {
                             const value = e.target.value;
-                            if (value.length <= 40) {
+                            if (value.length <= 100) {
                               setNewNewsletter({
                                 ...newNewsletter,
                                 title: value,
