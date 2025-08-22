@@ -34,7 +34,7 @@ const createCommentSchema = z.object({
 });
 
 const editTopicSchema = z.object({
-  title: z.string().min(1).max(100).optional(),
+  title: z.string().min(1).max(80).optional(),
   description: z.string().min(1).max(200).optional(),
   content: z.string().min(1).max(50000).optional(),
   category: z.string().min(1).optional(),
