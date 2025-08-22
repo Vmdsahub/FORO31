@@ -367,8 +367,6 @@ export default function EnhancedRichTextEditor({
       // Aplicar cor e tamanho atuais quando focar no editor
       applyCurrentColor();
       applyCurrentFontSize();
-      // Atualizar estado dos botões de formatação
-      updateFormattingState();
     }, 50);
   };
 
