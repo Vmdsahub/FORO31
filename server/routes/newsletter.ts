@@ -70,9 +70,8 @@ initializeDemo();
 
 // Validation schema
 const createArticleSchema = z.object({
-  title: z.string().min(1, "Título é obrigatório"),
+  title: z.string().min(1, "Título é obrigatório").max(40, "Título deve ter no máximo 40 caracteres"),
   content: z.string().min(1, "Conteúdo é obrigatório"),
-  readTime: z.string().min(1, "Tempo de leitura é obrigatório"),
   targetWeek: z.number().optional(), // Semana específica (opcional)
   targetYear: z.number().optional(), // Ano específico (opcional)
 });
@@ -153,7 +152,7 @@ export const handleCreateArticle: RequestHandler = (req, res) => {
         .json({ message: "Apenas administradores podem criar artigos" });
     }
 
-    const { title, content, readTime, targetWeek, targetYear } =
+    const { title, content, targetWeek, targetYear } =
       createArticleSchema.parse(req.body);
 
     // Se admin especificou semana/ano, usar esses. Senão, usar semana atual
@@ -183,7 +182,7 @@ export const handleCreateArticle: RequestHandler = (req, res) => {
       id: articleId,
       title,
       content,
-      readTime,
+      readTime: "", // Campo mantido para compatibilidade, mas não usado
       authorId: req.user.id,
       authorName: req.user.name,
       createdAt: new Date().toISOString(),
@@ -255,7 +254,6 @@ export const handleGetArticles: RequestHandler = (req, res) => {
           id: article.id, // Keep original string ID for proper deletion
           title: article.title,
           content: article.content,
-          readTime: article.readTime,
         });
 
         return acc;
