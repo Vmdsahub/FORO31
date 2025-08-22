@@ -571,7 +571,7 @@ export default function Index(props: IndexProps) {
                   title={
                     user?.name === "Vitoca"
                       ? "Avançar para semanas mais recentes (Admin)"
-                      : "Avançar de volta at�� a semana atual"
+                      : "Avançar de volta até a semana atual"
                   }
                 >
                   <svg
@@ -751,26 +751,6 @@ export default function Index(props: IndexProps) {
                             })
                           }
                           placeholder="Ex: GPT-4 vs Claude: An��lise Comparativa"
-                          className="border-gray-300 focus:border-gray-500 focus:ring-gray-500 bg-white"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label
-                          htmlFor="news-time"
-                          className="text-gray-900 font-medium"
-                        >
-                          Tempo de Leitura
-                        </Label>
-                        <Input
-                          id="news-time"
-                          value={newNewsletter.readTime}
-                          onChange={(e) =>
-                            setNewNewsletter({
-                              ...newNewsletter,
-                              readTime: e.target.value,
-                            })
-                          }
-                          placeholder="Ex: 8 min"
                           className="border-gray-300 focus:border-gray-500 focus:ring-gray-500 bg-white"
                         />
                       </div>
