@@ -635,7 +635,10 @@ export default function Index(props: IndexProps) {
                       <div className="p-6">
                         <div
                           className="prose max-w-none text-gray-700 leading-relaxed mb-4 break-words overflow-wrap-anywhere"
-                          style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}
+                          style={{
+                            wordBreak: "break-word",
+                            overflowWrap: "break-word",
+                          }}
                           dangerouslySetInnerHTML={{ __html: topic.content }}
                         />
                         {isAdmin && (
