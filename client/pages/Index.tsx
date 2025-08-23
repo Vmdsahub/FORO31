@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import EnhancedRichTextEditor from "@/components/EnhancedRichTextEditor";
+import { cleanContentForSaving } from "@/utils/contentCleaner";
 import {
   Dialog,
   DialogContent,
@@ -126,7 +128,6 @@ export default function Index(props: IndexProps) {
   const [newNewsletter, setNewNewsletter] = useState({
     title: "",
     content: "",
-    readTime: "",
   });
 
   // Buscar tópicos reais da API quando uma categoria é selecionada
@@ -267,17 +268,17 @@ export default function Index(props: IndexProps) {
       return;
     }
 
-    if (!newNewsletter.readTime.trim()) {
-      toast.error("Preencha o tempo de leitura");
+    if (newNewsletter.title.length > 100) {
+      toast.error("Título deve ter no máximo 100 caracteres");
       return;
     }
 
     try {
       // Se admin e há uma semana selecionada, usar essa semana. Senão, criar na semana atual
+      const cleanedContent = cleanContentForSaving(newNewsletter.content);
       const requestBody: any = {
         title: newNewsletter.title,
-        content: newNewsletter.content,
-        readTime: newNewsletter.readTime,
+        content: cleanedContent,
       };
 
       // Se admin está visualizando uma semana específica, criar artigo nessa semana
@@ -302,7 +303,7 @@ export default function Index(props: IndexProps) {
 
       if (response.ok) {
         toast.success("Artigo criado com sucesso!");
-        setNewNewsletter({ title: "", content: "", readTime: "" });
+        setNewNewsletter({ title: "", content: "" });
         setIsNewsletterModalOpen(false);
         // Refresh newsletters
         if (onNewsletterRefresh) {
@@ -612,9 +613,6 @@ export default function Index(props: IndexProps) {
                             ? `${topic.title.substring(0, 40)}...`
                             : topic.title}
                         </h3>
-                        <div className="text-sm text-gray-500">
-                          {topic.readTime} de leitura
-                        </div>
                       </div>
                       <div
                         className={`transform transition-transform duration-300 ease-in-out ${expandedNewsletter === topic.id ? "rotate-180" : ""}`}
@@ -635,9 +633,14 @@ export default function Index(props: IndexProps) {
                   {expandedNewsletter === topic.id && (
                     <div className="border-t border-gray-100 bg-gray-50 animate-slide-up">
                       <div className="p-6">
-                        <div className="prose max-w-none text-gray-700 leading-relaxed whitespace-pre-line mb-4">
-                          {topic.content}
-                        </div>
+                        <div
+                          className="prose max-w-none text-gray-700 leading-relaxed mb-4 break-words overflow-wrap-anywhere"
+                          style={{
+                            wordBreak: "break-word",
+                            overflowWrap: "break-word",
+                          }}
+                          dangerouslySetInnerHTML={{ __html: topic.content }}
+                        />
                         {isAdmin && (
                           <div className="px-6 py-3 border-t border-gray-200 bg-gray-50">
                             <div className="flex gap-2">
@@ -738,40 +741,27 @@ export default function Index(props: IndexProps) {
                           htmlFor="news-title"
                           className="text-gray-900 font-medium"
                         >
-                          Título do Artigo
+                          Título do Artigo (máx. 100 caracteres)
                         </Label>
                         <Input
                           id="news-title"
                           value={newNewsletter.title}
-                          onChange={(e) =>
-                            setNewNewsletter({
-                              ...newNewsletter,
-                              title: e.target.value,
-                            })
-                          }
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (value.length <= 100) {
+                              setNewNewsletter({
+                                ...newNewsletter,
+                                title: value,
+                              });
+                            }
+                          }}
                           placeholder="Ex: GPT-4 vs Claude: An��lise Comparativa"
                           className="border-gray-300 focus:border-gray-500 focus:ring-gray-500 bg-white"
+                          maxLength={100}
                         />
-                      </div>
-                      <div className="space-y-2">
-                        <Label
-                          htmlFor="news-time"
-                          className="text-gray-900 font-medium"
-                        >
-                          Tempo de Leitura
-                        </Label>
-                        <Input
-                          id="news-time"
-                          value={newNewsletter.readTime}
-                          onChange={(e) =>
-                            setNewNewsletter({
-                              ...newNewsletter,
-                              readTime: e.target.value,
-                            })
-                          }
-                          placeholder="Ex: 8 min"
-                          className="border-gray-300 focus:border-gray-500 focus:ring-gray-500 bg-white"
-                        />
+                        <div className="text-xs text-gray-500 mt-1">
+                          {newNewsletter.title.length}/100 caracteres
+                        </div>
                       </div>
                       <div className="space-y-2">
                         <Label
@@ -780,19 +770,19 @@ export default function Index(props: IndexProps) {
                         >
                           Conteúdo do Artigo
                         </Label>
-                        <Textarea
-                          id="news-content"
-                          value={newNewsletter.content}
-                          onChange={(e) =>
-                            setNewNewsletter({
-                              ...newNewsletter,
-                              content: e.target.value,
-                            })
-                          }
-                          placeholder="Escreva o conteúdo completo do artigo..."
-                          rows={8}
-                          className="border-gray-300 focus:border-gray-500 focus:ring-gray-500 bg-white"
-                        />
+                        <div className="border border-gray-300 rounded-md">
+                          <EnhancedRichTextEditor
+                            value={newNewsletter.content}
+                            onChange={(content) =>
+                              setNewNewsletter({
+                                ...newNewsletter,
+                                content,
+                              })
+                            }
+                            placeholder="Escreva o conteúdo completo do artigo..."
+                            isEditMode={true}
+                          />
+                        </div>
                       </div>
                       <div className="flex justify-end gap-3 pt-4">
                         <Button
