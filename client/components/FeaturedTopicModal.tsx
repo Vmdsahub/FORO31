@@ -178,22 +178,31 @@ export default function FeaturedTopicModal({
                     const isUsed = positions.usedPositions.includes(pos);
                     const isAvailable =
                       positions.availablePositions.includes(pos);
+                    const isCurrentTopicPosition =
+                      topic.isFeatured && topic.featuredPosition === pos;
 
                     return (
                       <button
                         key={pos}
                         onClick={() => setSelectedPosition(pos)}
-                        disabled={isUsed}
+                        disabled={isUsed && !isCurrentTopicPosition}
                         className={`p-3 text-sm font-medium rounded-lg border-2 transition-all ${
                           selectedPosition === pos
                             ? "border-blue-500 bg-blue-50 text-blue-700"
-                            : isUsed
+                            : isUsed && !isCurrentTopicPosition
                               ? "border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed"
                               : "border-gray-300 hover:border-gray-400 text-gray-700"
                         }`}
                       >
                         {pos}
-                        {isUsed && <div className="text-xs mt-1">Ocupada</div>}
+                        {isUsed && !isCurrentTopicPosition && (
+                          <div className="text-xs mt-1">Ocupada</div>
+                        )}
+                        {isCurrentTopicPosition && (
+                          <div className="text-xs mt-1 text-green-600">
+                            Atual
+                          </div>
+                        )}
                       </button>
                     );
                   })}
@@ -233,21 +242,20 @@ export default function FeaturedTopicModal({
                 </Button>
                 <Button
                   onClick={handleAddToFeatured}
-                  disabled={
-                    isLoading || positions.availablePositions.length === 0
-                  }
+                  disabled={isLoading}
                   className="flex-1"
                 >
                   {isLoading ? "Adicionando..." : "Adicionar aos Destaques"}
                 </Button>
               </div>
 
-              {positions.availablePositions.length === 0 && (
-                <p className="text-xs text-red-600 text-center">
-                  Todas as posições estão ocupadas. Selecione uma posição para
-                  substituir.
-                </p>
-              )}
+              {positions.usedPositions.length === 4 &&
+                !positions.availablePositions.length && (
+                  <p className="text-xs text-orange-600 text-center">
+                    Todas as posições estão ocupadas. Selecione uma posição para
+                    substituir.
+                  </p>
+                )}
             </div>
           )}
         </div>

@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { Topic } from "@shared/forum";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 interface FeaturedTopic extends Topic {
   featuredImageUrl?: string;
@@ -10,29 +11,17 @@ interface FeaturedTopic extends Topic {
 
 interface FeaturedCarouselProps {
   isAdmin?: boolean;
+  onFeaturedUpdate?: () => void;
 }
 
-export default function FeaturedCarousel({ isAdmin }: FeaturedCarouselProps) {
+export default function FeaturedCarousel({
+  isAdmin,
+  onFeaturedUpdate,
+}: FeaturedCarouselProps) {
   const [featuredTopics, setFeaturedTopics] = useState<FeaturedTopic[]>([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
-
-  // Carregar tópicos em destaque
-  useEffect(() => {
-    fetchFeaturedTopics();
-  }, []);
-
-  // Auto-rotation a cada 10 segundos
-  useEffect(() => {
-    if (featuredTopics.length === 0) return;
-
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % featuredTopics.length);
-    }, 10000);
-
-    return () => clearInterval(interval);
-  }, [featuredTopics.length]);
 
   const fetchFeaturedTopics = async () => {
     try {
@@ -53,16 +42,16 @@ export default function FeaturedCarousel({ isAdmin }: FeaturedCarouselProps) {
     }
   };
 
-  const nextSlide = () => {
+  const nextSlide = useCallback(() => {
     if (isTransitioning) return;
     setIsTransitioning(true);
     setTimeout(() => {
       setCurrentSlide((prev) => (prev + 1) % featuredTopics.length);
       setTimeout(() => setIsTransitioning(false), 50);
     }, 250);
-  };
+  }, [isTransitioning, featuredTopics.length]);
 
-  const prevSlide = () => {
+  const prevSlide = useCallback(() => {
     if (isTransitioning) return;
     setIsTransitioning(true);
     setTimeout(() => {
@@ -71,16 +60,68 @@ export default function FeaturedCarousel({ isAdmin }: FeaturedCarouselProps) {
       );
       setTimeout(() => setIsTransitioning(false), 50);
     }, 250);
+  }, [isTransitioning, featuredTopics.length]);
+
+  const goToSlide = useCallback(
+    (index: number) => {
+      if (isTransitioning || index === currentSlide) return;
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentSlide(index);
+        setTimeout(() => setIsTransitioning(false), 50);
+      }, 250);
+    },
+    [isTransitioning, currentSlide],
+  );
+
+  const removeFeaturedTopic = async (topicId: string) => {
+    try {
+      const response = await fetch(`/api/featured-topics/${topicId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+        },
+      });
+
+      if (response.ok) {
+        toast.success("Tópico removido dos destaques!");
+        // Atualizar a lista de tópicos em destaque
+        await fetchFeaturedTopics();
+        // Ajustar slide atual se necessário
+        setTimeout(() => {
+          if (featuredTopics.length <= 1) {
+            setCurrentSlide(0);
+          } else if (currentSlide >= featuredTopics.length - 1) {
+            setCurrentSlide(Math.max(0, featuredTopics.length - 2));
+          }
+        }, 100);
+        // Notificar componente pai para atualizar dados
+        onFeaturedUpdate?.();
+      } else {
+        const error = await response.json();
+        toast.error(error.message || "Erro ao remover tópico dos destaques");
+      }
+    } catch (error) {
+      console.error("Error removing featured topic:", error);
+      toast.error("Erro ao remover tópico dos destaques");
+    }
   };
 
-  const goToSlide = (index: number) => {
-    if (isTransitioning || index === currentSlide) return;
-    setIsTransitioning(true);
-    setTimeout(() => {
-      setCurrentSlide(index);
-      setTimeout(() => setIsTransitioning(false), 50);
-    }, 250);
-  };
+  // Carregar tópicos em destaque
+  useEffect(() => {
+    fetchFeaturedTopics();
+  }, []);
+
+  // Auto-rotation a cada 10 segundos
+  useEffect(() => {
+    if (featuredTopics.length <= 1) return;
+
+    const interval = setInterval(() => {
+      nextSlide();
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, [featuredTopics.length, nextSlide]);
 
   if (isLoading) {
     return (
@@ -153,6 +194,26 @@ export default function FeaturedCarousel({ isAdmin }: FeaturedCarouselProps) {
             </h2>
           </div>
 
+          {/* Remove button for admin in top-right corner */}
+          {isAdmin && (
+            <div
+              className={`absolute top-6 right-6 z-10 transition-all duration-300 ${
+                isTransitioning
+                  ? "opacity-0 transform translate-y-2"
+                  : "opacity-100 transform translate-y-0"
+              }`}
+            >
+              <button
+                onClick={() => removeFeaturedTopic(currentTopic.id)}
+                className="p-2 bg-red-500 bg-opacity-80 hover:bg-opacity-100 rounded-lg transition-all text-white drop-shadow-lg hover:scale-110"
+                aria-label="Remover dos destaques"
+                title="Remover dos destaques"
+              >
+                <Trash2 size={20} />
+              </button>
+            </div>
+          )}
+
           {/* Content */}
           <div
             className={`relative h-full flex items-end p-6 transition-all duration-300 ${
@@ -174,7 +235,9 @@ export default function FeaturedCarousel({ isAdmin }: FeaturedCarouselProps) {
                     por <strong>{currentTopic.author}</strong>
                   </span>
                   <span className="flex items-center gap-1">
-                    💬 {currentTopic.replies} comentários
+                    💬{" "}
+                    {currentTopic.replies || currentTopic.comments?.length || 0}{" "}
+                    comentários
                   </span>
                   <span className="flex items-center gap-1">
                     ❤️ {currentTopic.likes} likes
@@ -189,19 +252,37 @@ export default function FeaturedCarousel({ isAdmin }: FeaturedCarouselProps) {
             <>
               <button
                 onClick={prevSlide}
-                className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white bg-opacity-20 hover:bg-opacity-30 transition-all text-white backdrop-blur-sm"
+                className="absolute left-4 top-1/2 -translate-y-1/2 p-3 hover:scale-110 transition-all text-white drop-shadow-lg"
                 aria-label="Tópico anterior"
               >
-                <ChevronLeft size={24} />
+                <ChevronLeft size={28} />
               </button>
               <button
                 onClick={nextSlide}
-                className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white bg-opacity-20 hover:bg-opacity-30 transition-all text-white backdrop-blur-sm"
+                className="absolute right-4 top-1/2 -translate-y-1/2 p-3 hover:scale-110 transition-all text-white drop-shadow-lg"
                 aria-label="Próximo tópico"
               >
-                <ChevronRight size={24} />
+                <ChevronRight size={28} />
               </button>
             </>
+          )}
+
+          {/* Pagination Dots */}
+          {featuredTopics.length > 1 && (
+            <div className="absolute bottom-4 right-6 flex gap-2">
+              {featuredTopics.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => goToSlide(index)}
+                  className={`transition-all duration-300 rounded-full bg-white bg-opacity-70 hover:bg-opacity-90 ${
+                    index === currentSlide
+                      ? "w-3 h-3 bg-opacity-100"
+                      : "w-2 h-2"
+                  }`}
+                  aria-label={`Ir para tópico ${index + 1}`}
+                />
+              ))}
+            </div>
           )}
         </div>
       </div>

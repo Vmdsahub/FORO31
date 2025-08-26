@@ -551,6 +551,60 @@ export function initializeDemo() {
       parentId: "demo4",
       createdAt: new Date(Date.now() - 4800000).toISOString(),
     },
+    // Comentários para tópicos em destaque
+    {
+      id: "feat1_comment1",
+      content:
+        "Excelente tutorial! GPT-4 realmente facilita muito a automação.",
+      author: "Maria Santos",
+      authorId: "user_maria_789",
+      authorAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=maria",
+      topicId: "demo_featured_1",
+      parentId: null,
+      createdAt: new Date(Date.now() - 3600000).toISOString(),
+    },
+    {
+      id: "feat1_comment2",
+      content:
+        "Consegui implementar na minha empresa seguindo este guia. Salvou horas de trabalho!",
+      author: "Carlos Silva",
+      authorId: "user_carlos",
+      authorAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=carlos",
+      topicId: "demo_featured_1",
+      parentId: "feat1_comment1",
+      createdAt: new Date(Date.now() - 3000000).toISOString(),
+    },
+    {
+      id: "feat1_comment3",
+      content: "Alguma dica para integrar com APIs personalizadas?",
+      author: "Ana Paula",
+      authorId: "user_ana_202",
+      authorAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=ana",
+      topicId: "demo_featured_1",
+      parentId: null,
+      createdAt: new Date(Date.now() - 2400000).toISOString(),
+    },
+    {
+      id: "feat2_comment1",
+      content:
+        "Ótima análise comparativa! Me ajudou muito na escolha da ferramenta certa.",
+      author: "Pedro Costa",
+      authorId: "user_pedro_101",
+      authorAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=pedro",
+      topicId: "demo_featured_2",
+      parentId: null,
+      createdAt: new Date(Date.now() - 1800000).toISOString(),
+    },
+    {
+      id: "feat2_comment2",
+      content: "Concordo com o Pedro. A tabela comparativa foi muito útil.",
+      author: "Eduardo Lima",
+      authorId: "user_eduardo",
+      authorAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=eduardo",
+      topicId: "demo_featured_2",
+      parentId: "feat2_comment1",
+      createdAt: new Date(Date.now() - 1200000).toISOString(),
+    },
   ];
 
   // Salvar dados demo
@@ -595,6 +649,25 @@ export function initializeDemo() {
 
   // user_eduardo recebe 2 likes no comentário demo5
   commentLikes.set("demo5", new Set(["demo_user_123", "admin_vitoca_456"])); // 2 likes para Eduardo
+
+  // Likes para comentários dos tópicos em destaque
+  commentLikes.set(
+    "feat1_comment1",
+    new Set(["demo_user_123", "user_carlos", "user_pedro_101"]),
+  ); // 3 likes
+  commentLikes.set(
+    "feat1_comment2",
+    new Set(["user_maria_789", "user_ana_202"]),
+  ); // 2 likes
+  commentLikes.set("feat1_comment3", new Set(["demo_user_123"])); // 1 like
+  commentLikes.set(
+    "feat2_comment1",
+    new Set(["user_maria_789", "user_carlos", "admin_vitoca_456"]),
+  ); // 3 likes
+  commentLikes.set(
+    "feat2_comment2",
+    new Set(["user_pedro_101", "user_ana_202"]),
+  ); // 2 likes
 
   console.log(
     "[COMMENTS] Sistema inicializado com dados demo de múltiplos níveis e likes para pontos reais",
