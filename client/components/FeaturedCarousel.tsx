@@ -97,14 +97,10 @@ export default function FeaturedCarousel({ isAdmin }: FeaturedCarouselProps) {
   const currentTopic = featuredTopics[currentSlide];
 
   return (
-    <div className="max-w-4xl mx-auto bg-white rounded-xl border border-gray-200 overflow-hidden mb-8 shadow-sm">
-      <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
-        <h2 className="text-xl font-semibold text-black">Tópicos em Destaque</h2>
-      </div>
-
+    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden mb-8 shadow-sm">
       <div className="relative">
         {/* Main Carousel Container */}
-        <div className="relative h-80 overflow-hidden rounded-b-xl">
+        <div className="relative h-80 overflow-hidden rounded-xl">
           {/* Background Image */}
           <div
             className="absolute inset-0 bg-cover bg-center transition-all duration-500"
@@ -118,14 +114,19 @@ export default function FeaturedCarousel({ isAdmin }: FeaturedCarouselProps) {
             <div className="absolute inset-0 featured-topic-overlay"></div>
           </div>
 
+          {/* Title in top-left corner */}
+          <div className="absolute top-6 left-6 z-10">
+            <h2 className="text-xl font-semibold text-white mb-4 drop-shadow-lg">Tópicos em Destaque</h2>
+          </div>
+
           {/* Content */}
           <div className="relative h-full flex items-end p-6">
             <div className="text-white max-w-2xl">
-              <Link 
+              <Link
                 to={`/topic/${currentTopic.id}`}
                 className="block hover:opacity-80 transition-opacity"
               >
-                <h3 className="text-2xl font-bold mb-2 line-clamp-2">
+                <h3 className="text-2xl font-bold mb-2 line-clamp-2 drop-shadow-lg">
                   {currentTopic.title}
                 </h3>
                 <div className="flex items-center gap-4 text-sm text-gray-200">
@@ -146,14 +147,14 @@ export default function FeaturedCarousel({ isAdmin }: FeaturedCarouselProps) {
             <>
               <button
                 onClick={prevSlide}
-                className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white bg-opacity-20 hover:bg-opacity-30 transition-all text-white backdrop-blur-sm"
+                className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white bg-opacity-20 hover:bg-opacity-30 transition-all text-white backdrop-blur-sm"
                 aria-label="Tópico anterior"
               >
                 <ChevronLeft size={24} />
               </button>
               <button
                 onClick={nextSlide}
-                className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white bg-opacity-20 hover:bg-opacity-30 transition-all text-white backdrop-blur-sm"
+                className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white bg-opacity-20 hover:bg-opacity-30 transition-all text-white backdrop-blur-sm"
                 aria-label="Próximo tópico"
               >
                 <ChevronRight size={24} />
