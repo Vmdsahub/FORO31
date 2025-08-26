@@ -975,7 +975,11 @@ export default function Index(props: IndexProps) {
                         <div className="flex-1">
                           <div className="flex items-center gap-4">
                             <div
-                              className={`w-12 h-12 flex items-center justify-center rounded-lg overflow-hidden transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg border-2 border-transparent hover:border-blue-200 ${user?.name === "Vitoca" ? "cursor-pointer" : ""}`}
+                              className={`w-12 h-12 flex items-center justify-center transition-all duration-300 ease-in-out hover:scale-105 ${
+                                category.id === "imagem"
+                                  ? ""
+                                  : "rounded-lg overflow-hidden hover:shadow-lg border-2 border-transparent hover:border-blue-200"
+                              } ${user?.name === "Vitoca" ? "cursor-pointer" : ""}`}
                               onClick={(e) => handleIconClick(category.id, e)}
                               title={
                                 user?.name === "Vitoca"
@@ -987,7 +991,10 @@ export default function Index(props: IndexProps) {
                                 <img
                                   src={categoryIcons[category.id] || customIcons[category.id]}
                                   alt={category.name}
-                                  className="w-full h-full object-cover"
+                                  className={category.id === "imagem"
+                                    ? "w-full h-full object-contain"
+                                    : "w-full h-full object-cover"
+                                  }
                                 />
                               ) : (
                                 <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-black text-white font-semibold">
