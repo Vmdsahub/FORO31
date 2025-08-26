@@ -105,8 +105,11 @@ export const getFeaturedTopics: RequestHandler = async (req, res) => {
       // Primeiro tentar buscar nos tópicos reais
       const realTopic = realTopicsStorage.get(featured.topicId);
       if (realTopic) {
+        // Obter contagem real de comentários
+        const commentStats = getTopicCommentStats(featured.topicId);
         return {
           ...realTopic,
+          replies: commentStats.totalComments,
           isFeatured: true,
           featuredPosition: featured.position,
           featuredImageUrl: featured.featuredImageUrl || realTopic.featuredImageUrl
@@ -116,8 +119,11 @@ export const getFeaturedTopics: RequestHandler = async (req, res) => {
       // Fallback para mock data se não encontrar tópico real
       const mockTopic = mockTopics.find(t => t.id === featured.topicId);
       if (mockTopic) {
+        // Para tópicos mock, também tentar obter contagem real de comentários
+        const commentStats = getTopicCommentStats(featured.topicId);
         return {
           ...mockTopic,
+          replies: commentStats.totalComments > 0 ? commentStats.totalComments : mockTopic.replies,
           isFeatured: true,
           featuredPosition: featured.position,
           featuredImageUrl: featured.featuredImageUrl || mockTopic.featuredImageUrl
