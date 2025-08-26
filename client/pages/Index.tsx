@@ -73,7 +73,7 @@ interface IndexProps {
   handleCategoryClick: (categoryId: string) => void;
   getSelectedCategoryData: () => ForumCategory | undefined;
   navigateWeek: (direction: "prev" | "next") => void; // Mantido para compatibilidade, mas não usado
-  canNavigatePrev: () => boolean; // Mantido para compatibilidade, mas n��o usado
+  canNavigatePrev: () => boolean; // Mantido para compatibilidade, mas n����o usado
   canNavigateNext: () => boolean; // Mantido para compatibilidade, mas não usado
   currentNewsletter: WeeklyNewsletter; // Mantido para compatibilidade, mas não usado
   refreshCategoryStats?: () => void;
@@ -839,7 +839,15 @@ export default function Index(props: IndexProps) {
             }}
           >
             {/* Carrossel de Tópicos em Destaque */}
-            <FeaturedCarousel isAdmin={isAdmin} />
+            <FeaturedCarousel
+              isAdmin={isAdmin}
+              onFeaturedUpdate={() => {
+                // Refresh topics when featured topics are updated
+                if (selectedCategory) {
+                  fetchTopics(selectedCategory);
+                }
+              }}
+            />
 
             {/* Forum Categories */}
             <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
