@@ -163,39 +163,6 @@ export default function FeaturedCarousel({ isAdmin }: FeaturedCarouselProps) {
         </div>
 
 
-        {/* Thumbnail Preview */}
-        {featuredTopics.length > 1 && (
-          <div className="p-4 bg-gray-50 border-t border-gray-200">
-            <div className="flex gap-3 overflow-x-auto">
-              {featuredTopics.map((topic, index) => (
-                <button
-                  key={topic.id}
-                  onClick={() => goToSlide(index)}
-                  className={`flex-shrink-0 w-20 h-16 rounded-lg overflow-hidden border-2 transition-all ${
-                    index === currentSlide 
-                      ? 'border-black shadow-md' 
-                      : 'border-gray-300 hover:border-gray-400'
-                  }`}
-                >
-                  <div 
-                    className="w-full h-full bg-cover bg-center"
-                    style={{
-                      backgroundImage: topic.featuredImageUrl 
-                        ? `url(${topic.featuredImageUrl})` 
-                        : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                    }}
-                  >
-                    {!topic.featuredImageUrl && (
-                      <div className="w-full h-full flex items-center justify-center bg-gray-300 text-gray-600 text-xs font-semibold">
-                        {topic.title.split(' ').map(word => word[0]).join('').toUpperCase().slice(0, 2)}
-                      </div>
-                    )}
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
