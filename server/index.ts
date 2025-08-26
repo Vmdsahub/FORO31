@@ -73,6 +73,12 @@ import {
   handleSecurityHealth,
   handleSecurityReport,
 } from "./routes/security-logs";
+import {
+  getFeaturedTopics,
+  addFeaturedTopic,
+  removeFeaturedTopic,
+  getAvailablePositions,
+} from "./routes/featured-topics";
 
 export function createServer() {
   const app = express();
