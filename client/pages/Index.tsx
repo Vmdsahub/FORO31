@@ -1379,9 +1379,9 @@ export default function Index(props: IndexProps) {
                                   <div className="flex items-center gap-1">
                                     <button
                                       onClick={(e) => handleFeaturedClick(topic, e)}
-                                      className={`p-1 rounded hover:bg-gray-100 transition-colors ${
+                                      className={`clover-button p-1 rounded hover:bg-gray-100 transition-colors ${
                                         topic.isFeatured
-                                          ? "text-green-600 hover:text-green-800"
+                                          ? "text-green-600 hover:text-green-800 featured"
                                           : "text-gray-400 hover:text-green-600"
                                       }`}
                                       title={
