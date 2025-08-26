@@ -97,14 +97,14 @@ export default function FeaturedCarousel({ isAdmin }: FeaturedCarouselProps) {
   const currentTopic = featuredTopics[currentSlide];
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden mb-8">
+    <div className="max-w-4xl mx-auto bg-white rounded-xl border border-gray-200 overflow-hidden mb-8 shadow-sm">
       <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
         <h2 className="text-xl font-semibold text-black">Tópicos em Destaque</h2>
       </div>
-      
+
       <div className="relative">
         {/* Main Carousel Container */}
-        <div className="relative h-80 overflow-hidden">
+        <div className="relative h-80 overflow-hidden rounded-b-xl">
           {/* Background Image */}
           <div
             className="absolute inset-0 bg-cover bg-center transition-all duration-500"
