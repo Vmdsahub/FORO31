@@ -1,6 +1,10 @@
 import { RequestHandler } from "express";
 import { Topic } from "@shared/forum";
 import { getTopicCommentStats } from "./simple-comments";
+import multer from "multer";
+import { v4 as uuidv4 } from "uuid";
+import path from "path";
+import fs from "fs/promises";
 
 // Importar o storage de tópicos reais do forum.ts
 let topicsStorage: Map<string, Topic> | null = null;
