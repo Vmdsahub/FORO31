@@ -1168,7 +1168,7 @@ export default function Index(props: IndexProps) {
                         <div className="flex-1">
                           <div className="flex items-center gap-4">
                             <div
-                              className={`w-12 h-12 flex items-center justify-center transition-all duration-300 ease-in-out hover:scale-105 ${user?.name === "Vitoca" ? "cursor-pointer" : ""}`}
+                              className={`w-14 h-14 flex items-center justify-center transition-all duration-300 ease-in-out hover:scale-105 ${user?.name === "Vitoca" ? "cursor-pointer" : ""}`}
                               onClick={(e) => handleIconClick(category.id, e)}
                               title={
                                 user?.name === "Vitoca"
@@ -1183,7 +1183,7 @@ export default function Index(props: IndexProps) {
                                   className="w-full h-full object-contain"
                                 />
                               ) : (
-                                <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-green-600 text-white font-semibold">
+                                <div className="w-14 h-14 flex items-center justify-center rounded-lg bg-green-600 text-white font-semibold">
                                   {category.name.split(" ")[0][0]}
                                   {category.name.split(" ")[1]?.[0] || ""}
                                 </div>
