@@ -119,7 +119,9 @@ export default function FeaturedCarousel({ isAdmin }: FeaturedCarouselProps) {
         <div className="relative h-80 overflow-hidden rounded-xl">
           {/* Background Image */}
           <div
-            className="absolute inset-0 bg-cover bg-center transition-all duration-500"
+            className={`absolute inset-0 bg-cover bg-center transition-all duration-500 ${
+              isTransitioning ? 'opacity-70 scale-105' : 'opacity-100 scale-100'
+            }`}
             style={{
               backgroundImage: currentTopic.featuredImageUrl
                 ? `url(${currentTopic.featuredImageUrl})`
@@ -131,12 +133,16 @@ export default function FeaturedCarousel({ isAdmin }: FeaturedCarouselProps) {
           </div>
 
           {/* Title in top-left corner */}
-          <div className="absolute top-6 left-6 z-10">
+          <div className={`absolute top-6 left-6 z-10 transition-all duration-300 ${
+            isTransitioning ? 'opacity-0 transform translate-y-2' : 'opacity-100 transform translate-y-0'
+          }`}>
             <h2 className="text-xl font-semibold text-white mb-4 drop-shadow-lg">Tópicos em Destaque</h2>
           </div>
 
           {/* Content */}
-          <div className="relative h-full flex items-end p-6">
+          <div className={`relative h-full flex items-end p-6 transition-all duration-300 ${
+            isTransitioning ? 'opacity-0 transform translate-y-4' : 'opacity-100 transform translate-y-0'
+          }`}>
             <div className="text-white max-w-2xl">
               <Link
                 to={`/topic/${currentTopic.id}`}
