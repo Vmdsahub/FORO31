@@ -422,6 +422,18 @@ export default function Index(props: IndexProps) {
     }
   };
 
+  const handlePageChange = (page: number) => {
+    if (selectedCategory && page !== currentPage) {
+      setCurrentPage(page);
+      fetchTopics(selectedCategory, page);
+      // Scroll to top of topics list when changing pages
+      const topicsHeader = document.querySelector('.bg-gray-50');
+      if (topicsHeader) {
+        topicsHeader.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  };
+
   // Função para lidar com upload de ícone
   const handleIconUpload = async (file: File, categoryId: string) => {
     const formData = new FormData();
@@ -1516,26 +1528,22 @@ export default function Index(props: IndexProps) {
               </div>
             </div>
 
-            {/* Pagination */}
-            <div className="flex justify-center">
-              <div className="flex items-center gap-2">
-                <button className="px-3 py-2 rounded-md border border-gray-300 text-gray-600 hover:bg-gray-50 transition-all duration-200">
-                  Anterior
-                </button>
-                <button className="px-3 py-2 rounded-md bg-black text-white">
-                  1
-                </button>
-                <button className="px-3 py-2 rounded-md border border-gray-300 text-gray-600 hover:bg-gray-50 transition-all duration-200">
-                  2
-                </button>
-                <button className="px-3 py-2 rounded-md border border-gray-300 text-gray-600 hover:bg-gray-50 transition-all duration-200">
-                  3
-                </button>
-                <button className="px-3 py-2 rounded-md border border-gray-300 text-gray-600 hover:bg-gray-50 transition-all duration-200">
-                  Próximo
-                </button>
+            {/* Topics Summary and Pagination */}
+            {!isLoadingTopics && realTopics.length > 0 && (
+              <div className="bg-white rounded-lg border border-gray-200 p-4 mt-4">
+                <div className="text-center text-sm text-gray-600 mb-4">
+                  Mostrando {realTopics.length} de {totalTopics} tópicos
+                  {totalPages > 1 && (
+                    <span> (Página {currentPage} de {totalPages})</span>
+                  )}
+                </div>
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
               </div>
-            </div>
+            )}
           </div>
         )}
       </div>
