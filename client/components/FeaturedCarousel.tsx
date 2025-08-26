@@ -54,15 +54,30 @@ export default function FeaturedCarousel({ isAdmin }: FeaturedCarouselProps) {
   };
 
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % featuredTopics.length);
+    if (isTransitioning) return;
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setCurrentSlide((prev) => (prev + 1) % featuredTopics.length);
+      setTimeout(() => setIsTransitioning(false), 50);
+    }, 250);
   };
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + featuredTopics.length) % featuredTopics.length);
+    if (isTransitioning) return;
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setCurrentSlide((prev) => (prev - 1 + featuredTopics.length) % featuredTopics.length);
+      setTimeout(() => setIsTransitioning(false), 50);
+    }, 250);
   };
 
   const goToSlide = (index: number) => {
-    setCurrentSlide(index);
+    if (isTransitioning || index === currentSlide) return;
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setCurrentSlide(index);
+      setTimeout(() => setIsTransitioning(false), 50);
+    }, 250);
   };
 
   if (isLoading) {
