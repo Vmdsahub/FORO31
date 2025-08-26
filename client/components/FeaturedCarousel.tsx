@@ -18,22 +18,6 @@ export default function FeaturedCarousel({ isAdmin }: FeaturedCarouselProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
-  // Carregar tópicos em destaque
-  useEffect(() => {
-    fetchFeaturedTopics();
-  }, []);
-
-  // Auto-rotation a cada 10 segundos
-  useEffect(() => {
-    if (featuredTopics.length <= 1) return;
-
-    const interval = setInterval(() => {
-      nextSlide();
-    }, 10000);
-
-    return () => clearInterval(interval);
-  }, [featuredTopics.length, nextSlide]);
-
   const fetchFeaturedTopics = async () => {
     try {
       const response = await fetch("/api/featured-topics", {
@@ -81,6 +65,22 @@ export default function FeaturedCarousel({ isAdmin }: FeaturedCarouselProps) {
       setTimeout(() => setIsTransitioning(false), 50);
     }, 250);
   }, [isTransitioning, currentSlide]);
+
+  // Carregar tópicos em destaque
+  useEffect(() => {
+    fetchFeaturedTopics();
+  }, []);
+
+  // Auto-rotation a cada 10 segundos
+  useEffect(() => {
+    if (featuredTopics.length <= 1) return;
+
+    const interval = setInterval(() => {
+      nextSlide();
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, [featuredTopics.length, nextSlide]);
 
   if (isLoading) {
     return (
