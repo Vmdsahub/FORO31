@@ -132,6 +132,7 @@ export const getFeaturedTopics: RequestHandler = async (req, res) => {
         if (mockTopic) {
           // Para tópicos mock, também tentar obter contagem real de comentários
           const commentStats = getTopicCommentStats(featured.topicId);
+          console.log(`[FEATURED] Mock topic ${featured.topicId} has ${commentStats.commentsCount} comments (fallback: ${mockTopic.replies})`);
           return {
             ...mockTopic,
             replies:
