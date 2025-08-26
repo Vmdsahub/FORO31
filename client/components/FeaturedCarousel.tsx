@@ -73,14 +73,14 @@ export default function FeaturedCarousel({ isAdmin }: FeaturedCarouselProps) {
     }, 250);
   }, [isTransitioning, featuredTopics.length]);
 
-  const goToSlide = (index: number) => {
+  const goToSlide = useCallback((index: number) => {
     if (isTransitioning || index === currentSlide) return;
     setIsTransitioning(true);
     setTimeout(() => {
       setCurrentSlide(index);
       setTimeout(() => setIsTransitioning(false), 50);
     }, 250);
-  };
+  }, [isTransitioning, currentSlide]);
 
   if (isLoading) {
     return (
