@@ -216,28 +216,21 @@ export default function FeaturedCarousel({
     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden mb-8 shadow-sm">
       <div className="relative">
         {/* Main Carousel Container */}
-        <div className="relative aspect-[2/1] overflow-hidden rounded-xl">
+        <div className="relative h-80 overflow-hidden rounded-xl">
           {/* Background Image */}
-          {currentTopic.featuredImageUrl ? (
-            <img
-              src={currentTopic.featuredImageUrl}
-              alt={currentTopic.title}
-              className={`absolute inset-0 w-full h-full object-cover transition-all duration-500 ${
-                isTransitioning ? "opacity-70 scale-105" : "opacity-100 scale-100"
-              }`}
-            />
-          ) : (
-            <div
-              className={`absolute inset-0 transition-all duration-500 ${
-                isTransitioning ? "opacity-70 scale-105" : "opacity-100 scale-100"
-              }`}
-              style={{
-                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-              }}
-            />
-          )}
-          {/* Overlay */}
-          <div className="absolute inset-0 featured-topic-overlay"></div>
+          <div
+            className={`absolute inset-0 bg-cover bg-center transition-all duration-500 ${
+              isTransitioning ? "opacity-70 scale-105" : "opacity-100 scale-100"
+            }`}
+            style={{
+              backgroundImage: currentTopic.featuredImageUrl
+                ? `url(${currentTopic.featuredImageUrl})`
+                : "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            }}
+          >
+            {/* Overlay */}
+            <div className="absolute inset-0 featured-topic-overlay"></div>
+          </div>
 
           {/* Title in top-left corner */}
           <div
