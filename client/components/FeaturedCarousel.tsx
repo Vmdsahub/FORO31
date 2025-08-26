@@ -28,7 +28,7 @@ export default function FeaturedCarousel({ isAdmin }: FeaturedCarouselProps) {
     if (featuredTopics.length === 0) return;
 
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % featuredTopics.length);
+      nextSlide();
     }, 10000);
 
     return () => clearInterval(interval);
