@@ -904,6 +904,73 @@
     max-width: 400px !important;
   }
 
+  /* === CAROUSEL STYLES === */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+  }
+
+  .carousel-slide-enter {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+
+  .carousel-slide-enter-active {
+    opacity: 1;
+    transform: translateX(0%);
+    transition: opacity 500ms, transform 500ms;
+  }
+
+  .carousel-slide-exit {
+    opacity: 1;
+    transform: translateX(0%);
+  }
+
+  .carousel-slide-exit-active {
+    opacity: 0;
+    transform: translateX(-100%);
+    transition: opacity 500ms, transform 500ms;
+  }
+
+  /* === FEATURED TOPIC STYLES === */
+  .featured-topic-overlay {
+    background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.1) 0%,
+      rgba(0, 0, 0, 0.3) 50%,
+      rgba(0, 0, 0, 0.7) 100%
+    );
+  }
+
+  .featured-topic-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  }
+
+  /* === CLOVER BUTTON ANIMATION === */
+  .clover-button {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .clover-button:hover {
+    transform: scale(1.2) rotate(5deg);
+  }
+
+  .clover-button.featured {
+    animation: cloverPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes cloverPulse {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+  }
+
   /* 💎 GLASSMORPHISM LIQUID THEME - Estilo iOS Minimalista */
   .theme-glassmorphism-liquid {
     /* === PALETA MINIMALISTA === */
