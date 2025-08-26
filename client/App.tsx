@@ -128,6 +128,15 @@ const toolsCategories: ForumCategory[] = [
     lastPost: undefined,
     posts: [],
   },
+  {
+    id: "pedidos",
+    name: "Pedidos",
+    description: "Solicitações e pedidos relacionados a ferramentas de IA",
+    totalTopics: 0,
+    totalPosts: 0,
+    lastPost: undefined,
+    posts: [],
+  },
 ];
 
 // Categorias da seção Open-Source
@@ -204,6 +213,15 @@ const openSourceCategories: ForumCategory[] = [
     name: "Outros",
     description:
       "Discussões gerais sobre projetos open-source de IA não categorizados",
+    totalTopics: 0,
+    totalPosts: 0,
+    lastPost: undefined,
+    posts: [],
+  },
+  {
+    id: "opensource-pedidos",
+    name: "Pedidos",
+    description: "Solicitações e pedidos relacionados a projetos open-source de IA",
     totalTopics: 0,
     totalPosts: 0,
     lastPost: undefined,

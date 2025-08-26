@@ -1017,6 +1017,7 @@ export const handleGetCategoryStats: RequestHandler = (req, res) => {
       "duvidas-erros",
       "projetos-comunidade",
       "outros",
+      "pedidos",
       // Open-Source
       "opensource-llms",
       "opensource-imagem",
@@ -1026,6 +1027,7 @@ export const handleGetCategoryStats: RequestHandler = (req, res) => {
       "opensource-duvidas-erros",
       "opensource-projetos-comunidade",
       "opensource-outros",
+      "opensource-pedidos",
     ];
 
     // Calculate stats for each category
