@@ -11,6 +11,7 @@ interface FeaturedTopic extends Topic {
 
 interface FeaturedCarouselProps {
   isAdmin?: boolean;
+  onFeaturedUpdate?: () => void;
 }
 
 export default function FeaturedCarousel({ isAdmin }: FeaturedCarouselProps) {
