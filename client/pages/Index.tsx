@@ -1533,6 +1533,19 @@ export default function Index(props: IndexProps) {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Modal para gerenciar tópicos em destaque */}
+      {selectedTopicForFeatured && (
+        <FeaturedTopicModal
+          topic={selectedTopicForFeatured}
+          isOpen={featuredModalOpen}
+          onClose={() => {
+            setFeaturedModalOpen(false);
+            setSelectedTopicForFeatured(null);
+          }}
+          onFeaturedUpdate={handleFeaturedUpdate}
+        />
+      )}
     </main>
   );
 }
