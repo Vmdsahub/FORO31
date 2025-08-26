@@ -78,6 +78,7 @@ import {
   addFeaturedTopic,
   removeFeaturedTopic,
   getAvailablePositions,
+  updateFeaturedImage,
 } from "./routes/featured-topics";
 
 export function createServer() {
