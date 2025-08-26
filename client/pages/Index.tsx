@@ -21,6 +21,7 @@ import {
 import CreateTopicModal from "@/components/CreateTopicModal";
 import FeaturedTopicModal from "@/components/FeaturedTopicModal";
 import FeaturedCarousel from "@/components/FeaturedCarousel";
+import { Pagination } from "@/components/ui/pagination";
 
 // Category icon mapping
 const categoryIcons: Record<string, string> = {
