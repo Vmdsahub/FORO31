@@ -837,6 +837,9 @@ export default function Index(props: IndexProps) {
               animation: "fadeInUp 0.8s ease-out 0.2s forwards",
             }}
           >
+            {/* Carrossel de Tópicos em Destaque */}
+            <FeaturedCarousel isAdmin={isAdmin} />
+
             {/* Forum Categories */}
             <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
               <div className="bg-gray-50 px-6 py-4 border-b border-gray-200 flex items-center justify-between">
