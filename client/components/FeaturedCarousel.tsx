@@ -85,6 +85,8 @@ export default function FeaturedCarousel({ isAdmin, onFeaturedUpdate }: Featured
         if (currentSlide >= featuredTopics.length - 1) {
           setCurrentSlide(Math.max(0, featuredTopics.length - 2));
         }
+        // Notificar componente pai para atualizar dados
+        onFeaturedUpdate?.();
       } else {
         const error = await response.json();
         toast.error(error.message || "Erro ao remover tópico dos destaques");
