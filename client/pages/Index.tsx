@@ -131,6 +131,10 @@ export default function Index(props: IndexProps) {
     content: "",
   });
 
+  // Estados para modal de destaque
+  const [featuredModalOpen, setFeaturedModalOpen] = useState(false);
+  const [selectedTopicForFeatured, setSelectedTopicForFeatured] = useState<Topic | null>(null);
+
   // Buscar tópicos reais da API quando uma categoria é selecionada
   useEffect(() => {
     if (selectedCategory && activeSection === "forum") {
