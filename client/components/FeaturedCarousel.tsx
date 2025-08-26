@@ -107,6 +107,57 @@ export default function FeaturedCarousel({
     }
   };
 
+  const changeFeaturedImage = async (topicId: string) => {
+    // Criar input de arquivo temporário
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      // Validar tamanho do arquivo (máx 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('Arquivo muito grande. Máximo 5MB.');
+        return;
+      }
+
+      // Validar tipo de arquivo
+      if (!file.type.startsWith('image/')) {
+        toast.error('Por favor, selecione apenas arquivos de imagem.');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('image', file);
+
+      try {
+        const response = await fetch(`/api/featured-topics/${topicId}/image`, {
+          method: 'PUT',
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+          },
+          body: formData,
+        });
+
+        if (response.ok) {
+          toast.success('Imagem atualizada com sucesso!');
+          await fetchFeaturedTopics();
+          onFeaturedUpdate?.();
+        } else {
+          const error = await response.json();
+          toast.error(error.message || 'Erro ao atualizar imagem');
+        }
+      } catch (error) {
+        console.error('Error updating featured image:', error);
+        toast.error('Erro ao atualizar imagem');
+      }
+    };
+
+    input.click();
+  };
+
   // Carregar tópicos em destaque
   useEffect(() => {
     fetchFeaturedTopics();
