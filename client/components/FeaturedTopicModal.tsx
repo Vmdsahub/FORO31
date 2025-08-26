@@ -234,17 +234,15 @@ export default function FeaturedTopicModal({
                 </Button>
                 <Button
                   onClick={handleAddToFeatured}
-                  disabled={
-                    isLoading || positions.availablePositions.length === 0
-                  }
+                  disabled={isLoading}
                   className="flex-1"
                 >
                   {isLoading ? "Adicionando..." : "Adicionar aos Destaques"}
                 </Button>
               </div>
 
-              {positions.availablePositions.length === 0 && (
-                <p className="text-xs text-red-600 text-center">
+              {positions.usedPositions.length === 4 && !positions.availablePositions.length && (
+                <p className="text-xs text-orange-600 text-center">
                   Todas as posições estão ocupadas. Selecione uma posição para
                   substituir.
                 </p>
