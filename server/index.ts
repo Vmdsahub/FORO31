@@ -73,6 +73,12 @@ import {
   handleSecurityHealth,
   handleSecurityReport,
 } from "./routes/security-logs";
+import {
+  getFeaturedTopics,
+  addFeaturedTopic,
+  removeFeaturedTopic,
+  getAvailablePositions,
+} from "./routes/featured-topics";
 
 export function createServer() {
   const app = express();
@@ -202,6 +208,20 @@ export function createServer() {
   app.get("/api/upload-stats", handleUploadStats);
   app.get("/api/verify-file/:hash", handleFileVerification);
   app.post("/api/quarantine-management", handleQuarantineManagement);
+
+  // Featured topics routes
+  app.get("/api/featured-topics", optionalAuthenticateToken, getFeaturedTopics);
+  app.post(
+    "/api/featured-topics/:topicId",
+    authenticateToken,
+    addFeaturedTopic,
+  );
+  app.delete(
+    "/api/featured-topics/:topicId",
+    authenticateToken,
+    removeFeaturedTopic,
+  );
+  app.get("/api/featured-topics/positions", getAvailablePositions);
 
   // Security logs and monitoring routes
   app.get("/api/security/stats", handleSecurityStats);

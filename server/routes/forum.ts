@@ -19,6 +19,9 @@ const comments: Map<string, Comment> = new Map();
 const likes: Map<string, Set<string>> = new Map(); // entityId -> Set of userIds
 const userStats: Map<string, { points: number; badges: string[] }> = new Map(); // userId -> stats
 
+// Export function to access topics storage from other modules
+export const getTopicsStorage = () => topics;
+
 // Validation schemas
 const createTopicSchema = z.object({
   title: z.string().min(1).max(40),
@@ -919,11 +922,9 @@ export const handleDeleteTopic: RequestHandler = (req, res) => {
 
   // Allow topic author or admin to delete the topic
   if (req.user.role !== "admin" && req.user.id !== topic.authorId) {
-    return res
-      .status(403)
-      .json({
-        message: "Apenas o autor do tópico ou administradores podem excluí-lo",
-      });
+    return res.status(403).json({
+      message: "Apenas o autor do tópico ou administradores podem excluí-lo",
+    });
   }
 
   topics.delete(topicId);
@@ -946,7 +947,7 @@ export const handleDeleteComment: RequestHandler = (req, res) => {
   const comment = comments.get(commentId);
 
   if (!comment) {
-    return res.status(404).json({ message: "Comentário não encontrado" });
+    return res.status(404).json({ message: "Comentário n��o encontrado" });
   }
 
   const topic = topics.get(comment.topicId);
