@@ -1531,21 +1531,13 @@ export default function Index(props: IndexProps) {
               </div>
             </div>
 
-            {/* Topics Summary and Pagination */}
-            {!isLoadingTopics && realTopics.length > 0 && (
-              <div className="bg-white rounded-lg border border-gray-200 p-4 mt-4">
-                <div className="text-center text-sm text-gray-600 mb-4">
-                  Mostrando {realTopics.length} de {totalTopics} tópicos
-                  {totalPages > 1 && (
-                    <span> (Página {currentPage} de {totalPages})</span>
-                  )}
-                </div>
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                />
-              </div>
+            {/* Pagination */}
+            {!isLoadingTopics && totalPages > 1 && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
             )}
           </div>
         )}
