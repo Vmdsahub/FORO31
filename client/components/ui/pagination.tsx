@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -15,43 +15,46 @@ export function Pagination({
   onPageChange,
   className,
 }: PaginationProps) {
+  const [inputValue, setInputValue] = useState("");
+  const [showInput, setShowInput] = useState(false);
+
   if (totalPages <= 1) return null;
+
+  const handleInputSubmit = () => {
+    const page = parseInt(inputValue);
+    if (page && page >= 1 && page <= totalPages && page !== currentPage) {
+      onPageChange(page);
+    }
+    setShowInput(false);
+    setInputValue("");
+  };
+
+  const handleInputKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleInputSubmit();
+    } else if (e.key === "Escape") {
+      setShowInput(false);
+      setInputValue("");
+    }
+  };
 
   const getVisiblePages = () => {
     const pages: (number | string)[] = [];
-    const maxVisible = 5;
+    const maxVisible = 3; // Show first 3 pages
 
-    if (totalPages <= maxVisible) {
-      // Show all pages if total is small
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
-      }
-    } else {
-      // Always show first page
-      pages.push(1);
+    // Always show first few pages
+    for (let i = 1; i <= Math.min(maxVisible, totalPages); i++) {
+      pages.push(i);
+    }
 
-      if (currentPage > 3) {
-        pages.push("...");
-      }
+    // Add ellipsis if there are more pages
+    if (totalPages > maxVisible + 1) {
+      pages.push("...");
+    }
 
-      // Show pages around current page
-      const start = Math.max(2, currentPage - 1);
-      const end = Math.min(totalPages - 1, currentPage + 1);
-
-      for (let i = start; i <= end; i++) {
-        if (i !== 1 && i !== totalPages) {
-          pages.push(i);
-        }
-      }
-
-      if (currentPage < totalPages - 2) {
-        pages.push("...");
-      }
-
-      // Always show last page
-      if (totalPages > 1) {
-        pages.push(totalPages);
-      }
+    // Always show last page if it's not already shown
+    if (totalPages > maxVisible && totalPages !== maxVisible + 1) {
+      pages.push(totalPages);
     }
 
     return pages;
@@ -60,22 +63,18 @@ export function Pagination({
   const visiblePages = getVisiblePages();
 
   return (
-    <div
-      className={cn(
-        "flex items-center justify-center gap-1 mt-6",
-        className
+    <div className={cn("flex items-center justify-center gap-1 mt-6", className)}>
+      {/* Previous Button - only show from page 2 onwards */}
+      {currentPage > 1 && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => onPageChange(currentPage - 1)}
+          className="mr-2"
+        >
+          Anterior
+        </Button>
       )}
-    >
-      {/* Previous Button */}
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={() => onPageChange(currentPage - 1)}
-        disabled={currentPage <= 1}
-        className="mr-2"
-      >
-        Anterior
-      </Button>
 
       {/* Page Numbers */}
       {visiblePages.map((page, index) => (
@@ -93,7 +92,42 @@ export function Pagination({
               {page}
             </Button>
           ) : (
-            <span className="px-2 py-1 text-gray-500">...</span>
+            <div
+              className="relative"
+              onMouseEnter={() => setShowInput(true)}
+              onMouseLeave={() => {
+                if (!inputValue) setShowInput(false);
+              }}
+            >
+              {showInput ? (
+                <div className="flex items-center gap-1 bg-white border rounded px-2 py-1">
+                  <input
+                    type="number"
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyDown={handleInputKeyPress}
+                    onBlur={() => {
+                      if (!inputValue) setShowInput(false);
+                    }}
+                    placeholder="Página"
+                    className="w-16 text-sm text-center border-none outline-none"
+                    min="1"
+                    max={totalPages}
+                    autoFocus
+                  />
+                  <button
+                    onClick={handleInputSubmit}
+                    className="text-xs bg-black text-white px-2 py-1 rounded hover:bg-gray-800"
+                  >
+                    Ir
+                  </button>
+                </div>
+              ) : (
+                <span className="px-2 py-1 text-gray-500 cursor-pointer hover:text-black">
+                  ...
+                </span>
+              )}
+            </div>
           )}
         </React.Fragment>
       ))}
