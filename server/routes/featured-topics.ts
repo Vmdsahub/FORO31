@@ -23,22 +23,6 @@ let featuredTopics: Map<string, {
   addedAt: string;
 }> = new Map();
 
-// Função para inicializar dados demo
-const initializeDemoData = () => {
-  const realTopicsStorage = getTopicsStorage();
-
-  // Adicionar tópicos demo ao storage se não existirem
-  if (!realTopicsStorage.has("demo_featured_1")) {
-    realTopicsStorage.set("demo_featured_1", mockTopics[0]);
-  }
-
-  if (!realTopicsStorage.has("demo_featured_2")) {
-    realTopicsStorage.set("demo_featured_2", mockTopics[1]);
-  }
-
-  console.log("[FEATURED] Demo topics initialized");
-};
-
 // Mock data inicial para demonstração
 featuredTopics.set("demo_featured_1", {
   topicId: "demo_featured_1",
@@ -53,9 +37,6 @@ featuredTopics.set("demo_featured_2", {
   featuredImageUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=800&h=400&fit=crop",
   addedAt: new Date().toISOString(),
 });
-
-// Inicializar dados demo
-initializeDemoData();
 
 // Mock topics para demonstração
 const mockTopics: Topic[] = [
