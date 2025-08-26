@@ -181,6 +181,26 @@ export default function FeaturedCarousel({ isAdmin }: FeaturedCarouselProps) {
             </h2>
           </div>
 
+          {/* Remove button for admin in top-right corner */}
+          {isAdmin && (
+            <div
+              className={`absolute top-6 right-6 z-10 transition-all duration-300 ${
+                isTransitioning
+                  ? "opacity-0 transform translate-y-2"
+                  : "opacity-100 transform translate-y-0"
+              }`}
+            >
+              <button
+                onClick={() => removeFeaturedTopic(currentTopic.id)}
+                className="p-2 bg-red-500 bg-opacity-80 hover:bg-opacity-100 rounded-lg transition-all text-white drop-shadow-lg hover:scale-110"
+                aria-label="Remover dos destaques"
+                title="Remover dos destaques"
+              >
+                <Trash2 size={20} />
+              </button>
+            </div>
+          )}
+
           {/* Content */}
           <div
             className={`relative h-full flex items-end p-6 transition-all duration-300 ${
