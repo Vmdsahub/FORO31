@@ -248,14 +248,19 @@ export const getAvailablePositions: RequestHandler = async (req, res) => {
       (pos) => !usedPositions.includes(pos),
     );
 
-    console.log("[FEATURED] Featured topics map:", featuredTopics.size);
+    console.log("[FEATURED] Featured topics map size:", featuredTopics.size);
     console.log("[FEATURED] Used positions:", usedPositions);
     console.log("[FEATURED] Available positions:", availablePositions);
+    console.log("[FEATURED] All featured topics:", Array.from(featuredTopics.entries()));
 
     res.json({
       success: true,
       availablePositions,
       usedPositions: usedPositions.sort(),
+      debug: {
+        totalFeatured: featuredTopics.size,
+        featuredTopics: Array.from(featuredTopics.values()),
+      }
     });
   } catch (error) {
     console.error("Error getting available positions:", error);
