@@ -1,6 +1,19 @@
 import { RequestHandler } from "express";
 import { Topic } from "@shared/forum";
 
+// Importar o storage de tópicos reais do forum.ts
+let topicsStorage: Map<string, Topic> | null = null;
+
+// Função para obter referência ao storage de tópicos
+const getTopicsStorage = () => {
+  if (!topicsStorage) {
+    // Esta é uma referência temporária - em produção seria uma conexão com banco
+    const forumModule = require('./forum');
+    topicsStorage = forumModule.getTopicsStorage?.() || new Map();
+  }
+  return topicsStorage;
+};
+
 // Simulação de dados em memória para tópicos em destaque
 let featuredTopics: Map<string, {
   topicId: string;
