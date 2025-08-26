@@ -76,7 +76,7 @@ const mockTopics: Topic[] = [
       date: "2024-01-15",
       time: "14:30"
     },
-    category: "LLMs",
+    category: "llms",
     createdAt: "2024-01-10T10:00:00Z",
     updatedAt: "2024-01-15T14:30:00Z",
     comments: [],
