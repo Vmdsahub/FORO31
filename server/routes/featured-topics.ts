@@ -97,20 +97,37 @@ export const getFeaturedTopics: RequestHandler = async (req, res) => {
     // Ordenar por posição
     const featuredList = Array.from(featuredTopics.values())
       .sort((a, b) => a.position - b.position);
-    
-    // Buscar dados completos dos tópicos (aqui seria do banco de dados)
+
+    // Buscar dados completos dos tópicos do storage real
+    const realTopicsStorage = getTopicsStorage();
     const topics = featuredList.map(featured => {
-      const topic = mockTopics.find(t => t.id === featured.topicId);
-      if (topic) {
+      // Primeiro tentar buscar nos tópicos reais
+      const realTopic = realTopicsStorage.get(featured.topicId);
+      if (realTopic) {
         return {
-          ...topic,
+          ...realTopic,
           isFeatured: true,
           featuredPosition: featured.position,
-          featuredImageUrl: featured.featuredImageUrl || topic.featuredImageUrl
+          featuredImageUrl: featured.featuredImageUrl || realTopic.featuredImageUrl
         };
       }
+
+      // Fallback para mock data se não encontrar tópico real
+      const mockTopic = mockTopics.find(t => t.id === featured.topicId);
+      if (mockTopic) {
+        return {
+          ...mockTopic,
+          isFeatured: true,
+          featuredPosition: featured.position,
+          featuredImageUrl: featured.featuredImageUrl || mockTopic.featuredImageUrl
+        };
+      }
+
       return null;
     }).filter(Boolean);
+
+    console.log("[FEATURED] Topics found:", topics.length);
+    console.log("[FEATURED] Featured list:", featuredList);
 
     res.json({
       success: true,
