@@ -106,16 +106,16 @@ export default function FeaturedCarousel({ isAdmin }: FeaturedCarouselProps) {
         {/* Main Carousel Container */}
         <div className="relative h-80 overflow-hidden">
           {/* Background Image */}
-          <div 
+          <div
             className="absolute inset-0 bg-cover bg-center transition-all duration-500"
             style={{
-              backgroundImage: currentTopic.featuredImageUrl 
-                ? `url(${currentTopic.featuredImageUrl})` 
+              backgroundImage: currentTopic.featuredImageUrl
+                ? `url(${currentTopic.featuredImageUrl})`
                 : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
             }}
           >
             {/* Overlay */}
-            <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+            <div className="absolute inset-0 featured-topic-overlay"></div>
           </div>
 
           {/* Content */}
