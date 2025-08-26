@@ -222,6 +222,11 @@ export function createServer() {
     authenticateToken,
     removeFeaturedTopic,
   );
+  app.put(
+    "/api/featured-topics/:topicId/image",
+    authenticateToken,
+    updateFeaturedImage,
+  );
   app.get("/api/featured-topics/positions", getAvailablePositions);
 
   // Security logs and monitoring routes
