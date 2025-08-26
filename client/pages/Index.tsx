@@ -1326,6 +1326,9 @@ export default function Index(props: IndexProps) {
               onClick={() => {
                 props.setSelectedCategory(null);
                 setRealTopics([]); // Limpar tópicos ao voltar
+                setCurrentPage(1); // Reset pagination
+                setTotalPages(1);
+                setTotalTopics(0);
               }}
               className="flex items-center gap-2 text-gray-600 hover:text-black transition-all duration-300 ease-in-out hover:translate-x-1"
             >
