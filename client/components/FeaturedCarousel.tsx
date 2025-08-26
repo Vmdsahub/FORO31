@@ -67,6 +67,33 @@ export default function FeaturedCarousel({ isAdmin }: FeaturedCarouselProps) {
     }, 250);
   }, [isTransitioning, currentSlide]);
 
+  const removeFeaturedTopic = async (topicId: string) => {
+    try {
+      const response = await fetch(`/api/featured-topics/${topicId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+        },
+      });
+
+      if (response.ok) {
+        toast.success("Tópico removido dos destaques!");
+        // Atualizar a lista de tópicos em destaque
+        await fetchFeaturedTopics();
+        // Ajustar slide atual se necessário
+        if (currentSlide >= featuredTopics.length - 1) {
+          setCurrentSlide(Math.max(0, featuredTopics.length - 2));
+        }
+      } else {
+        const error = await response.json();
+        toast.error(error.message || "Erro ao remover tópico dos destaques");
+      }
+    } catch (error) {
+      console.error("Error removing featured topic:", error);
+      toast.error("Erro ao remover tópico dos destaques");
+    }
+  };
+
   // Carregar tópicos em destaque
   useEffect(() => {
     fetchFeaturedTopics();
