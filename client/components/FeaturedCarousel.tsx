@@ -16,6 +16,7 @@ export default function FeaturedCarousel({ isAdmin }: FeaturedCarouselProps) {
   const [featuredTopics, setFeaturedTopics] = useState<FeaturedTopic[]>([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   // Carregar tópicos em destaque
   useEffect(() => {
