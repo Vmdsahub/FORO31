@@ -1,5 +1,6 @@
 import { RequestHandler } from "express";
 import { Topic } from "@shared/forum";
+import { getTopicCommentStats } from "./simple-comments";
 
 // Importar o storage de tópicos reais do forum.ts
 let topicsStorage: Map<string, Topic> | null = null;
