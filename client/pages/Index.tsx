@@ -19,6 +19,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import CreateTopicModal from "@/components/CreateTopicModal";
+import FeaturedTopicModal from "@/components/FeaturedTopicModal";
 
 // Interfaces movidas para @/utils/weekSystem
 
