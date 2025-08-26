@@ -101,7 +101,7 @@ const mockTopics: Topic[] = [
       date: "2024-01-14",
       time: "16:45"
     },
-    category: "Ferramentas",
+    category: "vibe-coding",
     createdAt: "2024-01-08T08:00:00Z",
     updatedAt: "2024-01-14T16:45:00Z",
     comments: [],
