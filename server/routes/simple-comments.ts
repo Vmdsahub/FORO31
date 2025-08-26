@@ -647,6 +647,13 @@ export function initializeDemo() {
   // user_eduardo recebe 2 likes no comentário demo5
   commentLikes.set("demo5", new Set(["demo_user_123", "admin_vitoca_456"])); // 2 likes para Eduardo
 
+  // Likes para comentários dos tópicos em destaque
+  commentLikes.set("feat1_comment1", new Set(["demo_user_123", "user_carlos", "user_pedro_101"])); // 3 likes
+  commentLikes.set("feat1_comment2", new Set(["user_maria_789", "user_ana_202"])); // 2 likes
+  commentLikes.set("feat1_comment3", new Set(["demo_user_123"])); // 1 like
+  commentLikes.set("feat2_comment1", new Set(["user_maria_789", "user_carlos", "admin_vitoca_456"])); // 3 likes
+  commentLikes.set("feat2_comment2", new Set(["user_pedro_101", "user_ana_202"])); // 2 likes
+
   console.log(
     "[COMMENTS] Sistema inicializado com dados demo de múltiplos níveis e likes para pontos reais",
   );
