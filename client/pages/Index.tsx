@@ -134,7 +134,8 @@ export default function Index(props: IndexProps) {
 
   // Estados para modal de destaque
   const [featuredModalOpen, setFeaturedModalOpen] = useState(false);
-  const [selectedTopicForFeatured, setSelectedTopicForFeatured] = useState<Topic | null>(null);
+  const [selectedTopicForFeatured, setSelectedTopicForFeatured] =
+    useState<Topic | null>(null);
 
   // Buscar tópicos reais da API quando uma categoria é selecionada
   useEffect(() => {
@@ -1378,7 +1379,9 @@ export default function Index(props: IndexProps) {
                                 {isAdmin && (
                                   <div className="flex items-center gap-1">
                                     <button
-                                      onClick={(e) => handleFeaturedClick(topic, e)}
+                                      onClick={(e) =>
+                                        handleFeaturedClick(topic, e)
+                                      }
                                       className={`clover-button p-1 rounded hover:bg-gray-100 transition-colors ${
                                         topic.isFeatured
                                           ? "text-green-600 hover:text-green-800 featured"
@@ -1396,7 +1399,10 @@ export default function Index(props: IndexProps) {
                                       onClick={(e) => {
                                         e.preventDefault();
                                         e.stopPropagation();
-                                        handleDeleteTopic(topic.id, topic.title);
+                                        handleDeleteTopic(
+                                          topic.id,
+                                          topic.title,
+                                        );
                                       }}
                                       className="text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-50 transition-colors"
                                       title="Excluir tópico (Admin)"

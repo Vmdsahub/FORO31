@@ -922,11 +922,9 @@ export const handleDeleteTopic: RequestHandler = (req, res) => {
 
   // Allow topic author or admin to delete the topic
   if (req.user.role !== "admin" && req.user.id !== topic.authorId) {
-    return res
-      .status(403)
-      .json({
-        message: "Apenas o autor do tópico ou administradores podem excluí-lo",
-      });
+    return res.status(403).json({
+      message: "Apenas o autor do tópico ou administradores podem excluí-lo",
+    });
   }
 
   topics.delete(topicId);

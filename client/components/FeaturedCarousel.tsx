@@ -66,7 +66,9 @@ export default function FeaturedCarousel({ isAdmin }: FeaturedCarouselProps) {
     if (isTransitioning) return;
     setIsTransitioning(true);
     setTimeout(() => {
-      setCurrentSlide((prev) => (prev - 1 + featuredTopics.length) % featuredTopics.length);
+      setCurrentSlide(
+        (prev) => (prev - 1 + featuredTopics.length) % featuredTopics.length,
+      );
       setTimeout(() => setIsTransitioning(false), 50);
     }, 250);
   };
@@ -84,7 +86,9 @@ export default function FeaturedCarousel({ isAdmin }: FeaturedCarouselProps) {
     return (
       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden mb-8">
         <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-black">Tópicos em Destaque</h2>
+          <h2 className="text-xl font-semibold text-black">
+            Tópicos em Destaque
+          </h2>
         </div>
         <div className="p-8 text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black mx-auto mb-4"></div>
@@ -98,12 +102,16 @@ export default function FeaturedCarousel({ isAdmin }: FeaturedCarouselProps) {
     return (
       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden mb-8">
         <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-black">Tópicos em Destaque</h2>
+          <h2 className="text-xl font-semibold text-black">
+            Tópicos em Destaque
+          </h2>
         </div>
         <div className="p-8 text-center text-gray-500">
           <p>Nenhum tópico em destaque no momento.</p>
           {isAdmin && (
-            <p className="text-sm mt-2">Use o símbolo 🍀 em tópicos para adicioná-los aos destaques.</p>
+            <p className="text-sm mt-2">
+              Use o símbolo 🍀 em tópicos para adicioná-los aos destaques.
+            </p>
           )}
         </div>
       </div>
@@ -120,12 +128,12 @@ export default function FeaturedCarousel({ isAdmin }: FeaturedCarouselProps) {
           {/* Background Image */}
           <div
             className={`absolute inset-0 bg-cover bg-center transition-all duration-500 ${
-              isTransitioning ? 'opacity-70 scale-105' : 'opacity-100 scale-100'
+              isTransitioning ? "opacity-70 scale-105" : "opacity-100 scale-100"
             }`}
             style={{
               backgroundImage: currentTopic.featuredImageUrl
                 ? `url(${currentTopic.featuredImageUrl})`
-                : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                : "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
             }}
           >
             {/* Overlay */}
@@ -133,16 +141,26 @@ export default function FeaturedCarousel({ isAdmin }: FeaturedCarouselProps) {
           </div>
 
           {/* Title in top-left corner */}
-          <div className={`absolute top-6 left-6 z-10 transition-all duration-300 ${
-            isTransitioning ? 'opacity-0 transform translate-y-2' : 'opacity-100 transform translate-y-0'
-          }`}>
-            <h2 className="text-xl font-semibold text-white mb-4 drop-shadow-lg">Tópicos em Destaque</h2>
+          <div
+            className={`absolute top-6 left-6 z-10 transition-all duration-300 ${
+              isTransitioning
+                ? "opacity-0 transform translate-y-2"
+                : "opacity-100 transform translate-y-0"
+            }`}
+          >
+            <h2 className="text-xl font-semibold text-white mb-4 drop-shadow-lg">
+              Tópicos em Destaque
+            </h2>
           </div>
 
           {/* Content */}
-          <div className={`relative h-full flex items-end p-6 transition-all duration-300 ${
-            isTransitioning ? 'opacity-0 transform translate-y-4' : 'opacity-100 transform translate-y-0'
-          }`}>
+          <div
+            className={`relative h-full flex items-end p-6 transition-all duration-300 ${
+              isTransitioning
+                ? "opacity-0 transform translate-y-4"
+                : "opacity-100 transform translate-y-0"
+            }`}
+          >
             <div className="text-white max-w-2xl">
               <Link
                 to={`/topic/${currentTopic.id}`}
@@ -152,7 +170,9 @@ export default function FeaturedCarousel({ isAdmin }: FeaturedCarouselProps) {
                   {currentTopic.title}
                 </h3>
                 <div className="flex items-center gap-4 text-sm text-gray-200">
-                  <span>por <strong>{currentTopic.author}</strong></span>
+                  <span>
+                    por <strong>{currentTopic.author}</strong>
+                  </span>
                   <span className="flex items-center gap-1">
                     💬 {currentTopic.replies} comentários
                   </span>
@@ -184,8 +204,6 @@ export default function FeaturedCarousel({ isAdmin }: FeaturedCarouselProps) {
             </>
           )}
         </div>
-
-
       </div>
     </div>
   );

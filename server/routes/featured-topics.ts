@@ -9,32 +9,37 @@ let topicsStorage: Map<string, Topic> | null = null;
 const getTopicsStorage = () => {
   if (!topicsStorage) {
     // Esta é uma referência temporária - em produção seria uma conexão com banco
-    const forumModule = require('./forum');
+    const forumModule = require("./forum");
     topicsStorage = forumModule.getTopicsStorage?.() || new Map();
   }
   return topicsStorage;
 };
 
 // Simulação de dados em memória para tópicos em destaque
-let featuredTopics: Map<string, {
-  topicId: string;
-  position: number;
-  featuredImageUrl?: string;
-  addedAt: string;
-}> = new Map();
+let featuredTopics: Map<
+  string,
+  {
+    topicId: string;
+    position: number;
+    featuredImageUrl?: string;
+    addedAt: string;
+  }
+> = new Map();
 
 // Mock data inicial para demonstração
 featuredTopics.set("demo_featured_1", {
   topicId: "demo_featured_1",
   position: 1,
-  featuredImageUrl: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&h=400&fit=crop",
+  featuredImageUrl:
+    "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&h=400&fit=crop",
   addedAt: new Date().toISOString(),
 });
 
 featuredTopics.set("demo_featured_2", {
   topicId: "demo_featured_2",
   position: 2,
-  featuredImageUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=800&h=400&fit=crop",
+  featuredImageUrl:
+    "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=800&h=400&fit=crop",
   addedAt: new Date().toISOString(),
 });
 
@@ -55,7 +60,7 @@ const mockTopics: Topic[] = [
     lastPost: {
       author: "Maria Santos",
       date: "2024-01-15",
-      time: "14:30"
+      time: "14:30",
     },
     category: "llms",
     createdAt: "2024-01-10T10:00:00Z",
@@ -63,7 +68,8 @@ const mockTopics: Topic[] = [
     comments: [],
     isFeatured: true,
     featuredPosition: 1,
-    featuredImageUrl: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&h=400&fit=crop"
+    featuredImageUrl:
+      "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&h=400&fit=crop",
   },
   {
     id: "demo_featured_2",
@@ -80,7 +86,7 @@ const mockTopics: Topic[] = [
     lastPost: {
       author: "Ana Paula",
       date: "2024-01-14",
-      time: "16:45"
+      time: "16:45",
     },
     category: "vibe-coding",
     createdAt: "2024-01-08T08:00:00Z",
@@ -88,63 +94,72 @@ const mockTopics: Topic[] = [
     comments: [],
     isFeatured: true,
     featuredPosition: 2,
-    featuredImageUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=800&h=400&fit=crop"
-  }
+    featuredImageUrl:
+      "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=800&h=400&fit=crop",
+  },
 ];
 
 // GET /api/featured-topics - Buscar tópicos em destaque
 export const getFeaturedTopics: RequestHandler = async (req, res) => {
   try {
     // Ordenar por posição
-    const featuredList = Array.from(featuredTopics.values())
-      .sort((a, b) => a.position - b.position);
+    const featuredList = Array.from(featuredTopics.values()).sort(
+      (a, b) => a.position - b.position,
+    );
 
     // Buscar dados completos dos tópicos do storage real
     const realTopicsStorage = getTopicsStorage();
-    const topics = featuredList.map(featured => {
-      // Primeiro tentar buscar nos tópicos reais
-      const realTopic = realTopicsStorage.get(featured.topicId);
-      if (realTopic) {
-        // Obter contagem real de comentários
-        const commentStats = getTopicCommentStats(featured.topicId);
-        return {
-          ...realTopic,
-          replies: commentStats.totalComments,
-          isFeatured: true,
-          featuredPosition: featured.position,
-          featuredImageUrl: featured.featuredImageUrl || realTopic.featuredImageUrl
-        };
-      }
+    const topics = featuredList
+      .map((featured) => {
+        // Primeiro tentar buscar nos tópicos reais
+        const realTopic = realTopicsStorage.get(featured.topicId);
+        if (realTopic) {
+          // Obter contagem real de comentários
+          const commentStats = getTopicCommentStats(featured.topicId);
+          return {
+            ...realTopic,
+            replies: commentStats.totalComments,
+            isFeatured: true,
+            featuredPosition: featured.position,
+            featuredImageUrl:
+              featured.featuredImageUrl || realTopic.featuredImageUrl,
+          };
+        }
 
-      // Fallback para mock data se não encontrar tópico real
-      const mockTopic = mockTopics.find(t => t.id === featured.topicId);
-      if (mockTopic) {
-        // Para tópicos mock, também tentar obter contagem real de comentários
-        const commentStats = getTopicCommentStats(featured.topicId);
-        return {
-          ...mockTopic,
-          replies: commentStats.totalComments > 0 ? commentStats.totalComments : mockTopic.replies,
-          isFeatured: true,
-          featuredPosition: featured.position,
-          featuredImageUrl: featured.featuredImageUrl || mockTopic.featuredImageUrl
-        };
-      }
+        // Fallback para mock data se não encontrar tópico real
+        const mockTopic = mockTopics.find((t) => t.id === featured.topicId);
+        if (mockTopic) {
+          // Para tópicos mock, também tentar obter contagem real de comentários
+          const commentStats = getTopicCommentStats(featured.topicId);
+          return {
+            ...mockTopic,
+            replies:
+              commentStats.totalComments > 0
+                ? commentStats.totalComments
+                : mockTopic.replies,
+            isFeatured: true,
+            featuredPosition: featured.position,
+            featuredImageUrl:
+              featured.featuredImageUrl || mockTopic.featuredImageUrl,
+          };
+        }
 
-      return null;
-    }).filter(Boolean);
+        return null;
+      })
+      .filter(Boolean);
 
     console.log("[FEATURED] Topics found:", topics.length);
     console.log("[FEATURED] Featured list:", featuredList);
 
     res.json({
       success: true,
-      topics
+      topics,
     });
   } catch (error) {
     console.error("Error fetching featured topics:", error);
     res.status(500).json({
       success: false,
-      message: "Erro ao buscar tópicos em destaque"
+      message: "Erro ao buscar tópicos em destaque",
     });
   }
 };
@@ -159,14 +174,15 @@ export const addFeaturedTopic: RequestHandler = async (req, res) => {
     if (!position || position < 1 || position > 4) {
       return res.status(400).json({
         success: false,
-        message: "Posição deve ser entre 1 e 4"
+        message: "Posição deve ser entre 1 e 4",
       });
     }
 
     // Verificar se já existe tópico nesta posição
-    const existingAtPosition = Array.from(featuredTopics.values())
-      .find(f => f.position === position);
-    
+    const existingAtPosition = Array.from(featuredTopics.values()).find(
+      (f) => f.position === position,
+    );
+
     if (existingAtPosition) {
       // Remover o tópico existente da posição
       featuredTopics.delete(existingAtPosition.topicId);
@@ -177,18 +193,18 @@ export const addFeaturedTopic: RequestHandler = async (req, res) => {
       topicId,
       position,
       featuredImageUrl,
-      addedAt: new Date().toISOString()
+      addedAt: new Date().toISOString(),
     });
 
     res.json({
       success: true,
-      message: "Tópico adicionado aos destaques"
+      message: "Tópico adicionado aos destaques",
     });
   } catch (error) {
     console.error("Error adding featured topic:", error);
     res.status(500).json({
       success: false,
-      message: "Erro ao adicionar tópico aos destaques"
+      message: "Erro ao adicionar tópico aos destaques",
     });
   }
 };
@@ -202,19 +218,19 @@ export const removeFeaturedTopic: RequestHandler = async (req, res) => {
       featuredTopics.delete(topicId);
       res.json({
         success: true,
-        message: "Tópico removido dos destaques"
+        message: "Tópico removido dos destaques",
       });
     } else {
       res.status(404).json({
         success: false,
-        message: "Tópico não encontrado nos destaques"
+        message: "Tópico não encontrado nos destaques",
       });
     }
   } catch (error) {
     console.error("Error removing featured topic:", error);
     res.status(500).json({
       success: false,
-      message: "Erro ao remover tópico dos destaques"
+      message: "Erro ao remover tópico dos destaques",
     });
   }
 };
@@ -222,23 +238,24 @@ export const removeFeaturedTopic: RequestHandler = async (req, res) => {
 // GET /api/featured-topics/positions - Buscar posições disponíveis
 export const getAvailablePositions: RequestHandler = async (req, res) => {
   try {
-    const usedPositions = Array.from(featuredTopics.values())
-      .map(f => f.position);
-    
-    const availablePositions = [1, 2, 3, 4].filter(pos => 
-      !usedPositions.includes(pos)
+    const usedPositions = Array.from(featuredTopics.values()).map(
+      (f) => f.position,
+    );
+
+    const availablePositions = [1, 2, 3, 4].filter(
+      (pos) => !usedPositions.includes(pos),
     );
 
     res.json({
       success: true,
       availablePositions,
-      usedPositions: usedPositions.sort()
+      usedPositions: usedPositions.sort(),
     });
   } catch (error) {
     console.error("Error getting available positions:", error);
     res.status(500).json({
       success: false,
-      message: "Erro ao buscar posições disponíveis"
+      message: "Erro ao buscar posições disponíveis",
     });
   }
 };

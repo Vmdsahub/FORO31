@@ -920,7 +920,9 @@
   .carousel-slide-enter-active {
     opacity: 1;
     transform: translateX(0%);
-    transition: opacity 500ms, transform 500ms;
+    transition:
+      opacity 500ms,
+      transform 500ms;
   }
 
   .carousel-slide-exit {
@@ -931,7 +933,9 @@
   .carousel-slide-exit-active {
     opacity: 0;
     transform: translateX(-100%);
-    transition: opacity 500ms, transform 500ms;
+    transition:
+      opacity 500ms,
+      transform 500ms;
   }
 
   /* === FEATURED TOPIC STYLES === */
@@ -963,7 +967,8 @@
   }
 
   @keyframes cloverPulse {
-    0%, 100% {
+    0%,
+    100% {
       transform: scale(1);
     }
     50% {

@@ -211,8 +211,16 @@ export function createServer() {
 
   // Featured topics routes
   app.get("/api/featured-topics", optionalAuthenticateToken, getFeaturedTopics);
-  app.post("/api/featured-topics/:topicId", authenticateToken, addFeaturedTopic);
-  app.delete("/api/featured-topics/:topicId", authenticateToken, removeFeaturedTopic);
+  app.post(
+    "/api/featured-topics/:topicId",
+    authenticateToken,
+    addFeaturedTopic,
+  );
+  app.delete(
+    "/api/featured-topics/:topicId",
+    authenticateToken,
+    removeFeaturedTopic,
+  );
   app.get("/api/featured-topics/positions", getAvailablePositions);
 
   // Security logs and monitoring routes

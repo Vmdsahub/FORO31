@@ -54,7 +54,7 @@ export default function FeaturedTopicModal({
       if (response.ok) {
         const data = await response.json();
         setPositions(data);
-        
+
         // Se o tópico já está em destaque, usar sua posição atual
         if (topic.isFeatured && topic.featuredPosition) {
           setSelectedPosition(topic.featuredPosition);
@@ -85,7 +85,7 @@ export default function FeaturedTopicModal({
 
       if (response.ok) {
         toast.success(
-          `Tópico adicionado aos destaques na posição ${selectedPosition}!`
+          `Tópico adicionado aos destaques na posição ${selectedPosition}!`,
         );
         onFeaturedUpdate();
         onClose();
@@ -135,14 +135,15 @@ export default function FeaturedTopicModal({
             🍀 Gerenciar Destaque
           </DialogTitle>
         </DialogHeader>
-        
+
         <div className="space-y-4">
           {/* Informações do tópico */}
           <div className="p-3 bg-gray-50 rounded-lg">
             <h4 className="font-medium text-sm text-gray-900 mb-1">Tópico:</h4>
             <p className="text-sm text-gray-700 line-clamp-2">{topic.title}</p>
             <p className="text-xs text-gray-500 mt-1">
-              por {topic.author} • {topic.likes} likes • {topic.replies} comentários
+              por {topic.author} • {topic.likes} likes • {topic.replies}{" "}
+              comentários
             </p>
           </div>
 
@@ -151,10 +152,11 @@ export default function FeaturedTopicModal({
             <div className="space-y-3">
               <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
                 <p className="text-sm text-green-800">
-                  ✅ Este tópico está em destaque na <strong>posição {topic.featuredPosition}</strong>
+                  ✅ Este tópico está em destaque na{" "}
+                  <strong>posição {topic.featuredPosition}</strong>
                 </p>
               </div>
-              
+
               <div className="flex gap-2">
                 <Button
                   onClick={handleRemoveFromFeatured}
@@ -174,8 +176,9 @@ export default function FeaturedTopicModal({
                 <div className="grid grid-cols-4 gap-2">
                   {[1, 2, 3, 4].map((pos) => {
                     const isUsed = positions.usedPositions.includes(pos);
-                    const isAvailable = positions.availablePositions.includes(pos);
-                    
+                    const isAvailable =
+                      positions.availablePositions.includes(pos);
+
                     return (
                       <button
                         key={pos}
@@ -185,14 +188,12 @@ export default function FeaturedTopicModal({
                           selectedPosition === pos
                             ? "border-blue-500 bg-blue-50 text-blue-700"
                             : isUsed
-                            ? "border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed"
-                            : "border-gray-300 hover:border-gray-400 text-gray-700"
+                              ? "border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed"
+                              : "border-gray-300 hover:border-gray-400 text-gray-700"
                         }`}
                       >
                         {pos}
-                        {isUsed && (
-                          <div className="text-xs mt-1">Ocupada</div>
-                        )}
+                        {isUsed && <div className="text-xs mt-1">Ocupada</div>}
                       </button>
                     );
                   })}
@@ -232,16 +233,19 @@ export default function FeaturedTopicModal({
                 </Button>
                 <Button
                   onClick={handleAddToFeatured}
-                  disabled={isLoading || positions.availablePositions.length === 0}
+                  disabled={
+                    isLoading || positions.availablePositions.length === 0
+                  }
                   className="flex-1"
                 >
                   {isLoading ? "Adicionando..." : "Adicionar aos Destaques"}
                 </Button>
               </div>
-              
+
               {positions.availablePositions.length === 0 && (
                 <p className="text-xs text-red-600 text-center">
-                  Todas as posições estão ocupadas. Selecione uma posição para substituir.
+                  Todas as posições estão ocupadas. Selecione uma posição para
+                  substituir.
                 </p>
               )}
             </div>
