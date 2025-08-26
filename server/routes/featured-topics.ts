@@ -1,6 +1,10 @@
 import { RequestHandler } from "express";
 import { Topic } from "@shared/forum";
 import { getTopicCommentStats } from "./simple-comments";
+import multer from "multer";
+import { v4 as uuidv4 } from "uuid";
+import path from "path";
+import fs from "fs/promises";
 
 // Importar o storage de tópicos reais do forum.ts
 let topicsStorage: Map<string, Topic> | null = null;
@@ -276,4 +280,122 @@ export const getAvailablePositions: RequestHandler = async (req, res) => {
       message: "Erro ao buscar posições disponíveis",
     });
   }
+};
+
+// Configuração do multer para upload de imagens
+const storage = multer.diskStorage({
+  destination: async (req, file, cb) => {
+    const uploadDir = path.join(process.cwd(), "public", "uploads", "featured");
+    try {
+      await fs.mkdir(uploadDir, { recursive: true });
+      cb(null, uploadDir);
+    } catch (error) {
+      cb(error as Error, uploadDir);
+    }
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    const filename = `featured-${uuidv4()}${ext}`;
+    cb(null, filename);
+  },
+});
+
+const upload = multer({
+  storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = /jpeg|jpg|png|gif|webp/;
+    const extname = allowedTypes.test(
+      path.extname(file.originalname).toLowerCase(),
+    );
+    const mimetype = allowedTypes.test(file.mimetype);
+
+    if (mimetype && extname) {
+      return cb(null, true);
+    } else {
+      cb(new Error("Apenas arquivos de imagem são permitidos!"));
+    }
+  },
+});
+
+// PUT /api/featured-topics/:topicId/image - Alterar imagem de tópico em destaque
+export const updateFeaturedImage = (req: any, res: any) => {
+  upload.single("image")(req, res, async (err) => {
+    if (err) {
+      console.error("Error uploading image:", err);
+      return res.status(400).json({
+        success: false,
+        message: err.message || "Erro ao fazer upload da imagem",
+      });
+    }
+
+    try {
+      const { topicId } = req.params;
+      const file = req.file;
+
+      if (!file) {
+        return res.status(400).json({
+          success: false,
+          message: "Nenhuma imagem foi enviada",
+        });
+      }
+
+      // Verificar se o tópico está nos destaques
+      const featuredTopic = featuredTopics.get(topicId);
+      if (!featuredTopic) {
+        // Remover arquivo se tópico não estiver em destaque
+        await fs.unlink(file.path).catch(console.error);
+        return res.status(404).json({
+          success: false,
+          message: "Tópico não encontrado nos destaques",
+        });
+      }
+
+      // Construir URL da nova imagem
+      const imageUrl = `/uploads/featured/${file.filename}`;
+
+      // Remover imagem anterior se existir
+      if (
+        featuredTopic.featuredImageUrl &&
+        featuredTopic.featuredImageUrl.startsWith("/uploads/")
+      ) {
+        const oldImagePath = path.join(
+          process.cwd(),
+          "public",
+          featuredTopic.featuredImageUrl,
+        );
+        await fs.unlink(oldImagePath).catch(console.error);
+      }
+
+      // Atualizar URL da imagem no tópico em destaque
+      featuredTopics.set(topicId, {
+        ...featuredTopic,
+        featuredImageUrl: imageUrl,
+      });
+
+      // Também atualizar no storage de tópicos reais se existir
+      const realTopicsStorage = getTopicsStorage();
+      const realTopic = realTopicsStorage.get(topicId);
+      if (realTopic) {
+        realTopicsStorage.set(topicId, {
+          ...realTopic,
+          featuredImageUrl: imageUrl,
+        });
+      }
+
+      res.json({
+        success: true,
+        message: "Imagem atualizada com sucesso",
+        imageUrl,
+      });
+    } catch (error) {
+      console.error("Error updating featured image:", error);
+      res.status(500).json({
+        success: false,
+        message: "Erro interno do servidor",
+      });
+    }
+  });
 };

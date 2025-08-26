@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { Topic } from "@shared/forum";
-import { ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Trash2, Image } from "lucide-react";
 import { toast } from "sonner";
 
 interface FeaturedTopic extends Topic {
@@ -107,6 +107,57 @@ export default function FeaturedCarousel({
     }
   };
 
+  const changeFeaturedImage = async (topicId: string) => {
+    // Criar input de arquivo temporário
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      // Validar tamanho do arquivo (máx 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Arquivo muito grande. Máximo 5MB.");
+        return;
+      }
+
+      // Validar tipo de arquivo
+      if (!file.type.startsWith("image/")) {
+        toast.error("Por favor, selecione apenas arquivos de imagem.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("image", file);
+
+      try {
+        const response = await fetch(`/api/featured-topics/${topicId}/image`, {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+          },
+          body: formData,
+        });
+
+        if (response.ok) {
+          toast.success("Imagem atualizada com sucesso!");
+          await fetchFeaturedTopics();
+          onFeaturedUpdate?.();
+        } else {
+          const error = await response.json();
+          toast.error(error.message || "Erro ao atualizar imagem");
+        }
+      } catch (error) {
+        console.error("Error updating featured image:", error);
+        toast.error("Erro ao atualizar imagem");
+      }
+    };
+
+    input.click();
+  };
+
   // Carregar tópicos em destaque
   useEffect(() => {
     fetchFeaturedTopics();
@@ -194,15 +245,23 @@ export default function FeaturedCarousel({
             </h2>
           </div>
 
-          {/* Remove button for admin in top-right corner */}
+          {/* Admin buttons in top-right corner */}
           {isAdmin && (
             <div
-              className={`absolute top-6 right-6 z-10 transition-all duration-300 ${
+              className={`absolute top-6 right-6 z-10 transition-all duration-300 flex gap-2 ${
                 isTransitioning
                   ? "opacity-0 transform translate-y-2"
                   : "opacity-100 transform translate-y-0"
               }`}
             >
+              <button
+                onClick={() => changeFeaturedImage(currentTopic.id)}
+                className="p-2 bg-blue-500 bg-opacity-80 hover:bg-opacity-100 rounded-lg transition-all text-white drop-shadow-lg hover:scale-110"
+                aria-label="Alterar imagem"
+                title="Alterar imagem"
+              >
+                <Image size={20} />
+              </button>
               <button
                 onClick={() => removeFeaturedTopic(currentTopic.id)}
                 className="p-2 bg-red-500 bg-opacity-80 hover:bg-opacity-100 rounded-lg transition-all text-white drop-shadow-lg hover:scale-110"

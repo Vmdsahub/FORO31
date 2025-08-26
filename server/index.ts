@@ -78,6 +78,7 @@ import {
   addFeaturedTopic,
   removeFeaturedTopic,
   getAvailablePositions,
+  updateFeaturedImage,
 } from "./routes/featured-topics";
 
 export function createServer() {
@@ -220,6 +221,11 @@ export function createServer() {
     "/api/featured-topics/:topicId",
     authenticateToken,
     removeFeaturedTopic,
+  );
+  app.put(
+    "/api/featured-topics/:topicId/image",
+    authenticateToken,
+    updateFeaturedImage,
   );
   app.get("/api/featured-topics/positions", getAvailablePositions);
 
