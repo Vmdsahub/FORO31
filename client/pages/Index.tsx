@@ -351,6 +351,20 @@ export default function Index(props: IndexProps) {
     }
   };
 
+  const handleFeaturedClick = (topic: Topic, event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setSelectedTopicForFeatured(topic);
+    setFeaturedModalOpen(true);
+  };
+
+  const handleFeaturedUpdate = () => {
+    // Recarregar os tópicos para refletir mudanças de destaque
+    if (selectedCategory) {
+      fetchTopics(selectedCategory);
+    }
+  };
+
   // Função para lidar com upload de ícone
   const handleIconUpload = async (file: File, categoryId: string) => {
     const formData = new FormData();
