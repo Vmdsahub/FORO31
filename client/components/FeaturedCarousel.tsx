@@ -82,9 +82,13 @@ export default function FeaturedCarousel({ isAdmin, onFeaturedUpdate }: Featured
         // Atualizar a lista de tópicos em destaque
         await fetchFeaturedTopics();
         // Ajustar slide atual se necessário
-        if (currentSlide >= featuredTopics.length - 1) {
-          setCurrentSlide(Math.max(0, featuredTopics.length - 2));
-        }
+        setTimeout(() => {
+          if (featuredTopics.length <= 1) {
+            setCurrentSlide(0);
+          } else if (currentSlide >= featuredTopics.length - 1) {
+            setCurrentSlide(Math.max(0, featuredTopics.length - 2));
+          }
+        }, 100);
         // Notificar componente pai para atualizar dados
         onFeaturedUpdate?.();
       } else {
