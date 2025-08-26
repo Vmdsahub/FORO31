@@ -174,7 +174,7 @@ export default function FeaturedCarousel({ isAdmin }: FeaturedCarouselProps) {
                     por <strong>{currentTopic.author}</strong>
                   </span>
                   <span className="flex items-center gap-1">
-                    💬 {currentTopic.replies} comentários
+                    💬 {currentTopic.replies || currentTopic.comments?.length || 0} comentários
                   </span>
                   <span className="flex items-center gap-1">
                     ❤️ {currentTopic.likes} likes
