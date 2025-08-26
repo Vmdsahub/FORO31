@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { Topic } from "@shared/forum";
-import { ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Trash2, Image } from "lucide-react";
 import { toast } from "sonner";
 
 interface FeaturedTopic extends Topic {
