@@ -14,7 +14,7 @@ interface FeaturedCarouselProps {
   onFeaturedUpdate?: () => void;
 }
 
-export default function FeaturedCarousel({ isAdmin }: FeaturedCarouselProps) {
+export default function FeaturedCarousel({ isAdmin, onFeaturedUpdate }: FeaturedCarouselProps) {
   const [featuredTopics, setFeaturedTopics] = useState<FeaturedTopic[]>([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
