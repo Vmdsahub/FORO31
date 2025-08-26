@@ -975,11 +975,7 @@ export default function Index(props: IndexProps) {
                         <div className="flex-1">
                           <div className="flex items-center gap-4">
                             <div
-                              className={`w-12 h-12 flex items-center justify-center ${
-                                customIcons[category.id]
-                                  ? "cursor-pointer hover:opacity-75 transition-opacity"
-                                  : "rounded-full bg-black text-white font-semibold"
-                              } ${user?.name === "Vitoca" ? "hover:ring-2 hover:ring-blue-500" : ""}`}
+                              className={`w-12 h-12 flex items-center justify-center rounded-lg overflow-hidden transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg border-2 border-transparent hover:border-blue-200 ${user?.name === "Vitoca" ? "cursor-pointer" : ""}`}
                               onClick={(e) => handleIconClick(category.id, e)}
                               title={
                                 user?.name === "Vitoca"
@@ -987,17 +983,17 @@ export default function Index(props: IndexProps) {
                                   : undefined
                               }
                             >
-                              {customIcons[category.id] ? (
+                              {categoryIcons[category.id] || customIcons[category.id] ? (
                                 <img
-                                  src={customIcons[category.id]}
+                                  src={categoryIcons[category.id] || customIcons[category.id]}
                                   alt={category.name}
-                                  className="w-12 h-12 object-contain"
+                                  className="w-full h-full object-cover"
                                 />
                               ) : (
-                                <>
+                                <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-black text-white font-semibold">
                                   {category.name.split(" ")[0][0]}
                                   {category.name.split(" ")[1]?.[0] || ""}
-                                </>
+                                </div>
                               )}
                             </div>
                             <div>
@@ -1172,11 +1168,7 @@ export default function Index(props: IndexProps) {
                         <div className="flex-1">
                           <div className="flex items-center gap-4">
                             <div
-                              className={`w-12 h-12 flex items-center justify-center ${
-                                customIcons[category.id]
-                                  ? "cursor-pointer hover:opacity-75 transition-opacity"
-                                  : "rounded-full bg-green-600 text-white font-semibold"
-                              } ${user?.name === "Vitoca" ? "hover:ring-2 hover:ring-blue-500" : ""}`}
+                              className={`w-12 h-12 flex items-center justify-center rounded-lg overflow-hidden transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg border-2 border-transparent hover:border-green-200 ${user?.name === "Vitoca" ? "cursor-pointer" : ""}`}
                               onClick={(e) => handleIconClick(category.id, e)}
                               title={
                                 user?.name === "Vitoca"
@@ -1184,17 +1176,17 @@ export default function Index(props: IndexProps) {
                                   : undefined
                               }
                             >
-                              {customIcons[category.id] ? (
+                              {categoryIcons[category.id] || customIcons[category.id] ? (
                                 <img
-                                  src={customIcons[category.id]}
+                                  src={categoryIcons[category.id] || customIcons[category.id]}
                                   alt={category.name}
-                                  className="w-12 h-12 object-contain"
+                                  className="w-full h-full object-cover"
                                 />
                               ) : (
-                                <>
+                                <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-green-600 text-white font-semibold">
                                   {category.name.split(" ")[0][0]}
                                   {category.name.split(" ")[1]?.[0] || ""}
-                                </>
+                                </div>
                               )}
                             </div>
                             <div>
