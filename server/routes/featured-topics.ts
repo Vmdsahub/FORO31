@@ -118,7 +118,7 @@ export const getFeaturedTopics: RequestHandler = async (req, res) => {
           const commentStats = getTopicCommentStats(featured.topicId);
           return {
             ...realTopic,
-            replies: commentStats.totalComments,
+            replies: commentStats.commentsCount,
             isFeatured: true,
             featuredPosition: featured.position,
             featuredImageUrl:
@@ -134,8 +134,8 @@ export const getFeaturedTopics: RequestHandler = async (req, res) => {
           return {
             ...mockTopic,
             replies:
-              commentStats.totalComments > 0
-                ? commentStats.totalComments
+              commentStats.commentsCount > 0
+                ? commentStats.commentsCount
                 : mockTopic.replies,
             isFeatured: true,
             featuredPosition: featured.position,
