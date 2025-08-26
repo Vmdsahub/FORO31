@@ -245,15 +245,23 @@ export default function FeaturedCarousel({
             </h2>
           </div>
 
-          {/* Remove button for admin in top-right corner */}
+          {/* Admin buttons in top-right corner */}
           {isAdmin && (
             <div
-              className={`absolute top-6 right-6 z-10 transition-all duration-300 ${
+              className={`absolute top-6 right-6 z-10 transition-all duration-300 flex gap-2 ${
                 isTransitioning
                   ? "opacity-0 transform translate-y-2"
                   : "opacity-100 transform translate-y-0"
               }`}
             >
+              <button
+                onClick={() => changeFeaturedImage(currentTopic.id)}
+                className="p-2 bg-blue-500 bg-opacity-80 hover:bg-opacity-100 rounded-lg transition-all text-white drop-shadow-lg hover:scale-110"
+                aria-label="Alterar imagem"
+                title="Alterar imagem"
+              >
+                <Image size={20} />
+              </button>
               <button
                 onClick={() => removeFeaturedTopic(currentTopic.id)}
                 className="p-2 bg-red-500 bg-opacity-80 hover:bg-opacity-100 rounded-lg transition-all text-white drop-shadow-lg hover:scale-110"
