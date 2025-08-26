@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { Topic } from "@shared/forum";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -25,14 +25,14 @@ export default function FeaturedCarousel({ isAdmin }: FeaturedCarouselProps) {
 
   // Auto-rotation a cada 10 segundos
   useEffect(() => {
-    if (featuredTopics.length === 0) return;
+    if (featuredTopics.length <= 1) return;
 
     const interval = setInterval(() => {
       nextSlide();
     }, 10000);
 
     return () => clearInterval(interval);
-  }, [featuredTopics.length]);
+  }, [featuredTopics.length, nextSlide]);
 
   const fetchFeaturedTopics = async () => {
     try {
@@ -53,16 +53,16 @@ export default function FeaturedCarousel({ isAdmin }: FeaturedCarouselProps) {
     }
   };
 
-  const nextSlide = () => {
+  const nextSlide = useCallback(() => {
     if (isTransitioning) return;
     setIsTransitioning(true);
     setTimeout(() => {
       setCurrentSlide((prev) => (prev + 1) % featuredTopics.length);
       setTimeout(() => setIsTransitioning(false), 50);
     }, 250);
-  };
+  }, [isTransitioning, featuredTopics.length]);
 
-  const prevSlide = () => {
+  const prevSlide = useCallback(() => {
     if (isTransitioning) return;
     setIsTransitioning(true);
     setTimeout(() => {
@@ -71,7 +71,7 @@ export default function FeaturedCarousel({ isAdmin }: FeaturedCarouselProps) {
       );
       setTimeout(() => setIsTransitioning(false), 50);
     }, 250);
-  };
+  }, [isTransitioning, featuredTopics.length]);
 
   const goToSlide = (index: number) => {
     if (isTransitioning || index === currentSlide) return;
