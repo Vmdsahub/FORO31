@@ -34,6 +34,9 @@ export interface Topic {
   };
   isPinned?: boolean;
   isHot?: boolean;
+  isFeatured?: boolean;
+  featuredPosition?: number; // 1, 2, 3, ou 4
+  featuredImageUrl?: string;
   category: string;
   createdAt: string;
   updatedAt: string;
