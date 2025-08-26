@@ -189,17 +189,17 @@ export default function FeaturedCarousel({ isAdmin }: FeaturedCarouselProps) {
             <>
               <button
                 onClick={prevSlide}
-                className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white bg-opacity-20 hover:bg-opacity-30 transition-all text-white backdrop-blur-sm"
+                className="absolute left-4 top-1/2 -translate-y-1/2 p-3 hover:scale-110 transition-all text-white drop-shadow-lg"
                 aria-label="Tópico anterior"
               >
-                <ChevronLeft size={24} />
+                <ChevronLeft size={28} />
               </button>
               <button
                 onClick={nextSlide}
-                className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white bg-opacity-20 hover:bg-opacity-30 transition-all text-white backdrop-blur-sm"
+                className="absolute right-4 top-1/2 -translate-y-1/2 p-3 hover:scale-110 transition-all text-white drop-shadow-lg"
                 aria-label="Próximo tópico"
               >
-                <ChevronRight size={24} />
+                <ChevronRight size={28} />
               </button>
             </>
           )}
