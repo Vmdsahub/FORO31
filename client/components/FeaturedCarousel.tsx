@@ -203,6 +203,24 @@ export default function FeaturedCarousel({ isAdmin }: FeaturedCarouselProps) {
               </button>
             </>
           )}
+
+          {/* Pagination Dots */}
+          {featuredTopics.length > 1 && (
+            <div className="absolute bottom-4 right-6 flex gap-2">
+              {featuredTopics.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => goToSlide(index)}
+                  className={`transition-all duration-300 rounded-full bg-white bg-opacity-70 hover:bg-opacity-90 ${
+                    index === currentSlide
+                      ? 'w-3 h-3 bg-opacity-100'
+                      : 'w-2 h-2'
+                  }`}
+                  aria-label={`Ir para tópico ${index + 1}`}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
