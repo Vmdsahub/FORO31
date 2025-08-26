@@ -116,6 +116,7 @@ export const getFeaturedTopics: RequestHandler = async (req, res) => {
         if (realTopic) {
           // Obter contagem real de comentários
           const commentStats = getTopicCommentStats(featured.topicId);
+          console.log(`[FEATURED] Real topic ${featured.topicId} has ${commentStats.commentsCount} comments`);
           return {
             ...realTopic,
             replies: commentStats.commentsCount,
