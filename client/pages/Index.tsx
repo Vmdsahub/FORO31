@@ -157,6 +157,9 @@ export default function Index(props: IndexProps) {
 
   const [realTopics, setRealTopics] = useState<Topic[]>([]);
   const [isLoadingTopics, setIsLoadingTopics] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalTopics, setTotalTopics] = useState(0);
 
   // Estados para modais admin
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
@@ -182,7 +185,8 @@ export default function Index(props: IndexProps) {
   // Buscar tópicos reais da API quando uma categoria é selecionada
   useEffect(() => {
     if (selectedCategory && activeSection === "forum") {
-      fetchTopics(selectedCategory);
+      setCurrentPage(1); // Reset to first page when changing category
+      fetchTopics(selectedCategory, 1);
     }
   }, [selectedCategory, activeSection]);
 
@@ -236,11 +240,13 @@ export default function Index(props: IndexProps) {
     }
   };
 
-  const fetchTopics = async (category: string, retryCount = 0) => {
+  const fetchTopics = async (category: string, page = 1, retryCount = 0) => {
     setIsLoadingTopics(true);
     try {
       const params = new URLSearchParams();
       params.append("category", category);
+      params.append("page", page.toString());
+      params.append("limit", "10"); // 10 topics per page
 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
@@ -257,6 +263,9 @@ export default function Index(props: IndexProps) {
       if (response.ok) {
         const data = await response.json();
         setRealTopics(data.topics || []);
+        setTotalTopics(data.total || 0);
+        setCurrentPage(data.page || 1);
+        setTotalPages(Math.ceil((data.total || 0) / (data.limit || 10)));
       } else {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
@@ -269,7 +278,7 @@ export default function Index(props: IndexProps) {
         (error instanceof TypeError || error.name === "AbortError")
       ) {
         console.log(`Retrying fetch topics (attempt ${retryCount + 1}/3)...`);
-        setTimeout(() => fetchTopics(category, retryCount + 1), 1000);
+        setTimeout(() => fetchTopics(category, page, retryCount + 1), 1000);
         return;
       }
 
@@ -283,6 +292,8 @@ export default function Index(props: IndexProps) {
 
       // Set empty array on error to prevent UI issues
       setRealTopics([]);
+      setTotalTopics(0);
+      setTotalPages(1);
     } finally {
       setIsLoadingTopics(false);
     }
@@ -290,12 +301,10 @@ export default function Index(props: IndexProps) {
 
   const handleTopicCreated = (newTopic: Topic) => {
     console.log("Novo tópico criado na Index:", newTopic);
-    // Adicionar o novo tópico ao início da lista
-    setRealTopics((prev) => {
-      const updated = [newTopic, ...prev];
-      console.log("Tópicos atualizados:", updated);
-      return updated;
-    });
+    // Refresh the current page to show the new topic
+    if (selectedCategory) {
+      fetchTopics(selectedCategory, currentPage);
+    }
   };
 
   const handleCreateCategory = () => {
@@ -384,7 +393,10 @@ export default function Index(props: IndexProps) {
       });
 
       if (response.ok) {
-        setRealTopics((prev) => prev.filter((topic) => topic.id !== topicId));
+        // Refresh the current page after deleting a topic
+        if (selectedCategory) {
+          fetchTopics(selectedCategory, currentPage);
+        }
         toast.success("Tópico excluído com sucesso!");
       } else {
         toast.error("Erro ao excluir tópico");
@@ -405,7 +417,7 @@ export default function Index(props: IndexProps) {
   const handleFeaturedUpdate = () => {
     // Recarregar os tópicos para refletir mudanças de destaque
     if (selectedCategory) {
-      fetchTopics(selectedCategory);
+      fetchTopics(selectedCategory, currentPage);
     }
   };
 
