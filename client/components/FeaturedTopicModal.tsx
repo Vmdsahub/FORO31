@@ -176,24 +176,25 @@ export default function FeaturedTopicModal({
                 <div className="grid grid-cols-4 gap-2">
                   {[1, 2, 3, 4].map((pos) => {
                     const isUsed = positions.usedPositions.includes(pos);
-                    const isAvailable =
-                      positions.availablePositions.includes(pos);
+                    const isAvailable = positions.availablePositions.includes(pos);
+                    const isCurrentTopicPosition = topic.isFeatured && topic.featuredPosition === pos;
 
                     return (
                       <button
                         key={pos}
                         onClick={() => setSelectedPosition(pos)}
-                        disabled={isUsed}
+                        disabled={isUsed && !isCurrentTopicPosition}
                         className={`p-3 text-sm font-medium rounded-lg border-2 transition-all ${
                           selectedPosition === pos
                             ? "border-blue-500 bg-blue-50 text-blue-700"
-                            : isUsed
+                            : isUsed && !isCurrentTopicPosition
                               ? "border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed"
                               : "border-gray-300 hover:border-gray-400 text-gray-700"
                         }`}
                       >
                         {pos}
-                        {isUsed && <div className="text-xs mt-1">Ocupada</div>}
+                        {isUsed && !isCurrentTopicPosition && <div className="text-xs mt-1">Ocupada</div>}
+                        {isCurrentTopicPosition && <div className="text-xs mt-1 text-green-600">Atual</div>}
                       </button>
                     );
                   })}
