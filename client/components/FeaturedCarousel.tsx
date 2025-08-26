@@ -14,7 +14,10 @@ interface FeaturedCarouselProps {
   onFeaturedUpdate?: () => void;
 }
 
-export default function FeaturedCarousel({ isAdmin, onFeaturedUpdate }: FeaturedCarouselProps) {
+export default function FeaturedCarousel({
+  isAdmin,
+  onFeaturedUpdate,
+}: FeaturedCarouselProps) {
   const [featuredTopics, setFeaturedTopics] = useState<FeaturedTopic[]>([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -59,14 +62,17 @@ export default function FeaturedCarousel({ isAdmin, onFeaturedUpdate }: Featured
     }, 250);
   }, [isTransitioning, featuredTopics.length]);
 
-  const goToSlide = useCallback((index: number) => {
-    if (isTransitioning || index === currentSlide) return;
-    setIsTransitioning(true);
-    setTimeout(() => {
-      setCurrentSlide(index);
-      setTimeout(() => setIsTransitioning(false), 50);
-    }, 250);
-  }, [isTransitioning, currentSlide]);
+  const goToSlide = useCallback(
+    (index: number) => {
+      if (isTransitioning || index === currentSlide) return;
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentSlide(index);
+        setTimeout(() => setIsTransitioning(false), 50);
+      }, 250);
+    },
+    [isTransitioning, currentSlide],
+  );
 
   const removeFeaturedTopic = async (topicId: string) => {
     try {
@@ -229,7 +235,9 @@ export default function FeaturedCarousel({ isAdmin, onFeaturedUpdate }: Featured
                     por <strong>{currentTopic.author}</strong>
                   </span>
                   <span className="flex items-center gap-1">
-                    💬 {currentTopic.replies || currentTopic.comments?.length || 0} comentários
+                    💬{" "}
+                    {currentTopic.replies || currentTopic.comments?.length || 0}{" "}
+                    comentários
                   </span>
                   <span className="flex items-center gap-1">
                     ❤️ {currentTopic.likes} likes
@@ -268,8 +276,8 @@ export default function FeaturedCarousel({ isAdmin, onFeaturedUpdate }: Featured
                   onClick={() => goToSlide(index)}
                   className={`transition-all duration-300 rounded-full bg-white bg-opacity-70 hover:bg-opacity-90 ${
                     index === currentSlide
-                      ? 'w-3 h-3 bg-opacity-100'
-                      : 'w-2 h-2'
+                      ? "w-3 h-3 bg-opacity-100"
+                      : "w-2 h-2"
                   }`}
                   aria-label={`Ir para tópico ${index + 1}`}
                 />

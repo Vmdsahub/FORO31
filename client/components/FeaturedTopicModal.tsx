@@ -176,8 +176,10 @@ export default function FeaturedTopicModal({
                 <div className="grid grid-cols-4 gap-2">
                   {[1, 2, 3, 4].map((pos) => {
                     const isUsed = positions.usedPositions.includes(pos);
-                    const isAvailable = positions.availablePositions.includes(pos);
-                    const isCurrentTopicPosition = topic.isFeatured && topic.featuredPosition === pos;
+                    const isAvailable =
+                      positions.availablePositions.includes(pos);
+                    const isCurrentTopicPosition =
+                      topic.isFeatured && topic.featuredPosition === pos;
 
                     return (
                       <button
@@ -193,8 +195,14 @@ export default function FeaturedTopicModal({
                         }`}
                       >
                         {pos}
-                        {isUsed && !isCurrentTopicPosition && <div className="text-xs mt-1">Ocupada</div>}
-                        {isCurrentTopicPosition && <div className="text-xs mt-1 text-green-600">Atual</div>}
+                        {isUsed && !isCurrentTopicPosition && (
+                          <div className="text-xs mt-1">Ocupada</div>
+                        )}
+                        {isCurrentTopicPosition && (
+                          <div className="text-xs mt-1 text-green-600">
+                            Atual
+                          </div>
+                        )}
                       </button>
                     );
                   })}
@@ -241,12 +249,13 @@ export default function FeaturedTopicModal({
                 </Button>
               </div>
 
-              {positions.usedPositions.length === 4 && !positions.availablePositions.length && (
-                <p className="text-xs text-orange-600 text-center">
-                  Todas as posições estão ocupadas. Selecione uma posição para
-                  substituir.
-                </p>
-              )}
+              {positions.usedPositions.length === 4 &&
+                !positions.availablePositions.length && (
+                  <p className="text-xs text-orange-600 text-center">
+                    Todas as posições estão ocupadas. Selecione uma posição para
+                    substituir.
+                  </p>
+                )}
             </div>
           )}
         </div>

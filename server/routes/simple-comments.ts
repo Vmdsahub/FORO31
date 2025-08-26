@@ -554,7 +554,8 @@ export function initializeDemo() {
     // Comentários para tópicos em destaque
     {
       id: "feat1_comment1",
-      content: "Excelente tutorial! GPT-4 realmente facilita muito a automação.",
+      content:
+        "Excelente tutorial! GPT-4 realmente facilita muito a automação.",
       author: "Maria Santos",
       authorId: "user_maria_789",
       authorAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=maria",
@@ -564,7 +565,8 @@ export function initializeDemo() {
     },
     {
       id: "feat1_comment2",
-      content: "Consegui implementar na minha empresa seguindo este guia. Salvou horas de trabalho!",
+      content:
+        "Consegui implementar na minha empresa seguindo este guia. Salvou horas de trabalho!",
       author: "Carlos Silva",
       authorId: "user_carlos",
       authorAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=carlos",
@@ -584,7 +586,8 @@ export function initializeDemo() {
     },
     {
       id: "feat2_comment1",
-      content: "Ótima análise comparativa! Me ajudou muito na escolha da ferramenta certa.",
+      content:
+        "Ótima análise comparativa! Me ajudou muito na escolha da ferramenta certa.",
       author: "Pedro Costa",
       authorId: "user_pedro_101",
       authorAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=pedro",
@@ -648,11 +651,23 @@ export function initializeDemo() {
   commentLikes.set("demo5", new Set(["demo_user_123", "admin_vitoca_456"])); // 2 likes para Eduardo
 
   // Likes para comentários dos tópicos em destaque
-  commentLikes.set("feat1_comment1", new Set(["demo_user_123", "user_carlos", "user_pedro_101"])); // 3 likes
-  commentLikes.set("feat1_comment2", new Set(["user_maria_789", "user_ana_202"])); // 2 likes
+  commentLikes.set(
+    "feat1_comment1",
+    new Set(["demo_user_123", "user_carlos", "user_pedro_101"]),
+  ); // 3 likes
+  commentLikes.set(
+    "feat1_comment2",
+    new Set(["user_maria_789", "user_ana_202"]),
+  ); // 2 likes
   commentLikes.set("feat1_comment3", new Set(["demo_user_123"])); // 1 like
-  commentLikes.set("feat2_comment1", new Set(["user_maria_789", "user_carlos", "admin_vitoca_456"])); // 3 likes
-  commentLikes.set("feat2_comment2", new Set(["user_pedro_101", "user_ana_202"])); // 2 likes
+  commentLikes.set(
+    "feat2_comment1",
+    new Set(["user_maria_789", "user_carlos", "admin_vitoca_456"]),
+  ); // 3 likes
+  commentLikes.set(
+    "feat2_comment2",
+    new Set(["user_pedro_101", "user_ana_202"]),
+  ); // 2 likes
 
   console.log(
     "[COMMENTS] Sistema inicializado com dados demo de múltiplos níveis e likes para pontos reais",

@@ -116,7 +116,9 @@ export const getFeaturedTopics: RequestHandler = async (req, res) => {
         if (realTopic) {
           // Obter contagem real de comentários
           const commentStats = getTopicCommentStats(featured.topicId);
-          console.log(`[FEATURED] Real topic ${featured.topicId} has ${commentStats.commentsCount} comments`);
+          console.log(
+            `[FEATURED] Real topic ${featured.topicId} has ${commentStats.commentsCount} comments`,
+          );
           return {
             ...realTopic,
             replies: commentStats.commentsCount,
@@ -132,7 +134,9 @@ export const getFeaturedTopics: RequestHandler = async (req, res) => {
         if (mockTopic) {
           // Para tópicos mock, também tentar obter contagem real de comentários
           const commentStats = getTopicCommentStats(featured.topicId);
-          console.log(`[FEATURED] Mock topic ${featured.topicId} has ${commentStats.commentsCount} comments (fallback: ${mockTopic.replies})`);
+          console.log(
+            `[FEATURED] Mock topic ${featured.topicId} has ${commentStats.commentsCount} comments (fallback: ${mockTopic.replies})`,
+          );
           return {
             ...mockTopic,
             replies:
@@ -251,7 +255,10 @@ export const getAvailablePositions: RequestHandler = async (req, res) => {
     console.log("[FEATURED] Featured topics map size:", featuredTopics.size);
     console.log("[FEATURED] Used positions:", usedPositions);
     console.log("[FEATURED] Available positions:", availablePositions);
-    console.log("[FEATURED] All featured topics:", Array.from(featuredTopics.entries()));
+    console.log(
+      "[FEATURED] All featured topics:",
+      Array.from(featuredTopics.entries()),
+    );
 
     res.json({
       success: true,
@@ -260,7 +267,7 @@ export const getAvailablePositions: RequestHandler = async (req, res) => {
       debug: {
         totalFeatured: featuredTopics.size,
         featuredTopics: Array.from(featuredTopics.values()),
-      }
+      },
     });
   } catch (error) {
     console.error("Error getting available positions:", error);
