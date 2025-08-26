@@ -221,7 +221,8 @@ const openSourceCategories: ForumCategory[] = [
   {
     id: "opensource-pedidos",
     name: "Pedidos",
-    description: "Solicitações e pedidos relacionados a projetos open-source de IA",
+    description:
+      "Solicitações e pedidos relacionados a projetos open-source de IA",
     totalTopics: 0,
     totalPosts: 0,
     lastPost: undefined,
