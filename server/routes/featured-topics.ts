@@ -248,6 +248,10 @@ export const getAvailablePositions: RequestHandler = async (req, res) => {
       (pos) => !usedPositions.includes(pos),
     );
 
+    console.log("[FEATURED] Featured topics map:", featuredTopics.size);
+    console.log("[FEATURED] Used positions:", usedPositions);
+    console.log("[FEATURED] Available positions:", availablePositions);
+
     res.json({
       success: true,
       availablePositions,
