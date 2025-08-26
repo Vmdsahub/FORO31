@@ -22,6 +22,31 @@ import CreateTopicModal from "@/components/CreateTopicModal";
 import FeaturedTopicModal from "@/components/FeaturedTopicModal";
 import FeaturedCarousel from "@/components/FeaturedCarousel";
 
+// Category icon mapping
+const categoryIcons: Record<string, string> = {
+  // Ferramentas (Blue icons)
+  "llms": "https://cdn.builder.io/api/v1/image/assets%2F1a46286616a74fbf89efc893be977ed9%2Faa7a9bf258f440469e3f4e6358ba4177?format=webp&width=800",
+  "imagem": "https://cdn.builder.io/api/v1/image/assets%2F1a46286616a74fbf89efc893be977ed9%2F247718b16f9c4befac506e0baa54e7b4?format=webp&width=800",
+  "video": "https://cdn.builder.io/api/v1/image/assets%2F1a46286616a74fbf89efc893be977ed9%2F9af7e4ae988d46d1a8ccaff74a77dd92?format=webp&width=800",
+  "musica-audio": "https://cdn.builder.io/api/v1/image/assets%2F1a46286616a74fbf89efc893be977ed9%2F3eb29141154b4311b8efdf3bb8dff747?format=webp&width=800",
+  "vibe-coding": "https://cdn.builder.io/api/v1/image/assets%2F1a46286616a74fbf89efc893be977ed9%2Fae70139e6ff54ecca5960cd26e03048d?format=webp&width=800",
+  "duvidas-erros": "https://cdn.builder.io/api/v1/image/assets%2F1a46286616a74fbf89efc893be977ed9%2F8cdc6e0df17b4269b4881c42ae267eb4?format=webp&width=800",
+  "projetos-comunidade": "https://cdn.builder.io/api/v1/image/assets%2F1a46286616a74fbf89efc893be977ed9%2Ff36d7f33536043c48ef97e8d446bf68b?format=webp&width=800",
+  "outros": "https://cdn.builder.io/api/v1/image/assets%2F1a46286616a74fbf89efc893be977ed9%2F37bd6fe46efe438595c0237af3049a4f?format=webp&width=800",
+  "pedidos": "https://cdn.builder.io/api/v1/image/assets%2F1a46286616a74fbf89efc893be977ed9%2F21f702c2ffbb4c6e8c4cc28032a4f7fd?format=webp&width=800",
+
+  // Open Source (Green icons)
+  "opensource-llms": "https://cdn.builder.io/api/v1/image/assets%2F1a46286616a74fbf89efc893be977ed9%2Ff3b909c5a14d459283ded983b7e6ffad?format=webp&width=800",
+  "opensource-imagem": "https://cdn.builder.io/api/v1/image/assets%2F1a46286616a74fbf89efc893be977ed9%2F2f7c43ce3e2e4cbc92b7f9495d05beb7?format=webp&width=800",
+  "opensource-video": "https://cdn.builder.io/api/v1/image/assets%2F1a46286616a74fbf89efc893be977ed9%2F63e185be044d4af590ba24db20d7988f?format=webp&width=800",
+  "opensource-musica-audio": "https://cdn.builder.io/api/v1/image/assets%2F1a46286616a74fbf89efc893be977ed9%2F539c1613e0c04d47825e6aef431c2bdd?format=webp&width=800",
+  "opensource-vibe-coding": "https://cdn.builder.io/api/v1/image/assets%2F1a46286616a74fbf89efc893be977ed9%2F102f5fe7c55743039d6ede734e6022e9?format=webp&width=800",
+  "opensource-duvidas-erros": "https://cdn.builder.io/api/v1/image/assets%2F1a46286616a74fbf89efc893be977ed9%2F9066b887cac048fd97be28b42d164b0c?format=webp&width=800",
+  "opensource-projetos-comunidade": "https://cdn.builder.io/api/v1/image/assets%2F1a46286616a74fbf89efc893be977ed9%2F8a81f43644334272b9b4dec5e408b16e?format=webp&width=800",
+  "opensource-outros": "https://cdn.builder.io/api/v1/image/assets%2F1a46286616a74fbf89efc893be977ed9%2Fda424f2ea3cf4dcaaea945e7a00b2850?format=webp&width=800",
+  "opensource-pedidos": "https://cdn.builder.io/api/v1/image/assets%2F1a46286616a74fbf89efc893be977ed9%2F6f039ddd7ce74c5280db22efcd188bf7?format=webp&width=800",
+};
+
 // Interfaces movidas para @/utils/weekSystem
 
 interface ForumPost {
