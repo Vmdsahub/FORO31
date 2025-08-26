@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/dialog";
 import CreateTopicModal from "@/components/CreateTopicModal";
 import FeaturedTopicModal from "@/components/FeaturedTopicModal";
+import FeaturedCarousel from "@/components/FeaturedCarousel";
 
 // Interfaces movidas para @/utils/weekSystem
 
