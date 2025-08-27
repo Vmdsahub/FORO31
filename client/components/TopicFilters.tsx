@@ -44,9 +44,9 @@ export default function TopicFilters({
   };
 
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex flex-wrap items-center gap-4">
       <div className="flex items-center gap-2">
-        <Label className="text-sm font-medium text-gray-600">Ordenar por:</Label>
+        <Label className="text-sm font-medium text-gray-600 whitespace-nowrap">Ordenar por:</Label>
         <Select value={filterType} onValueChange={onFilterTypeChange}>
           <SelectTrigger className="w-[180px] h-9">
             <SelectValue />
