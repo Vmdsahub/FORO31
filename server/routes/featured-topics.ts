@@ -118,14 +118,16 @@ export const getFeaturedTopics: RequestHandler = async (req, res) => {
         // Primeiro tentar buscar nos tópicos reais
         const realTopic = realTopicsStorage.get(featured.topicId);
         if (realTopic) {
-          // Obter contagem real de comentários
+          // Obter contagem real de comentários e likes
           const commentStats = getTopicCommentStats(featured.topicId);
+          const totalLikes = (realTopic.likes || 0) + commentStats.totalLikes;
           console.log(
-            `[FEATURED] Real topic ${featured.topicId} has ${commentStats.commentsCount} comments`,
+            `[FEATURED] Real topic ${featured.topicId} has ${commentStats.commentsCount} comments and ${totalLikes} total likes (topic: ${realTopic.likes}, comments: ${commentStats.totalLikes})`,
           );
           return {
             ...realTopic,
             replies: commentStats.commentsCount,
+            likes: totalLikes,
             isFeatured: true,
             featuredPosition: featured.position,
             featuredImageUrl:
