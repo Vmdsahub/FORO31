@@ -170,7 +170,7 @@ export default function EnhancedRichTextEditor({
       imgElement.setAttribute("data-has-delete", "true");
 
       // Make existing images draggable
-      makeDraggable(wrapper);
+      setTimeout(() => makeDraggable(wrapper), 50);
     });
 
     // Find videos without delete buttons
@@ -207,7 +207,7 @@ export default function EnhancedRichTextEditor({
       videoElement.setAttribute("data-has-delete", "true");
 
       // Make existing videos draggable
-      makeDraggable(videoElement as HTMLElement);
+      setTimeout(() => makeDraggable(videoElement as HTMLElement), 50);
     });
   };
 
@@ -728,105 +728,160 @@ export default function EnhancedRichTextEditor({
   const makeDraggable = (element: HTMLElement) => {
     if (!isEditMode) return;
 
+    console.log('Making element draggable:', element);
+
     let isDragging = false;
     let startX = 0;
-    let startLeft = 0;
+    let currentLeft = 0;
     let dragHandle: HTMLElement | null = null;
+    let isHovered = false;
+
+    // Ensure element can be positioned
+    element.style.position = 'relative';
+    element.style.cursor = 'move';
 
     // Create drag handle
     const createDragHandle = () => {
       const handle = document.createElement('div');
-      handle.innerHTML = '⋮⋮';
-      handle.title = 'Arrastar horizontalmente';
+      handle.innerHTML = '⚙️';
+      handle.title = 'Clique e arraste horizontalmente';
+      handle.className = 'drag-handle';
       handle.style.cssText = `
-        position: absolute;
-        top: 50%;
-        left: -15px;
-        transform: translateY(-50%);
-        background: rgba(0,0,0,0.7);
-        color: white;
-        width: 12px;
-        height: 24px;
-        border-radius: 6px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 8px;
-        cursor: grab;
-        opacity: 0;
-        transition: opacity 0.2s;
-        z-index: 15;
-        user-select: none;
-        font-family: monospace;
-        line-height: 1;
+        position: absolute !important;
+        top: -8px !important;
+        left: -8px !important;
+        background: rgba(59, 130, 246, 0.9) !important;
+        color: white !important;
+        width: 20px !important;
+        height: 20px !important;
+        border-radius: 50% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 10px !important;
+        cursor: grab !important;
+        opacity: 0 !important;
+        transition: all 0.2s ease !important;
+        z-index: 999 !important;
+        user-select: none !important;
+        pointer-events: auto !important;
+        border: 2px solid white !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
       `;
       return handle;
     };
 
     // Show drag handle on hover
-    element.addEventListener('mouseenter', () => {
-      if (!dragHandle && isEditMode) {
+    const handleMouseEnter = () => {
+      if (!isEditMode) return;
+
+      isHovered = true;
+      console.log('Mouse enter on draggable element');
+
+      if (!dragHandle) {
         dragHandle = createDragHandle();
         element.appendChild(dragHandle);
+        console.log('Created drag handle');
 
-        // Add drag functionality
+        // Add drag functionality to handle
         dragHandle.addEventListener('mousedown', startDrag);
       }
+
       if (dragHandle) {
         dragHandle.style.opacity = '1';
+        element.style.cursor = 'move';
       }
-    });
+    };
 
-    element.addEventListener('mouseleave', () => {
-      if (dragHandle && !isDragging) {
-        dragHandle.style.opacity = '0';
+    const handleMouseLeave = () => {
+      isHovered = false;
+
+      setTimeout(() => {
+        if (!isHovered && !isDragging && dragHandle) {
+          dragHandle.style.opacity = '0';
+          element.style.cursor = 'default';
+        }
+      }, 100);
+    };
+
+    // Add event listeners
+    element.addEventListener('mouseenter', handleMouseEnter);
+    element.addEventListener('mouseleave', handleMouseLeave);
+
+    // Also make the element itself draggable (not just the handle)
+    element.addEventListener('mousedown', (e) => {
+      if (!isEditMode) return;
+
+      // Only start drag if clicking directly on the element (not child elements like delete button)
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'BUTTON' || target.closest('button')) {
+        return;
       }
+
+      console.log('Starting drag on element click');
+      startDrag(e);
     });
 
     const startDrag = (e: MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
 
+      console.log('Drag started');
       isDragging = true;
       startX = e.clientX;
 
-      // Get current position
-      const rect = element.getBoundingClientRect();
-      const parentRect = element.parentElement!.getBoundingClientRect();
-      startLeft = rect.left - parentRect.left;
+      // Get current left offset
+      const computedStyle = window.getComputedStyle(element);
+      currentLeft = parseInt(computedStyle.left) || 0;
 
-      // Set initial position
-      element.style.position = 'relative';
-      element.style.left = '0px';
-
+      // Update cursor
+      document.body.style.cursor = 'grabbing';
       if (dragHandle) {
         dragHandle.style.cursor = 'grabbing';
+        dragHandle.style.opacity = '1';
       }
 
+      // Add global event listeners
       document.addEventListener('mousemove', drag);
       document.addEventListener('mouseup', stopDrag);
 
       // Prevent text selection
       document.body.style.userSelect = 'none';
+
+      console.log('Drag event listeners added');
     };
 
     const drag = (e: MouseEvent) => {
       if (!isDragging) return;
 
       const deltaX = e.clientX - startX;
-      const newLeft = Math.max(-100, Math.min(200, deltaX)); // Limit horizontal movement
+      const newLeft = currentLeft + deltaX;
 
-      element.style.left = newLeft + 'px';
+      // Limit horizontal movement
+      const limitedLeft = Math.max(-100, Math.min(200, newLeft));
+
+      element.style.left = limitedLeft + 'px';
+      console.log('Dragging to:', limitedLeft);
     };
 
     const stopDrag = () => {
+      console.log('Drag stopped');
       isDragging = false;
 
+      // Update current position
+      const computedStyle = window.getComputedStyle(element);
+      currentLeft = parseInt(computedStyle.left) || 0;
+
+      // Restore cursors
+      document.body.style.cursor = '';
       if (dragHandle) {
         dragHandle.style.cursor = 'grab';
-        dragHandle.style.opacity = '0';
+        if (!isHovered) {
+          dragHandle.style.opacity = '0';
+        }
       }
 
+      // Remove global event listeners
       document.removeEventListener('mousemove', drag);
       document.removeEventListener('mouseup', stopDrag);
 
@@ -834,6 +889,15 @@ export default function EnhancedRichTextEditor({
       document.body.style.userSelect = '';
 
       handleInput();
+    };
+
+    // Cleanup function
+    return () => {
+      element.removeEventListener('mouseenter', handleMouseEnter);
+      element.removeEventListener('mouseleave', handleMouseLeave);
+      if (dragHandle && dragHandle.parentNode) {
+        dragHandle.parentNode.removeChild(dragHandle);
+      }
     };
   };
 
@@ -931,7 +995,7 @@ export default function EnhancedRichTextEditor({
           imageWrapper.appendChild(deleteButton);
 
           // Make the image wrapper draggable
-          makeDraggable(imageWrapper);
+          setTimeout(() => makeDraggable(imageWrapper), 50);
 
           lastImageContainer.appendChild(imageWrapper);
         } else {
@@ -1027,7 +1091,7 @@ export default function EnhancedRichTextEditor({
       imageWrapper.appendChild(deleteButton);
 
       // Make the image wrapper draggable
-      makeDraggable(imageWrapper);
+      setTimeout(() => makeDraggable(imageWrapper), 50);
 
       imageContainer.appendChild(imageWrapper);
     } else {
@@ -1193,7 +1257,7 @@ export default function EnhancedRichTextEditor({
         }
 
         // Make the video preview draggable
-        makeDraggable(videoPreview);
+        setTimeout(() => makeDraggable(videoPreview), 50);
 
         lastMediaContainer.appendChild(videoPreview);
 
@@ -1306,7 +1370,7 @@ export default function EnhancedRichTextEditor({
     }
 
     // Make the video preview draggable
-    makeDraggable(videoPreview);
+    setTimeout(() => makeDraggable(videoPreview), 50);
 
     mediaContainer.appendChild(videoPreview);
 
