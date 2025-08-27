@@ -328,7 +328,7 @@ export default function Index(props: IndexProps) {
   };
 
   const handleTopicCreated = (newTopic: Topic) => {
-    console.log("Novo tópico criado na Index:", newTopic);
+    console.log("Novo t��pico criado na Index:", newTopic);
     // Refresh the current page to show the new topic
     if (selectedCategory) {
       fetchTopics(selectedCategory, currentPage);
@@ -454,7 +454,7 @@ export default function Index(props: IndexProps) {
       setCurrentPage(page);
       fetchTopics(selectedCategory, page);
       // Scroll to top of filters when changing pages
-      const filtersContainer = document.querySelector('.bg-white.rounded-lg.border.border-gray-200.p-4.mb-4');
+      const filtersContainer = document.querySelector('[data-filters-container]');
       if (filtersContainer) {
         filtersContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
