@@ -45,8 +45,6 @@ export default function TopicView() {
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState("");
   const [editTitle, setEditTitle] = useState("");
-  const [editDescription, setEditDescription] = useState("");
-  const [editCategory, setEditCategory] = useState("");
 
   useEffect(() => {
     fetchTopic();
@@ -215,13 +213,11 @@ export default function TopicView() {
   const handleEditTopic = () => {
     if (!topic) return;
     setEditTitle(topic.title);
-    setEditDescription(topic.description);
     // Limpar conteúdo antes de editar para evitar HTML bugado
     const cleanContent = topic.content
       .replace(/data-edit-mode="[^"]*"/g, "")
       .replace(/data-has-delete="[^"]*"/g, "");
     setEditContent(cleanContent);
-    setEditCategory(topic.category);
     setIsEditing(true);
   };
 
@@ -237,9 +233,9 @@ export default function TopicView() {
         },
         body: JSON.stringify({
           title: editTitle,
-          description: editDescription,
+          description: topic.description,
           content: editContent,
-          category: editCategory,
+          category: topic.category,
         }),
       });
 
@@ -261,9 +257,7 @@ export default function TopicView() {
   const handleCancelEdit = () => {
     setIsEditing(false);
     setEditTitle("");
-    setEditDescription("");
     setEditContent("");
-    setEditCategory("");
   };
 
   if (isLoading) {
@@ -326,16 +320,7 @@ export default function TopicView() {
                 </span>
               )}
               <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                {isEditing ? (
-                  <Input
-                    value={editCategory}
-                    onChange={(e) => setEditCategory(e.target.value)}
-                    className="h-6 text-xs w-32"
-                    placeholder="Categoria"
-                  />
-                ) : (
-                  topic.category
-                )}
+                {topic.category}
               </span>
             </div>
             {isEditing ? (
@@ -345,22 +330,12 @@ export default function TopicView() {
                   onChange={(e) => setEditTitle(e.target.value)}
                   className="text-2xl font-bold"
                   placeholder="Título do tópico"
-                  maxLength={40}
-                />
-                <Input
-                  value={editDescription}
-                  onChange={(e) => setEditDescription(e.target.value)}
-                  placeholder="Descrição breve"
+                  maxLength={70}
                 />
               </div>
             ) : (
-              <h1
-                className="text-2xl font-bold text-black mb-4 break-words leading-tight"
-                title={topic.title.length > 40 ? topic.title : undefined}
-              >
-                {topic.title.length > 40
-                  ? `${topic.title.substring(0, 40)}...`
-                  : topic.title}
+              <h1 className="text-2xl font-bold text-black mb-4 break-words leading-tight">
+                {topic.title}
               </h1>
             )}
           </div>
@@ -378,11 +353,14 @@ export default function TopicView() {
                 <div className="flex items-center gap-3">
                   <Button
                     onClick={handleSaveEdit}
-                    className="bg-green-600 hover:bg-green-700"
+                    className="bg-black text-white hover:bg-gray-800"
                   >
                     Salvar Edições
                   </Button>
-                  <Button onClick={handleCancelEdit} variant="outline">
+                  <Button
+                    onClick={handleCancelEdit}
+                    className="bg-black text-white hover:bg-gray-800"
+                  >
                     Cancelar
                   </Button>
                 </div>

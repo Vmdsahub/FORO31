@@ -80,6 +80,7 @@ import {
   getAvailablePositions,
   updateFeaturedImage,
 } from "./routes/featured-topics";
+import { searchHandler } from "./routes/search";
 
 export function createServer() {
   const app = express();
@@ -105,6 +106,9 @@ export function createServer() {
   });
 
   app.get("/api/demo", handleDemo);
+
+  // Search route
+  app.get("/api/search", optionalAuthenticateToken, searchHandler);
 
   // Authentication routes
   app.post("/api/auth/login", handleLogin);
