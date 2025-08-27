@@ -1289,18 +1289,6 @@ export default function Header({ activeSection }: HeaderProps) {
         </div>
       </div>
 
-      {/* Search Results Modal */}
-      {showSearchResults && (
-        <SearchResults
-          query={activeSearchQuery}
-          categories={activeSearchCategories}
-          onClose={() => {
-            setShowSearchResults(false);
-            setActiveSearchQuery("");
-            setActiveSearchCategories([]);
-          }}
-        />
-      )}
     </header>
   );
 }
