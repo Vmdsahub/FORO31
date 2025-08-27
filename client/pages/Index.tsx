@@ -453,10 +453,10 @@ export default function Index(props: IndexProps) {
     if (selectedCategory && page !== currentPage) {
       setCurrentPage(page);
       fetchTopics(selectedCategory, page);
-      // Scroll to top of topics list when changing pages
-      const topicsHeader = document.querySelector('.bg-gray-50');
-      if (topicsHeader) {
-        topicsHeader.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Scroll to top of filters when changing pages
+      const filtersContainer = document.querySelector('.bg-white.rounded-lg.border.border-gray-200.p-4.mb-4');
+      if (filtersContainer) {
+        filtersContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }
   };
@@ -1356,6 +1356,10 @@ export default function Index(props: IndexProps) {
                 setCurrentPage(1); // Reset pagination
                 setTotalPages(1);
                 setTotalTopics(0);
+                // Reset filters
+                setFilterType('recent');
+                setLikesRange({ min: 0, max: 1000 });
+                setCommentsRange({ min: 0, max: 100 });
               }}
               className="flex items-center gap-2 text-gray-600 hover:text-black transition-all duration-300 ease-in-out hover:translate-x-1"
             >
