@@ -114,6 +114,12 @@ export default function NewSearchSystem({
       return;
     }
 
+    // Don't search if no filters are selected
+    if (!filterUsers && !filterTools && !filterOpenSource) {
+      setSearchResults([]);
+      return;
+    }
+
     setIsSearching(true);
     try {
       // Build search parameters
@@ -200,7 +206,7 @@ export default function NewSearchSystem({
   }
 
   return (
-    <div ref={searchRef} className="flex-1 max-w-2xl mx-8 relative">
+    <div ref={searchRef} className="flex-1 max-w-[605px] mx-8 relative">
       <div className="relative">
         <input
           ref={inputRef}
@@ -313,11 +319,7 @@ export default function NewSearchSystem({
               <div className="p-4 text-center text-gray-500">
                 Nenhum resultado encontrado
               </div>
-            ) : (
-              <div className="p-4 text-center text-gray-500">
-                Digite para buscar...
-              </div>
-            )}
+            ) : null}
           </div>
         </div>
       )}
