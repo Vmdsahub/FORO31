@@ -323,16 +323,7 @@ export default function TopicView() {
                 </span>
               )}
               <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                {isEditing ? (
-                  <Input
-                    value={editCategory}
-                    onChange={(e) => setEditCategory(e.target.value)}
-                    className="h-6 text-xs w-32"
-                    placeholder="Categoria"
-                  />
-                ) : (
-                  topic.category
-                )}
+                {topic.category}
               </span>
             </div>
             {isEditing ? (
