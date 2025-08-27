@@ -263,7 +263,7 @@ export default function Index(props: IndexProps) {
       const params = new URLSearchParams();
       params.append("category", category);
       params.append("page", page.toString());
-      params.append("limit", "15"); // 15 topics per page
+      params.append("limit", "12"); // 12 topics per page
 
       // Add filter parameters
       if (filterType === 'likes') {
@@ -295,7 +295,7 @@ export default function Index(props: IndexProps) {
         setRealTopics(data.topics || []);
         setTotalTopics(data.total || 0);
         setCurrentPage(data.page || 1);
-        setTotalPages(Math.ceil((data.total || 0) / (data.limit || 15)));
+        setTotalPages(Math.ceil((data.total || 0) / (data.limit || 12)));
       } else {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
