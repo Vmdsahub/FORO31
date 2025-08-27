@@ -138,10 +138,11 @@ export const getFeaturedTopics: RequestHandler = async (req, res) => {
         // Fallback para mock data se não encontrar tópico real
         const mockTopic = mockTopics.find((t) => t.id === featured.topicId);
         if (mockTopic) {
-          // Para tópicos mock, também tentar obter contagem real de comentários
+          // Para tópicos mock, também tentar obter contagem real de comentários e likes
           const commentStats = getTopicCommentStats(featured.topicId);
+          const totalLikes = (mockTopic.likes || 0) + commentStats.totalLikes;
           console.log(
-            `[FEATURED] Mock topic ${featured.topicId} has ${commentStats.commentsCount} comments (fallback: ${mockTopic.replies})`,
+            `[FEATURED] Mock topic ${featured.topicId} has ${commentStats.commentsCount} comments and ${totalLikes} total likes (topic: ${mockTopic.likes}, comments: ${commentStats.totalLikes}) (fallback: ${mockTopic.replies})`,
           );
           return {
             ...mockTopic,
@@ -149,6 +150,7 @@ export const getFeaturedTopics: RequestHandler = async (req, res) => {
               commentStats.commentsCount > 0
                 ? commentStats.commentsCount
                 : mockTopic.replies,
+            likes: totalLikes,
             isFeatured: true,
             featuredPosition: featured.position,
             featuredImageUrl:
