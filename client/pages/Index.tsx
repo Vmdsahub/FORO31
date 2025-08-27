@@ -1404,7 +1404,7 @@ export default function Index(props: IndexProps) {
 
             {/* Filters and Pagination */}
             <div className="bg-white rounded-lg border border-gray-200 p-4 mb-4">
-              <div className="flex items-center justify-between gap-4">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <TopicFilters
                   filterType={filterType}
                   onFilterTypeChange={setFilterType}
@@ -1415,11 +1415,13 @@ export default function Index(props: IndexProps) {
                 />
 
                 {!isLoadingTopics && totalPages > 1 && (
-                  <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={handlePageChange}
-                  />
+                  <div className="flex justify-center lg:justify-end">
+                    <Pagination
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      onPageChange={handlePageChange}
+                    />
+                  </div>
                 )}
               </div>
             </div>
