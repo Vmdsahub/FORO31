@@ -430,7 +430,7 @@ export default function EnhancedRichTextEditor({
       addDeleteButtonsToExistingMedia();
       // Salvar sele��ão atual
       saveCurrentSelection();
-      // Limpar formata��ão no estado inicial se todos os botões estão desativados
+      // Limpar formatação no estado inicial se todos os botões estão desativados
       if (
         !isBold &&
         !isItalic &&
@@ -733,13 +733,12 @@ export default function EnhancedRichTextEditor({
     let isDragging = false;
     let startX = 0;
     let currentLeft = 0;
-    let dragHandle: HTMLElement | null = null;
     let isInitialized = false;
 
     // Force styles on element to make it draggable
     const applyDraggableStyles = () => {
       element.style.setProperty('position', 'relative', 'important');
-      element.style.setProperty('cursor', 'move', 'important');
+      element.style.setProperty('cursor', 'grab', 'important');
       element.style.setProperty('user-select', 'none', 'important');
       element.setAttribute('draggable', 'false'); // Disable native drag
     };
@@ -752,66 +751,33 @@ export default function EnhancedRichTextEditor({
       console.log('Initializing draggable for:', element);
       applyDraggableStyles();
 
-      // Create drag handle immediately
-      if (!dragHandle) {
-        dragHandle = document.createElement('div');
-        dragHandle.innerHTML = '👉';
-        dragHandle.title = 'Arrastar horizontalmente';
-        dragHandle.className = 'drag-handle-custom';
-
-        // Apply styles using setProperty for better enforcement
-        dragHandle.style.setProperty('position', 'absolute', 'important');
-        dragHandle.style.setProperty('top', '-10px', 'important');
-        dragHandle.style.setProperty('left', '-10px', 'important');
-        dragHandle.style.setProperty('background', '#3B82F6', 'important');
-        dragHandle.style.setProperty('color', 'white', 'important');
-        dragHandle.style.setProperty('width', '24px', 'important');
-        dragHandle.style.setProperty('height', '24px', 'important');
-        dragHandle.style.setProperty('border-radius', '50%', 'important');
-        dragHandle.style.setProperty('display', 'flex', 'important');
-        dragHandle.style.setProperty('align-items', 'center', 'important');
-        dragHandle.style.setProperty('justify-content', 'center', 'important');
-        dragHandle.style.setProperty('font-size', '12px', 'important');
-        dragHandle.style.setProperty('cursor', 'grab', 'important');
-        dragHandle.style.setProperty('opacity', '0.8', 'important');
-        dragHandle.style.setProperty('z-index', '9999', 'important');
-        dragHandle.style.setProperty('user-select', 'none', 'important');
-        dragHandle.style.setProperty('pointer-events', 'auto', 'important');
-        dragHandle.style.setProperty('border', '2px solid white', 'important');
-        dragHandle.style.setProperty('box-shadow', '0 2px 8px rgba(0,0,0,0.3)', 'important');
-
-        element.appendChild(dragHandle);
-        console.log('Drag handle created and added');
-      }
-
       // Add event listeners
       const handleMouseEnter = (e: MouseEvent) => {
         e.stopPropagation();
-        console.log('Mouse enter - showing handle');
-        if (dragHandle) {
-          dragHandle.style.setProperty('opacity', '1', 'important');
-        }
-        applyDraggableStyles();
+        console.log('Mouse enter - applying drag styles');
+        element.style.setProperty('cursor', 'grab', 'important');
+        element.style.setProperty('opacity', '0.9', 'important');
+        element.style.setProperty('transform', 'scale(1.02)', 'important');
+        element.style.setProperty('transition', 'all 0.2s ease', 'important');
       };
 
       const handleMouseLeave = (e: MouseEvent) => {
         if (!isDragging) {
-          console.log('Mouse leave - hiding handle');
-          if (dragHandle) {
-            dragHandle.style.setProperty('opacity', '0.3', 'important');
-          }
+          console.log('Mouse leave - restoring styles');
+          element.style.setProperty('opacity', '1', 'important');
+          element.style.setProperty('transform', 'scale(1)', 'important');
         }
       };
 
       const handleMouseDown = (e: MouseEvent) => {
         // Check if clicked on delete button
         const target = e.target as HTMLElement;
-        if (target.closest('button:not(.drag-handle-custom)')) {
-          console.log('Clicked on delete button, ignoring drag');
+        if (target.closest('button')) {
+          console.log('Clicked on button, ignoring drag');
           return;
         }
 
-        console.log('Mouse down - starting drag');
+        console.log('Mouse down on image - starting drag');
         startDrag(e);
       };
 
@@ -843,11 +809,9 @@ export default function EnhancedRichTextEditor({
       // Apply dragging styles
       document.body.style.setProperty('cursor', 'grabbing', 'important');
       document.body.style.setProperty('user-select', 'none', 'important');
-
-      if (dragHandle) {
-        dragHandle.style.setProperty('cursor', 'grabbing', 'important');
-        dragHandle.innerHTML = '👊'; // Change to closed fist
-      }
+      element.style.setProperty('cursor', 'grabbing', 'important');
+      element.style.setProperty('opacity', '0.8', 'important');
+      element.style.setProperty('transform', 'scale(1.05)', 'important');
 
       // Add global mouse events
       document.addEventListener('mousemove', handleMouseMove, { passive: false });
@@ -864,11 +828,9 @@ export default function EnhancedRichTextEditor({
       const deltaX = e.clientX - startX;
       const newLeft = currentLeft + deltaX;
 
-      // Limit movement
-      const limitedLeft = Math.max(-100, Math.min(200, newLeft));
-
-      element.style.setProperty('left', limitedLeft + 'px', 'important');
-      console.log('Dragging to position:', limitedLeft);
+      // No limits - free horizontal movement
+      element.style.setProperty('left', newLeft + 'px', 'important');
+      console.log('Dragging to position:', newLeft);
     };
 
     const handleMouseUp = (e: MouseEvent) => {
@@ -882,18 +844,16 @@ export default function EnhancedRichTextEditor({
       // Restore styles
       document.body.style.removeProperty('cursor');
       document.body.style.removeProperty('user-select');
-
-      if (dragHandle) {
-        dragHandle.style.setProperty('cursor', 'grab', 'important');
-        dragHandle.innerHTML = '👉'; // Back to pointing finger
-      }
+      element.style.setProperty('cursor', 'grab', 'important');
+      element.style.setProperty('opacity', '1', 'important');
+      element.style.setProperty('transform', 'scale(1)', 'important');
 
       // Remove global events
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
 
       handleInput();
-      console.log('Drag completed');
+      console.log('Drag completed at position:', currentLeft);
     };
 
     // Initialize immediately
@@ -901,9 +861,7 @@ export default function EnhancedRichTextEditor({
 
     // Cleanup function
     return () => {
-      if (dragHandle && dragHandle.parentNode) {
-        dragHandle.parentNode.removeChild(dragHandle);
-      }
+      console.log('Cleaning up draggable for element');
     };
   };
 
