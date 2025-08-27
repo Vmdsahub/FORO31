@@ -454,6 +454,11 @@ export const handleGetTopics: RequestHandler = (req, res) => {
   const category = req.query.category as string;
   const search = req.query.search as string;
   const categories = req.query.categories as string;
+  const sortBy = req.query.sortBy as string || 'recent';
+  const minLikes = parseInt(req.query.minLikes as string) || 0;
+  const maxLikes = parseInt(req.query.maxLikes as string) || 999999;
+  const minComments = parseInt(req.query.minComments as string) || 0;
+  const maxComments = parseInt(req.query.maxComments as string) || 999999;
 
   let filteredTopics = Array.from(topics.values());
 
@@ -620,7 +625,7 @@ export const handleCreateTopic: RequestHandler = (req, res) => {
   }
 
   try {
-    console.log("[FORUM] Dados recebidos para criar tópico:", req.body);
+    console.log("[FORUM] Dados recebidos para criar t��pico:", req.body);
     const data = createTopicSchema.parse(req.body);
     console.log("[FORUM] Dados validados:", data);
     const { date, time } = formatDate();
