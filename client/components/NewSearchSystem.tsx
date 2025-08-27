@@ -14,7 +14,9 @@ interface NewSearchSystemProps {
   activeSection?: "newsletter" | "forum";
 }
 
-export default function NewSearchSystem({ activeSection }: NewSearchSystemProps) {
+export default function NewSearchSystem({
+  activeSection,
+}: NewSearchSystemProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
@@ -27,8 +29,15 @@ export default function NewSearchSystem({ activeSection }: NewSearchSystemProps)
 
   // Category filters
   const [selectedCategories, setSelectedCategories] = useState<string[]>([
-    "llms", "imagem", "video", "musica-audio", "vibe-coding", 
-    "duvidas-erros", "projetos-comunidade", "outros", "pedidos"
+    "llms",
+    "imagem",
+    "video",
+    "musica-audio",
+    "vibe-coding",
+    "duvidas-erros",
+    "projetos-comunidade",
+    "outros",
+    "pedidos",
   ]);
 
   const searchRef = useRef<HTMLDivElement>(null);
@@ -50,7 +59,10 @@ export default function NewSearchSystem({ activeSection }: NewSearchSystemProps)
   // Handle click outside to close dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(event.target as Node)
+      ) {
         setIsDropdownOpen(false);
       }
     };
@@ -88,10 +100,10 @@ export default function NewSearchSystem({ activeSection }: NewSearchSystemProps)
   };
 
   const handleCategoryToggle = (categoryId: string) => {
-    setSelectedCategories(prev => 
+    setSelectedCategories((prev) =>
       prev.includes(categoryId)
-        ? prev.filter(id => id !== categoryId)
-        : [...prev, categoryId]
+        ? prev.filter((id) => id !== categoryId)
+        : [...prev, categoryId],
     );
   };
 
@@ -107,26 +119,26 @@ export default function NewSearchSystem({ activeSection }: NewSearchSystemProps)
       // Build search parameters
       const params = new URLSearchParams();
       params.append("q", query);
-      
+
       if (filterUsers) {
         params.append("type", "users");
       } else {
         // Build category filters for topics
         const searchCategories: string[] = [];
-        
+
         if (filterTools) {
-          selectedCategories.forEach(cat => {
+          selectedCategories.forEach((cat) => {
             searchCategories.push(cat);
           });
         }
-        
+
         if (filterOpenSource) {
-          selectedCategories.forEach(cat => {
+          selectedCategories.forEach((cat) => {
             searchCategories.push(`opensource-${cat}`);
           });
         }
-        
-        searchCategories.forEach(cat => params.append("categories", cat));
+
+        searchCategories.forEach((cat) => params.append("categories", cat));
         params.append("type", "topics");
       }
 
@@ -161,7 +173,13 @@ export default function NewSearchSystem({ activeSection }: NewSearchSystemProps)
     }, 300);
 
     return () => clearTimeout(timeoutId);
-  }, [searchQuery, filterTools, filterOpenSource, filterUsers, selectedCategories]);
+  }, [
+    searchQuery,
+    filterTools,
+    filterOpenSource,
+    filterUsers,
+    selectedCategories,
+  ]);
 
   const handleResultClick = (result: SearchResult) => {
     if (filterUsers) {
@@ -224,7 +242,10 @@ export default function NewSearchSystem({ activeSection }: NewSearchSystemProps)
                     checked={filterOpenSource}
                     onCheckedChange={handleOpenSourceFilterChange}
                   />
-                  <label htmlFor="filter-opensource" className="text-sm font-medium">
+                  <label
+                    htmlFor="filter-opensource"
+                    className="text-sm font-medium"
+                  >
                     Open Source
                   </label>
                 </div>

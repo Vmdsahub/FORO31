@@ -73,7 +73,6 @@ export default function Header({ activeSection }: HeaderProps) {
     {},
   );
 
-
   const handleAccountClick = () => {
     navigate("/account");
   };
@@ -102,7 +101,6 @@ export default function Header({ activeSection }: HeaderProps) {
   const handleDeleteNotification = (notificationId: string) => {
     removeNotification(notificationId);
   };
-
 
   // Real-time validation functions
   const checkUsernameAvailable = async (username: string) => {
@@ -279,12 +277,7 @@ export default function Header({ activeSection }: HeaderProps) {
             className="px-3 py-2 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 transition-colors flex items-center"
             title="Tópicos Salvos"
           >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
               <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z" />
             </svg>
           </button>
@@ -1281,7 +1274,6 @@ export default function Header({ activeSection }: HeaderProps) {
           )}
         </div>
       </div>
-
     </header>
   );
 }

@@ -334,9 +334,7 @@ export default function TopicView() {
                 />
               </div>
             ) : (
-              <h1
-                className="text-2xl font-bold text-black mb-4 break-words leading-tight"
-              >
+              <h1 className="text-2xl font-bold text-black mb-4 break-words leading-tight">
                 {topic.title}
               </h1>
             )}

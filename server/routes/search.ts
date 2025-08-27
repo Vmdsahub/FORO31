@@ -18,15 +18,15 @@ function getCategoryType(categoryId: string): "tools" | "opensource" {
 function getCategoryDisplayName(categoryId: string): string {
   const categoryNames: Record<string, string> = {
     // Tools categories
-    "llms": "LLMs",
-    "imagem": "Imagem",
-    "video": "Vídeo",
+    llms: "LLMs",
+    imagem: "Imagem",
+    video: "Vídeo",
     "musica-audio": "Música/Áudio",
     "vibe-coding": "Vibe Coding",
     "duvidas-erros": "Dúvidas/Erros",
     "projetos-comunidade": "Projetos da comunidade",
-    "outros": "Outros",
-    "pedidos": "Pedidos",
+    outros: "Outros",
+    pedidos: "Pedidos",
     // Open Source categories
     "opensource-llms": "LLMs",
     "opensource-imagem": "Imagem",
@@ -56,10 +56,10 @@ export const searchHandler: RequestHandler = async (req, res) => {
     const searchQuery = query.trim().toLowerCase();
     const searchType = type as string;
     const searchCategories = Array.isArray(categories)
-      ? categories as string[]
+      ? (categories as string[])
       : categories
-      ? [categories as string]
-      : [];
+        ? [categories as string]
+        : [];
 
     if (searchType === "users") {
       // For now, return empty results for user search
@@ -76,23 +76,26 @@ export const searchHandler: RequestHandler = async (req, res) => {
     const allTopics = Array.from(topicsStorage.values());
 
     // Filter topics based on search criteria
-    const filteredTopics = allTopics.filter(topic => {
+    const filteredTopics = allTopics.filter((topic) => {
       // Check if title or content contains search query
       const titleMatch = topic.title.toLowerCase().includes(searchQuery);
       const contentMatch = topic.content.toLowerCase().includes(searchQuery);
-      const descriptionMatch = topic.description.toLowerCase().includes(searchQuery);
+      const descriptionMatch = topic.description
+        .toLowerCase()
+        .includes(searchQuery);
 
       const textMatch = titleMatch || contentMatch || descriptionMatch;
 
       // Check if topic's category is in selected categories (if any specified)
-      const categoryMatch = searchCategories.length === 0 ||
+      const categoryMatch =
+        searchCategories.length === 0 ||
         searchCategories.includes(topic.category);
 
       return textMatch && categoryMatch;
     });
 
     // Map to search result format
-    const searchResults: SearchResult[] = filteredTopics.map(topic => ({
+    const searchResults: SearchResult[] = filteredTopics.map((topic) => ({
       id: topic.id,
       title: topic.title,
       category: getCategoryDisplayName(topic.category),
@@ -105,7 +108,6 @@ export const searchHandler: RequestHandler = async (req, res) => {
       results: searchResults,
       total: searchResults.length,
     });
-
   } catch (error) {
     console.error("Search error:", error);
     res.status(500).json({
