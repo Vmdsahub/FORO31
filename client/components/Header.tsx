@@ -841,6 +841,28 @@ export default function Header({ activeSection }: HeaderProps) {
                               parseInt(registerBirthYear)
                           ) {
                             errors.birthDate = true;
+                          } else {
+                            // Verificar se o usuário tem pelo menos 18 anos
+                            const today = new Date();
+                            const age = today.getFullYear() - birthDate.getFullYear();
+                            const monthDiff = today.getMonth() - birthDate.getMonth();
+                            const dayDiff = today.getDate() - birthDate.getDate();
+
+                            // Ajustar idade se ainda não fez aniversário este ano
+                            const actualAge = age - (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0) ? 1 : 0);
+
+                            if (actualAge < 18) {
+                              errors.birthDate = true;
+                              setFieldMessages(prev => ({
+                                ...prev,
+                                birthDate: "Você deve ter pelo menos 18 anos para se cadastrar"
+                              }));
+                            } else {
+                              setFieldMessages(prev => {
+                                const { birthDate, ...rest } = prev;
+                                return rest;
+                              });
+                            }
                           }
                         }
 
@@ -1224,6 +1246,15 @@ export default function Header({ activeSection }: HeaderProps) {
                           ))}
                         </select>
                       </div>
+                      {fieldMessages.birthDate &&
+                        registerBirthDay &&
+                        registerBirthMonth &&
+                        registerBirthYear &&
+                        validationErrors.birthDate && (
+                          <p className="text-xs mt-1 text-red-600">
+                            {fieldMessages.birthDate}
+                          </p>
+                        )}
                     </div>
 
                     {/* Termos e Newsletter */}
