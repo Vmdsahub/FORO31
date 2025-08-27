@@ -165,8 +165,10 @@ export default function Index(props: IndexProps) {
 
   // Estados para filtros
   const [filterType, setFilterType] = useState<'recent' | 'likes' | 'comments'>('recent');
-  const [likesRange, setLikesRange] = useState({ min: 0, max: 1000 });
-  const [commentsRange, setCommentsRange] = useState({ min: 0, max: 100 });
+  const [dateRange, setDateRange] = useState({
+    start: new Date(new Date().setDate(new Date().getDate() - 30)).toISOString().split('T')[0],
+    end: new Date().toISOString().split('T')[0]
+  });
 
   // Estados para modais admin
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
