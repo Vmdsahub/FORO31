@@ -114,6 +114,12 @@ export default function NewSearchSystem({
       return;
     }
 
+    // Don't search if no filters are selected
+    if (!filterUsers && !filterTools && !filterOpenSource) {
+      setSearchResults([]);
+      return;
+    }
+
     setIsSearching(true);
     try {
       // Build search parameters
