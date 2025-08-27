@@ -348,11 +348,6 @@ export default function TopicView() {
                   placeholder="Título do tópico"
                   maxLength={70}
                 />
-                <Input
-                  value={editDescription}
-                  onChange={(e) => setEditDescription(e.target.value)}
-                  placeholder="Descrição breve"
-                />
               </div>
             ) : (
               <h1
@@ -376,11 +371,14 @@ export default function TopicView() {
                 <div className="flex items-center gap-3">
                   <Button
                     onClick={handleSaveEdit}
-                    className="bg-green-600 hover:bg-green-700"
+                    className="bg-black text-white hover:bg-gray-800"
                   >
                     Salvar Edições
                   </Button>
-                  <Button onClick={handleCancelEdit} variant="outline">
+                  <Button
+                    onClick={handleCancelEdit}
+                    className="bg-black text-white hover:bg-gray-800"
+                  >
                     Cancelar
                   </Button>
                 </div>
