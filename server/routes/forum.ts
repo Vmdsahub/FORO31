@@ -483,6 +483,21 @@ export const handleGetTopics: RequestHandler = (req, res) => {
     }
   }
 
+  // Apply likes range filter
+  if (sortBy === 'likes') {
+    filteredTopics = filteredTopics.filter((topic) =>
+      topic.likes >= minLikes && topic.likes <= maxLikes
+    );
+  }
+
+  // Apply comments range filter
+  if (sortBy === 'comments') {
+    filteredTopics = filteredTopics.filter((topic) =>
+      topic.replies >= minComments && topic.replies <= maxComments
+    );
+  }
+
+  // Sort topics based on filter type
   if (search) {
     filteredTopics.sort((a, b) => b.likes - a.likes);
   } else {
@@ -490,15 +505,21 @@ export const handleGetTopics: RequestHandler = (req, res) => {
       if (a.isPinned && !b.isPinned) return -1;
       if (!a.isPinned && b.isPinned) return 1;
 
-      // Sort by most recent activity (creation date or last comment)
-      const aActivity = getMostRecentActivity(a);
-      const bActivity = getMostRecentActivity(b);
+      if (sortBy === 'likes') {
+        return b.likes - a.likes;
+      } else if (sortBy === 'comments') {
+        return b.replies - a.replies;
+      } else {
+        // Sort by most recent activity (creation date or last comment)
+        const aActivity = getMostRecentActivity(a);
+        const bActivity = getMostRecentActivity(b);
 
-      console.log(
-        `[SORT] Comparing "${a.title}" (${new Date(aActivity).toLocaleString()}) vs "${b.title}" (${new Date(bActivity).toLocaleString()}) - Result: ${bActivity - aActivity}`,
-      );
+        console.log(
+          `[SORT] Comparing "${a.title}" (${new Date(aActivity).toLocaleString()}) vs "${b.title}" (${new Date(bActivity).toLocaleString()}) - Result: ${bActivity - aActivity}`,
+        );
 
-      return bActivity - aActivity;
+        return bActivity - aActivity;
+      }
     });
   }
 
@@ -625,7 +646,7 @@ export const handleCreateTopic: RequestHandler = (req, res) => {
   }
 
   try {
-    console.log("[FORUM] Dados recebidos para criar t��pico:", req.body);
+    console.log("[FORUM] Dados recebidos para criar tópico:", req.body);
     const data = createTopicSchema.parse(req.body);
     console.log("[FORUM] Dados validados:", data);
     const { date, time } = formatDate();
