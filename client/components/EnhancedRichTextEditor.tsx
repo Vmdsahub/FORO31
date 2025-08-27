@@ -728,7 +728,7 @@ export default function EnhancedRichTextEditor({
   const makeDraggable = (element: HTMLElement) => {
     if (!isEditMode) return;
 
-    console.log('Making element draggable:', element);
+    console.log("Making element draggable:", element);
 
     let isDragging = false;
     let startX = 0;
@@ -738,18 +738,18 @@ export default function EnhancedRichTextEditor({
 
     // Force styles on element to make it draggable
     const applyDraggableStyles = () => {
-      element.style.setProperty('position', 'relative', 'important');
-      element.style.setProperty('cursor', 'grab', 'important');
-      element.style.setProperty('user-select', 'none', 'important');
-      element.style.setProperty('pointer-events', 'auto', 'important');
-      element.setAttribute('draggable', 'false'); // Disable native drag
+      element.style.setProperty("position", "relative", "important");
+      element.style.setProperty("cursor", "grab", "important");
+      element.style.setProperty("user-select", "none", "important");
+      element.style.setProperty("pointer-events", "auto", "important");
+      element.setAttribute("draggable", "false"); // Disable native drag
 
       // Also apply to child elements
-      const children = element.querySelectorAll('*');
+      const children = element.querySelectorAll("*");
       children.forEach((child: Element) => {
         const childEl = child as HTMLElement;
-        if (!childEl.closest('button')) {
-          childEl.style.setProperty('pointer-events', 'none', 'important');
+        if (!childEl.closest("button")) {
+          childEl.style.setProperty("pointer-events", "none", "important");
         }
       });
     };
@@ -759,11 +759,11 @@ export default function EnhancedRichTextEditor({
       if (isInitialized) return;
       isInitialized = true;
 
-      console.log('Initializing draggable for:', element);
+      console.log("Initializing draggable for:", element);
       applyDraggableStyles();
 
       // Create overlay to capture all mouse events
-      const overlay = document.createElement('div');
+      const overlay = document.createElement("div");
       overlay.style.cssText = `
         position: absolute !important;
         top: 0 !important;
@@ -775,24 +775,24 @@ export default function EnhancedRichTextEditor({
         background: transparent !important;
         pointer-events: auto !important;
       `;
-      overlay.className = 'drag-overlay';
+      overlay.className = "drag-overlay";
       element.appendChild(overlay);
 
       // Add event listeners to overlay
       const handleMouseEnter = (e: MouseEvent) => {
         e.stopPropagation();
-        console.log('Mouse enter on overlay');
-        overlay.style.setProperty('cursor', 'grab', 'important');
-        element.style.setProperty('opacity', '0.9', 'important');
-        element.style.setProperty('transform', 'scale(1.02)', 'important');
-        element.style.setProperty('transition', 'all 0.2s ease', 'important');
+        console.log("Mouse enter on overlay");
+        overlay.style.setProperty("cursor", "grab", "important");
+        element.style.setProperty("opacity", "0.9", "important");
+        element.style.setProperty("transform", "scale(1.02)", "important");
+        element.style.setProperty("transition", "all 0.2s ease", "important");
       };
 
       const handleMouseLeave = (e: MouseEvent) => {
         if (!isDragging) {
-          console.log('Mouse leave overlay');
-          element.style.setProperty('opacity', '1', 'important');
-          element.style.setProperty('transform', 'scale(1)', 'important');
+          console.log("Mouse leave overlay");
+          element.style.setProperty("opacity", "1", "important");
+          element.style.setProperty("transform", "scale(1)", "important");
         }
       };
 
@@ -802,32 +802,38 @@ export default function EnhancedRichTextEditor({
 
         // Check if clicked on delete button (which should be outside overlay)
         const target = e.target as HTMLElement;
-        if (target.closest('button') && !target.closest('.drag-overlay')) {
-          console.log('Clicked on button, ignoring drag');
+        if (target.closest("button") && !target.closest(".drag-overlay")) {
+          console.log("Clicked on button, ignoring drag");
           return;
         }
 
-        console.log('Mouse down on overlay - starting drag');
+        console.log("Mouse down on overlay - starting drag");
         startDrag(e);
       };
 
       // Attach events to overlay
-      overlay.addEventListener('mouseenter', handleMouseEnter, { passive: false });
-      overlay.addEventListener('mouseleave', handleMouseLeave, { passive: false });
-      overlay.addEventListener('mousedown', handleMouseDown, { passive: false });
+      overlay.addEventListener("mouseenter", handleMouseEnter, {
+        passive: false,
+      });
+      overlay.addEventListener("mouseleave", handleMouseLeave, {
+        passive: false,
+      });
+      overlay.addEventListener("mousedown", handleMouseDown, {
+        passive: false,
+      });
 
       // Also prevent default on the element itself
-      element.addEventListener('dragstart', (e) => e.preventDefault());
-      element.addEventListener('selectstart', (e) => e.preventDefault());
+      element.addEventListener("dragstart", (e) => e.preventDefault());
+      element.addEventListener("selectstart", (e) => e.preventDefault());
 
-      console.log('Overlay and event listeners attached');
+      console.log("Overlay and event listeners attached");
     };
 
     const startDrag = (e: MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
 
-      console.log('Starting drag operation');
+      console.log("Starting drag operation");
       isDragging = true;
       dragActive = true;
       startX = e.clientX;
@@ -837,24 +843,30 @@ export default function EnhancedRichTextEditor({
       currentLeft = parseInt(computedStyle.left) || 0;
 
       // Apply dragging styles
-      document.body.style.setProperty('cursor', 'grabbing', 'important');
-      document.body.style.setProperty('user-select', 'none', 'important');
-      element.style.setProperty('cursor', 'grabbing', 'important');
-      element.style.setProperty('opacity', '0.8', 'important');
-      element.style.setProperty('transform', 'scale(1.05)', 'important');
-      element.style.setProperty('z-index', '1000', 'important');
+      document.body.style.setProperty("cursor", "grabbing", "important");
+      document.body.style.setProperty("user-select", "none", "important");
+      element.style.setProperty("cursor", "grabbing", "important");
+      element.style.setProperty("opacity", "0.8", "important");
+      element.style.setProperty("transform", "scale(1.05)", "important");
+      element.style.setProperty("z-index", "1000", "important");
 
       // Update overlay cursor
-      const overlay = element.querySelector('.drag-overlay') as HTMLElement;
+      const overlay = element.querySelector(".drag-overlay") as HTMLElement;
       if (overlay) {
-        overlay.style.setProperty('cursor', 'grabbing', 'important');
+        overlay.style.setProperty("cursor", "grabbing", "important");
       }
 
       // Add global mouse events with high priority
-      document.addEventListener('mousemove', handleMouseMove, { passive: false, capture: true });
-      document.addEventListener('mouseup', handleMouseUp, { passive: false, capture: true });
+      document.addEventListener("mousemove", handleMouseMove, {
+        passive: false,
+        capture: true,
+      });
+      document.addEventListener("mouseup", handleMouseUp, {
+        passive: false,
+        capture: true,
+      });
 
-      console.log('Global drag events added');
+      console.log("Global drag events added");
     };
 
     const handleMouseMove = (e: MouseEvent) => {
@@ -867,12 +879,12 @@ export default function EnhancedRichTextEditor({
       const newLeft = currentLeft + deltaX;
 
       // No limits - free horizontal movement
-      element.style.setProperty('left', newLeft + 'px', 'important');
-      console.log('Dragging to position:', newLeft);
+      element.style.setProperty("left", newLeft + "px", "important");
+      console.log("Dragging to position:", newLeft);
     };
 
     const handleMouseUp = (e: MouseEvent) => {
-      console.log('Ending drag operation');
+      console.log("Ending drag operation");
       isDragging = false;
       dragActive = false;
 
@@ -881,25 +893,25 @@ export default function EnhancedRichTextEditor({
       currentLeft = parseInt(computedStyle.left) || 0;
 
       // Restore styles
-      document.body.style.removeProperty('cursor');
-      document.body.style.removeProperty('user-select');
-      element.style.setProperty('cursor', 'grab', 'important');
-      element.style.setProperty('opacity', '1', 'important');
-      element.style.setProperty('transform', 'scale(1)', 'important');
-      element.style.removeProperty('z-index');
+      document.body.style.removeProperty("cursor");
+      document.body.style.removeProperty("user-select");
+      element.style.setProperty("cursor", "grab", "important");
+      element.style.setProperty("opacity", "1", "important");
+      element.style.setProperty("transform", "scale(1)", "important");
+      element.style.removeProperty("z-index");
 
       // Update overlay cursor
-      const overlay = element.querySelector('.drag-overlay') as HTMLElement;
+      const overlay = element.querySelector(".drag-overlay") as HTMLElement;
       if (overlay) {
-        overlay.style.setProperty('cursor', 'grab', 'important');
+        overlay.style.setProperty("cursor", "grab", "important");
       }
 
       // Remove global events
-      document.removeEventListener('mousemove', handleMouseMove, true);
-      document.removeEventListener('mouseup', handleMouseUp, true);
+      document.removeEventListener("mousemove", handleMouseMove, true);
+      document.removeEventListener("mouseup", handleMouseUp, true);
 
       handleInput();
-      console.log('Drag completed at position:', currentLeft);
+      console.log("Drag completed at position:", currentLeft);
     };
 
     // Initialize immediately
@@ -907,8 +919,8 @@ export default function EnhancedRichTextEditor({
 
     // Cleanup function
     return () => {
-      console.log('Cleaning up draggable for element');
-      const overlay = element.querySelector('.drag-overlay');
+      console.log("Cleaning up draggable for element");
+      const overlay = element.querySelector(".drag-overlay");
       if (overlay) {
         overlay.remove();
       }
