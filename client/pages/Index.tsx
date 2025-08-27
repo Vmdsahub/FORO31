@@ -164,10 +164,14 @@ export default function Index(props: IndexProps) {
   const [totalTopics, setTotalTopics] = useState(0);
 
   // Estados para filtros
-  const [filterType, setFilterType] = useState<'recent' | 'likes' | 'comments'>('recent');
+  const [filterType, setFilterType] = useState<"recent" | "likes" | "comments">(
+    "recent",
+  );
   const [dateRange, setDateRange] = useState({
-    start: new Date(new Date().setDate(new Date().getDate() - 30)).toISOString().split('T')[0],
-    end: new Date().toISOString().split('T')[0]
+    start: new Date(new Date().setDate(new Date().getDate() - 30))
+      .toISOString()
+      .split("T")[0],
+    end: new Date().toISOString().split("T")[0],
   });
 
   // Estados para modais admin
@@ -266,11 +270,11 @@ export default function Index(props: IndexProps) {
       params.append("limit", "12"); // 12 topics per page
 
       // Add filter parameters
-      if (filterType === 'likes') {
+      if (filterType === "likes") {
         params.append("sortBy", "likes");
         params.append("startDate", dateRange.start);
         params.append("endDate", dateRange.end);
-      } else if (filterType === 'comments') {
+      } else if (filterType === "comments") {
         params.append("sortBy", "comments");
         params.append("startDate", dateRange.start);
         params.append("endDate", dateRange.end);
@@ -456,9 +460,11 @@ export default function Index(props: IndexProps) {
       setCurrentPage(page);
       fetchTopics(selectedCategory, page);
       // Scroll to top of filters when changing pages
-      const filtersContainer = document.querySelector('[data-filters-container]');
+      const filtersContainer = document.querySelector(
+        "[data-filters-container]",
+      );
       if (filtersContainer) {
-        filtersContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        filtersContainer.scrollIntoView({ behavior: "smooth", block: "start" });
       }
     }
   };
@@ -1370,10 +1376,12 @@ export default function Index(props: IndexProps) {
                 setTotalPages(1);
                 setTotalTopics(0);
                 // Reset filters
-                setFilterType('recent');
+                setFilterType("recent");
                 setDateRange({
-                  start: new Date(new Date().setDate(new Date().getDate() - 30)).toISOString().split('T')[0],
-                  end: new Date().toISOString().split('T')[0]
+                  start: new Date(new Date().setDate(new Date().getDate() - 30))
+                    .toISOString()
+                    .split("T")[0],
+                  end: new Date().toISOString().split("T")[0],
                 });
               }}
               className="flex items-center gap-2 text-gray-600 hover:text-black transition-all duration-300 ease-in-out hover:translate-x-1"
@@ -1418,7 +1426,10 @@ export default function Index(props: IndexProps) {
             </div>
 
             {/* Filters and Pagination */}
-            <div className="flex flex-col gap-4 mb-6 lg:flex-row lg:items-center" data-filters-container>
+            <div
+              className="flex flex-col gap-4 mb-6 lg:flex-row lg:items-center"
+              data-filters-container
+            >
               {/* Empty space for left alignment */}
               <div className="hidden lg:block lg:flex-1"></div>
 

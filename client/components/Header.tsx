@@ -272,11 +272,13 @@ export default function Header({ activeSection }: HeaderProps) {
         const dayDiff = today.getDate() - birthDate.getDate();
 
         // Ajustar idade se ainda não fez aniversário este ano
-        const actualAge = age - (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0) ? 1 : 0);
+        const actualAge =
+          age - (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0) ? 1 : 0);
 
         if (actualAge < 18) {
           isBirthDateInvalid = true;
-          birthDateMessage = "Você deve ter pelo menos 18 anos para se cadastrar";
+          birthDateMessage =
+            "Você deve ter pelo menos 18 anos para se cadastrar";
         }
       }
     }
@@ -893,21 +895,29 @@ export default function Header({ activeSection }: HeaderProps) {
                           } else {
                             // Verificar se o usuário tem pelo menos 18 anos
                             const today = new Date();
-                            const age = today.getFullYear() - birthDate.getFullYear();
-                            const monthDiff = today.getMonth() - birthDate.getMonth();
-                            const dayDiff = today.getDate() - birthDate.getDate();
+                            const age =
+                              today.getFullYear() - birthDate.getFullYear();
+                            const monthDiff =
+                              today.getMonth() - birthDate.getMonth();
+                            const dayDiff =
+                              today.getDate() - birthDate.getDate();
 
                             // Ajustar idade se ainda não fez aniversário este ano
-                            const actualAge = age - (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0) ? 1 : 0);
+                            const actualAge =
+                              age -
+                              (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)
+                                ? 1
+                                : 0);
 
                             if (actualAge < 18) {
                               errors.birthDate = true;
-                              setFieldMessages(prev => ({
+                              setFieldMessages((prev) => ({
                                 ...prev,
-                                birthDate: "Você deve ter pelo menos 18 anos para se cadastrar"
+                                birthDate:
+                                  "Você deve ter pelo menos 18 anos para se cadastrar",
                               }));
                             } else {
-                              setFieldMessages(prev => {
+                              setFieldMessages((prev) => {
                                 const { birthDate, ...rest } = prev;
                                 return rest;
                               });
@@ -1229,7 +1239,11 @@ export default function Header({ activeSection }: HeaderProps) {
                           onChange={(e) => {
                             const value = e.target.value;
                             setRegisterBirthDay(value);
-                            validateBirthDate(value, registerBirthMonth, registerBirthYear);
+                            validateBirthDate(
+                              value,
+                              registerBirthMonth,
+                              registerBirthYear,
+                            );
                           }}
                           className={`w-full h-11 px-3 border rounded-md bg-white text-sm focus:border-gray-500 focus:ring-gray-500 ${
                             validationErrors.birthDate
@@ -1256,7 +1270,11 @@ export default function Header({ activeSection }: HeaderProps) {
                           onChange={(e) => {
                             const value = e.target.value;
                             setRegisterBirthMonth(value);
-                            validateBirthDate(registerBirthDay, value, registerBirthYear);
+                            validateBirthDate(
+                              registerBirthDay,
+                              value,
+                              registerBirthYear,
+                            );
                           }}
                           className={`w-full h-11 px-3 border rounded-md bg-white text-sm focus:border-gray-500 focus:ring-gray-500 ${
                             validationErrors.birthDate
@@ -1285,7 +1303,11 @@ export default function Header({ activeSection }: HeaderProps) {
                           onChange={(e) => {
                             const value = e.target.value;
                             setRegisterBirthYear(value);
-                            validateBirthDate(registerBirthDay, registerBirthMonth, value);
+                            validateBirthDate(
+                              registerBirthDay,
+                              registerBirthMonth,
+                              value,
+                            );
                           }}
                           className={`w-full h-11 px-3 border rounded-md bg-white text-sm focus:border-gray-500 focus:ring-gray-500 ${
                             validationErrors.birthDate

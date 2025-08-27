@@ -454,7 +454,7 @@ export const handleGetTopics: RequestHandler = (req, res) => {
   const category = req.query.category as string;
   const search = req.query.search as string;
   const categories = req.query.categories as string;
-  const sortBy = req.query.sortBy as string || 'recent';
+  const sortBy = (req.query.sortBy as string) || "recent";
   const startDate = req.query.startDate as string;
   const endDate = req.query.endDate as string;
 
@@ -482,7 +482,7 @@ export const handleGetTopics: RequestHandler = (req, res) => {
   }
 
   // Apply date range filter for likes and comments sorting
-  if ((sortBy === 'likes' || sortBy === 'comments') && startDate && endDate) {
+  if ((sortBy === "likes" || sortBy === "comments") && startDate && endDate) {
     const start = new Date(startDate);
     const end = new Date(endDate);
     end.setHours(23, 59, 59, 999); // Include the entire end date
@@ -501,9 +501,9 @@ export const handleGetTopics: RequestHandler = (req, res) => {
       if (a.isPinned && !b.isPinned) return -1;
       if (!a.isPinned && b.isPinned) return 1;
 
-      if (sortBy === 'likes') {
+      if (sortBy === "likes") {
         return b.likes - a.likes;
-      } else if (sortBy === 'comments') {
+      } else if (sortBy === "comments") {
         return b.replies - a.replies;
       } else {
         // Sort by most recent activity (creation date or last comment)

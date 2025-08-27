@@ -63,7 +63,9 @@ export function Pagination({
   const visiblePages = getVisiblePages();
 
   return (
-    <div className={cn("flex items-center justify-center gap-1 mt-6", className)}>
+    <div
+      className={cn("flex items-center justify-center gap-1 mt-6", className)}
+    >
       {/* Previous Button - only show from page 2 onwards */}
       {currentPage > 1 && (
         <Button
@@ -86,7 +88,7 @@ export function Pagination({
               onClick={() => onPageChange(page)}
               className={cn(
                 "min-w-[40px]",
-                currentPage === page && "bg-black text-white hover:bg-gray-800"
+                currentPage === page && "bg-black text-white hover:bg-gray-800",
               )}
             >
               {page}

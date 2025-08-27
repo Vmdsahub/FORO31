@@ -16,8 +16,8 @@ import {
 } from "@/components/ui/popover";
 
 interface TopicFiltersProps {
-  filterType: 'recent' | 'likes' | 'comments';
-  onFilterTypeChange: (type: 'recent' | 'likes' | 'comments') => void;
+  filterType: "recent" | "likes" | "comments";
+  onFilterTypeChange: (type: "recent" | "likes" | "comments") => void;
   dateRange: { start: string; end: string };
   onDateRangeChange: (range: { start: string; end: string }) => void;
 }
@@ -36,17 +36,19 @@ export default function TopicFilters({
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
-    return date.toLocaleDateString('pt-BR', { 
-      day: '2-digit', 
-      month: '2-digit', 
-      year: 'numeric' 
+    return date.toLocaleDateString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
     });
   };
 
   return (
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-2">
-        <Label className="text-sm font-medium text-gray-600 whitespace-nowrap">Ordenar por:</Label>
+        <Label className="text-sm font-medium text-gray-600 whitespace-nowrap">
+          Ordenar por:
+        </Label>
         <Select value={filterType} onValueChange={onFilterTypeChange}>
           <SelectTrigger className="w-[180px] h-9">
             <SelectValue />
@@ -59,7 +61,7 @@ export default function TopicFilters({
         </Select>
       </div>
 
-      {(filterType === 'likes' || filterType === 'comments') && (
+      {(filterType === "likes" || filterType === "comments") && (
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" size="sm" className="h-9">
@@ -70,11 +72,16 @@ export default function TopicFilters({
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label className="text-sm font-medium">
-                  Período para {filterType === 'likes' ? 'ordenar por likes' : 'ordenar por comentários'}
+                  Período para{" "}
+                  {filterType === "likes"
+                    ? "ordenar por likes"
+                    : "ordenar por comentários"}
                 </Label>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label className="text-xs text-gray-500">Data inicial</Label>
+                    <Label className="text-xs text-gray-500">
+                      Data inicial
+                    </Label>
                     <Input
                       type="date"
                       value={tempDateRange.start}
@@ -103,10 +110,9 @@ export default function TopicFilters({
                   </div>
                 </div>
                 <p className="text-xs text-gray-500 mt-2">
-                  {filterType === 'likes' 
-                    ? 'Tópicos serão ordenados por mais likes no período selecionado'
-                    : 'Tópicos serão ordenados por mais comentários no período selecionado'
-                  }
+                  {filterType === "likes"
+                    ? "Tópicos serão ordenados por mais likes no período selecionado"
+                    : "Tópicos serão ordenados por mais comentários no período selecionado"}
                 </p>
               </div>
               <Button onClick={handleDateRangeApply} className="w-full h-8">
