@@ -168,6 +168,9 @@ export default function EnhancedRichTextEditor({
 
       // Mark as processed
       imgElement.setAttribute("data-has-delete", "true");
+
+      // Make existing images draggable
+      setTimeout(() => makeDraggable(wrapper), 100);
     });
 
     // Find videos without delete buttons
@@ -202,6 +205,9 @@ export default function EnhancedRichTextEditor({
 
       videoElement.appendChild(deleteButton);
       videoElement.setAttribute("data-has-delete", "true");
+
+      // Make existing videos draggable
+      setTimeout(() => makeDraggable(videoElement as HTMLElement), 100);
     });
   };
 
@@ -718,6 +724,209 @@ export default function EnhancedRichTextEditor({
     toast.error("❌ Falha na verificação de segurança. Tente outro arquivo.");
   };
 
+  // Function to make media elements draggable horizontally
+  const makeDraggable = (element: HTMLElement) => {
+    if (!isEditMode) return;
+
+    console.log("Making element draggable:", element);
+
+    let isDragging = false;
+    let startX = 0;
+    let currentLeft = 0;
+    let isInitialized = false;
+    let dragActive = false;
+
+    // Force styles on element to make it draggable
+    const applyDraggableStyles = () => {
+      element.style.setProperty("position", "relative", "important");
+      element.style.setProperty("cursor", "grab", "important");
+      element.style.setProperty("user-select", "none", "important");
+      element.style.setProperty("pointer-events", "auto", "important");
+      element.setAttribute("draggable", "false"); // Disable native drag
+
+      // Also apply to child elements
+      const children = element.querySelectorAll("*");
+      children.forEach((child: Element) => {
+        const childEl = child as HTMLElement;
+        if (!childEl.closest("button")) {
+          childEl.style.setProperty("pointer-events", "none", "important");
+        }
+      });
+    };
+
+    // Initialize draggable functionality
+    const initializeDraggable = () => {
+      if (isInitialized) return;
+      isInitialized = true;
+
+      console.log("Initializing draggable for:", element);
+      applyDraggableStyles();
+
+      // Create overlay to capture all mouse events
+      const overlay = document.createElement("div");
+      overlay.style.cssText = `
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        z-index: 100 !important;
+        cursor: grab !important;
+        background: transparent !important;
+        pointer-events: auto !important;
+      `;
+      overlay.className = "drag-overlay";
+      element.appendChild(overlay);
+
+      // Add event listeners to overlay
+      const handleMouseEnter = (e: MouseEvent) => {
+        e.stopPropagation();
+        console.log("Mouse enter on overlay");
+        overlay.style.setProperty("cursor", "grab", "important");
+        element.style.setProperty("opacity", "0.9", "important");
+        element.style.setProperty("transform", "scale(1.02)", "important");
+        element.style.setProperty("transition", "all 0.2s ease", "important");
+      };
+
+      const handleMouseLeave = (e: MouseEvent) => {
+        if (!isDragging) {
+          console.log("Mouse leave overlay");
+          element.style.setProperty("opacity", "1", "important");
+          element.style.setProperty("transform", "scale(1)", "important");
+        }
+      };
+
+      const handleMouseDown = (e: MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Check if clicked on delete button (which should be outside overlay)
+        const target = e.target as HTMLElement;
+        if (target.closest("button") && !target.closest(".drag-overlay")) {
+          console.log("Clicked on button, ignoring drag");
+          return;
+        }
+
+        console.log("Mouse down on overlay - starting drag");
+        startDrag(e);
+      };
+
+      // Attach events to overlay
+      overlay.addEventListener("mouseenter", handleMouseEnter, {
+        passive: false,
+      });
+      overlay.addEventListener("mouseleave", handleMouseLeave, {
+        passive: false,
+      });
+      overlay.addEventListener("mousedown", handleMouseDown, {
+        passive: false,
+      });
+
+      // Also prevent default on the element itself
+      element.addEventListener("dragstart", (e) => e.preventDefault());
+      element.addEventListener("selectstart", (e) => e.preventDefault());
+
+      console.log("Overlay and event listeners attached");
+    };
+
+    const startDrag = (e: MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      console.log("Starting drag operation");
+      isDragging = true;
+      dragActive = true;
+      startX = e.clientX;
+
+      // Get current position
+      const computedStyle = window.getComputedStyle(element);
+      currentLeft = parseInt(computedStyle.left) || 0;
+
+      // Apply dragging styles
+      document.body.style.setProperty("cursor", "grabbing", "important");
+      document.body.style.setProperty("user-select", "none", "important");
+      element.style.setProperty("cursor", "grabbing", "important");
+      element.style.setProperty("opacity", "0.8", "important");
+      element.style.setProperty("transform", "scale(1.05)", "important");
+      element.style.setProperty("z-index", "1000", "important");
+
+      // Update overlay cursor
+      const overlay = element.querySelector(".drag-overlay") as HTMLElement;
+      if (overlay) {
+        overlay.style.setProperty("cursor", "grabbing", "important");
+      }
+
+      // Add global mouse events with high priority
+      document.addEventListener("mousemove", handleMouseMove, {
+        passive: false,
+        capture: true,
+      });
+      document.addEventListener("mouseup", handleMouseUp, {
+        passive: false,
+        capture: true,
+      });
+
+      console.log("Global drag events added");
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging || !dragActive) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      const deltaX = e.clientX - startX;
+      const newLeft = currentLeft + deltaX;
+
+      // No limits - free horizontal movement
+      element.style.setProperty("left", newLeft + "px", "important");
+      console.log("Dragging to position:", newLeft);
+    };
+
+    const handleMouseUp = (e: MouseEvent) => {
+      console.log("Ending drag operation");
+      isDragging = false;
+      dragActive = false;
+
+      // Update current position
+      const computedStyle = window.getComputedStyle(element);
+      currentLeft = parseInt(computedStyle.left) || 0;
+
+      // Restore styles
+      document.body.style.removeProperty("cursor");
+      document.body.style.removeProperty("user-select");
+      element.style.setProperty("cursor", "grab", "important");
+      element.style.setProperty("opacity", "1", "important");
+      element.style.setProperty("transform", "scale(1)", "important");
+      element.style.removeProperty("z-index");
+
+      // Update overlay cursor
+      const overlay = element.querySelector(".drag-overlay") as HTMLElement;
+      if (overlay) {
+        overlay.style.setProperty("cursor", "grab", "important");
+      }
+
+      // Remove global events
+      document.removeEventListener("mousemove", handleMouseMove, true);
+      document.removeEventListener("mouseup", handleMouseUp, true);
+
+      handleInput();
+      console.log("Drag completed at position:", currentLeft);
+    };
+
+    // Initialize immediately
+    setTimeout(initializeDraggable, 50);
+
+    // Cleanup function
+    return () => {
+      console.log("Cleaning up draggable for element");
+      const overlay = element.querySelector(".drag-overlay");
+      if (overlay) {
+        overlay.remove();
+      }
+    };
+  };
+
   const insertImageHtml = (src: string, alt: string) => {
     const editor = editorRef.current;
     if (!editor) return;
@@ -810,6 +1019,10 @@ export default function EnhancedRichTextEditor({
 
           imageWrapper.appendChild(imageElement);
           imageWrapper.appendChild(deleteButton);
+
+          // Make the image wrapper draggable
+          setTimeout(() => makeDraggable(imageWrapper), 100);
+
           lastImageContainer.appendChild(imageWrapper);
         } else {
           lastImageContainer.appendChild(imageElement);
@@ -902,6 +1115,10 @@ export default function EnhancedRichTextEditor({
 
       imageWrapper.appendChild(imageElement);
       imageWrapper.appendChild(deleteButton);
+
+      // Make the image wrapper draggable
+      setTimeout(() => makeDraggable(imageWrapper), 100);
+
       imageContainer.appendChild(imageWrapper);
     } else {
       imageContainer.appendChild(imageElement);
@@ -1065,6 +1282,9 @@ export default function EnhancedRichTextEditor({
           videoPreview.appendChild(deleteButton);
         }
 
+        // Make the video preview draggable
+        setTimeout(() => makeDraggable(videoPreview), 100);
+
         lastMediaContainer.appendChild(videoPreview);
 
         // Position cursor after the container
@@ -1174,6 +1394,9 @@ export default function EnhancedRichTextEditor({
 
       videoPreview.appendChild(deleteButton);
     }
+
+    // Make the video preview draggable
+    setTimeout(() => makeDraggable(videoPreview), 100);
 
     mediaContainer.appendChild(videoPreview);
 
