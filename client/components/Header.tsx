@@ -243,6 +243,55 @@ export default function Header({ activeSection }: HeaderProps) {
     }));
   };
 
+  const validateBirthDate = (day: string, month: string, year: string) => {
+    // Validação em tempo real da data de nascimento
+    let isBirthDateInvalid = false;
+    let birthDateMessage = "";
+
+    // Se todos os campos estão preenchidos, validar
+    if (day && month && year) {
+      const birthDate = new Date(
+        parseInt(year),
+        parseInt(month) - 1,
+        parseInt(day),
+      );
+
+      // Verificar se a data é válida
+      if (
+        birthDate.getDate() !== parseInt(day) ||
+        birthDate.getMonth() !== parseInt(month) - 1 ||
+        birthDate.getFullYear() !== parseInt(year)
+      ) {
+        isBirthDateInvalid = true;
+        birthDateMessage = "Data inválida";
+      } else {
+        // Verificar se o usuário tem pelo menos 18 anos
+        const today = new Date();
+        const age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        const dayDiff = today.getDate() - birthDate.getDate();
+
+        // Ajustar idade se ainda não fez aniversário este ano
+        const actualAge = age - (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0) ? 1 : 0);
+
+        if (actualAge < 18) {
+          isBirthDateInvalid = true;
+          birthDateMessage = "Você deve ter pelo menos 18 anos para se cadastrar";
+        }
+      }
+    }
+
+    setValidationErrors((prev) => ({
+      ...prev,
+      birthDate: isBirthDateInvalid,
+    }));
+
+    setFieldMessages((prev) => ({
+      ...prev,
+      birthDate: birthDateMessage,
+    }));
+  };
+
   return (
     <header className="fixed top-0 z-50 w-full glass-minimal border-b border-black/5 backdrop-blur-lg bg-white/95">
       <div className="container flex h-16 max-w-7xl items-center justify-between px-6 mx-auto">
@@ -1177,7 +1226,11 @@ export default function Header({ activeSection }: HeaderProps) {
                         <select
                           id="birth-day"
                           value={registerBirthDay}
-                          onChange={(e) => setRegisterBirthDay(e.target.value)}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            setRegisterBirthDay(value);
+                            validateBirthDate(value, registerBirthMonth, registerBirthYear);
+                          }}
                           className={`w-full h-11 px-3 border rounded-md bg-white text-sm focus:border-gray-500 focus:ring-gray-500 ${
                             validationErrors.birthDate
                               ? "border-red-500 text-red-600"
@@ -1200,9 +1253,11 @@ export default function Header({ activeSection }: HeaderProps) {
                         <select
                           id="birth-month"
                           value={registerBirthMonth}
-                          onChange={(e) =>
-                            setRegisterBirthMonth(e.target.value)
-                          }
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            setRegisterBirthMonth(value);
+                            validateBirthDate(registerBirthDay, value, registerBirthYear);
+                          }}
                           className={`w-full h-11 px-3 border rounded-md bg-white text-sm focus:border-gray-500 focus:ring-gray-500 ${
                             validationErrors.birthDate
                               ? "border-red-500 text-red-600"
@@ -1227,7 +1282,11 @@ export default function Header({ activeSection }: HeaderProps) {
                         <select
                           id="birth-year"
                           value={registerBirthYear}
-                          onChange={(e) => setRegisterBirthYear(e.target.value)}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            setRegisterBirthYear(value);
+                            validateBirthDate(registerBirthDay, registerBirthMonth, value);
+                          }}
                           className={`w-full h-11 px-3 border rounded-md bg-white text-sm focus:border-gray-500 focus:ring-gray-500 ${
                             validationErrors.birthDate
                               ? "border-red-500 text-red-600"
