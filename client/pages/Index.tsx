@@ -328,7 +328,7 @@ export default function Index(props: IndexProps) {
   };
 
   const handleTopicCreated = (newTopic: Topic) => {
-    console.log("Novo t��pico criado na Index:", newTopic);
+    console.log("Novo tópico criado na Index:", newTopic);
     // Refresh the current page to show the new topic
     if (selectedCategory) {
       fetchTopics(selectedCategory, currentPage);
@@ -1403,7 +1403,7 @@ export default function Index(props: IndexProps) {
             </div>
 
             {/* Filters and Pagination */}
-            <div className="bg-white rounded-lg border border-gray-200 p-4 mb-4">
+            <div className="bg-white rounded-lg border border-gray-200 p-4 mb-4" data-filters-container>
               <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <TopicFilters
                   filterType={filterType}
