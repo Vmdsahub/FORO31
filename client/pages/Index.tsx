@@ -729,11 +729,11 @@ export default function Index(props: IndexProps) {
                         <h3
                           className="text-xl font-semibold text-black mb-3 break-words leading-tight"
                           title={
-                            topic.title.length > 40 ? topic.title : undefined
+                            topic.title.length > 70 ? topic.title : undefined
                           }
                         >
-                          {topic.title.length > 40
-                            ? `${topic.title.substring(0, 40)}...`
+                          {topic.title.length > 70
+                            ? `${topic.title.substring(0, 70)}...`
                             : topic.title}
                         </h3>
                       </div>
