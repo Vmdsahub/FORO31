@@ -22,6 +22,7 @@ import CreateTopicModal from "@/components/CreateTopicModal";
 import FeaturedTopicModal from "@/components/FeaturedTopicModal";
 import FeaturedCarousel from "@/components/FeaturedCarousel";
 import { Pagination } from "@/components/ui/pagination";
+import TopicFilters from "@/components/TopicFilters";
 
 // Category icon mapping
 const categoryIcons: Record<string, string> = {
@@ -460,7 +461,7 @@ export default function Index(props: IndexProps) {
     }
   };
 
-  // Função para lidar com upload de ícone
+  // Fun��ão para lidar com upload de ícone
   const handleIconUpload = async (file: File, categoryId: string) => {
     const formData = new FormData();
     formData.append("file", file);
