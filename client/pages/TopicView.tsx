@@ -45,7 +45,6 @@ export default function TopicView() {
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState("");
   const [editTitle, setEditTitle] = useState("");
-  const [editCategory, setEditCategory] = useState("");
 
   useEffect(() => {
     fetchTopic();
@@ -219,7 +218,6 @@ export default function TopicView() {
       .replace(/data-edit-mode="[^"]*"/g, "")
       .replace(/data-has-delete="[^"]*"/g, "");
     setEditContent(cleanContent);
-    setEditCategory(topic.category);
     setIsEditing(true);
   };
 
@@ -237,7 +235,7 @@ export default function TopicView() {
           title: editTitle,
           description: topic.description,
           content: editContent,
-          category: editCategory,
+          category: topic.category,
         }),
       });
 
@@ -260,7 +258,6 @@ export default function TopicView() {
     setIsEditing(false);
     setEditTitle("");
     setEditContent("");
-    setEditCategory("");
   };
 
   if (isLoading) {
