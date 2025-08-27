@@ -481,18 +481,16 @@ export const handleGetTopics: RequestHandler = (req, res) => {
     }
   }
 
-  // Apply likes range filter
-  if (sortBy === 'likes') {
-    filteredTopics = filteredTopics.filter((topic) =>
-      topic.likes >= minLikes && topic.likes <= maxLikes
-    );
-  }
+  // Apply date range filter for likes and comments sorting
+  if ((sortBy === 'likes' || sortBy === 'comments') && startDate && endDate) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    end.setHours(23, 59, 59, 999); // Include the entire end date
 
-  // Apply comments range filter
-  if (sortBy === 'comments') {
-    filteredTopics = filteredTopics.filter((topic) =>
-      topic.replies >= minComments && topic.replies <= maxComments
-    );
+    filteredTopics = filteredTopics.filter((topic) => {
+      const topicDate = new Date(topic.createdAt);
+      return topicDate >= start && topicDate <= end;
+    });
   }
 
   // Sort topics based on filter type
