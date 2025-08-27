@@ -196,6 +196,14 @@ export default function Index(props: IndexProps) {
     }
   }, [selectedCategory, activeSection]);
 
+  // Refazer busca quando filtros mudarem
+  useEffect(() => {
+    if (selectedCategory && activeSection === "forum") {
+      setCurrentPage(1); // Reset to first page when filters change
+      fetchTopics(selectedCategory, 1);
+    }
+  }, [filterType, likesRange, commentsRange]);
+
   // Carregar ícones salvos ao montar componente
   useEffect(() => {
     // Add small delay to prevent simultaneous requests on initial load
