@@ -80,6 +80,7 @@ import {
   getAvailablePositions,
   updateFeaturedImage,
 } from "./routes/featured-topics";
+import { searchHandler } from "./routes/search";
 
 export function createServer() {
   const app = express();
