@@ -1398,6 +1398,28 @@ export default function Index(props: IndexProps) {
               </div>
             </div>
 
+            {/* Filters and Pagination */}
+            <div className="bg-white rounded-lg border border-gray-200 p-4 mb-4">
+              <div className="flex items-center justify-between gap-4">
+                <TopicFilters
+                  filterType={filterType}
+                  onFilterTypeChange={setFilterType}
+                  likesRange={likesRange}
+                  onLikesRangeChange={setLikesRange}
+                  commentsRange={commentsRange}
+                  onCommentsRangeChange={setCommentsRange}
+                />
+
+                {!isLoadingTopics && totalPages > 1 && (
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                )}
+              </div>
+            </div>
+
             {/* Topics List */}
             <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
               <div className="bg-gray-50 px-6 py-3 border-b border-gray-200">
@@ -1558,14 +1580,6 @@ export default function Index(props: IndexProps) {
               </div>
             </div>
 
-            {/* Pagination */}
-            {!isLoadingTopics && totalPages > 1 && (
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-              />
-            )}
           </div>
         )}
       </div>
