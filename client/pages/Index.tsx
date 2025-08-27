@@ -268,12 +268,12 @@ export default function Index(props: IndexProps) {
       // Add filter parameters
       if (filterType === 'likes') {
         params.append("sortBy", "likes");
-        params.append("minLikes", likesRange.min.toString());
-        params.append("maxLikes", likesRange.max.toString());
+        params.append("startDate", dateRange.start);
+        params.append("endDate", dateRange.end);
       } else if (filterType === 'comments') {
         params.append("sortBy", "comments");
-        params.append("minComments", commentsRange.min.toString());
-        params.append("maxComments", commentsRange.max.toString());
+        params.append("startDate", dateRange.start);
+        params.append("endDate", dateRange.end);
       } else {
         params.append("sortBy", "recent");
       }
