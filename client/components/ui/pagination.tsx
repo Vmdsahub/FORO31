@@ -1,117 +1,149 @@
-import * as React from "react";
-import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
-
+import React, { useState } from "react";
 import { cn } from "@/lib/utils";
-import { ButtonProps, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 
-const Pagination = ({ className, ...props }: React.ComponentProps<"nav">) => (
-  <nav
-    role="navigation"
-    aria-label="pagination"
-    className={cn("mx-auto flex w-full justify-center", className)}
-    {...props}
-  />
-);
-Pagination.displayName = "Pagination";
+interface PaginationProps {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+  className?: string;
+}
 
-const PaginationContent = React.forwardRef<
-  HTMLUListElement,
-  React.ComponentProps<"ul">
->(({ className, ...props }, ref) => (
-  <ul
-    ref={ref}
-    className={cn("flex flex-row items-center gap-1", className)}
-    {...props}
-  />
-));
-PaginationContent.displayName = "PaginationContent";
-
-const PaginationItem = React.forwardRef<
-  HTMLLIElement,
-  React.ComponentProps<"li">
->(({ className, ...props }, ref) => (
-  <li ref={ref} className={cn("", className)} {...props} />
-));
-PaginationItem.displayName = "PaginationItem";
-
-type PaginationLinkProps = {
-  isActive?: boolean;
-} & Pick<ButtonProps, "size"> &
-  React.ComponentProps<"a">;
-
-const PaginationLink = ({
+export function Pagination({
+  currentPage,
+  totalPages,
+  onPageChange,
   className,
-  isActive,
-  size = "icon",
-  ...props
-}: PaginationLinkProps) => (
-  <a
-    aria-current={isActive ? "page" : undefined}
-    className={cn(
-      buttonVariants({
-        variant: isActive ? "outline" : "ghost",
-        size,
-      }),
-      className,
-    )}
-    {...props}
-  />
-);
-PaginationLink.displayName = "PaginationLink";
+}: PaginationProps) {
+  const [inputValue, setInputValue] = useState("");
+  const [showInput, setShowInput] = useState(false);
 
-const PaginationPrevious = ({
-  className,
-  ...props
-}: React.ComponentProps<typeof PaginationLink>) => (
-  <PaginationLink
-    aria-label="Go to previous page"
-    size="default"
-    className={cn("gap-1 pl-2.5", className)}
-    {...props}
-  >
-    <ChevronLeft className="h-4 w-4" />
-    <span>Previous</span>
-  </PaginationLink>
-);
-PaginationPrevious.displayName = "PaginationPrevious";
+  if (totalPages <= 1) return null;
 
-const PaginationNext = ({
-  className,
-  ...props
-}: React.ComponentProps<typeof PaginationLink>) => (
-  <PaginationLink
-    aria-label="Go to next page"
-    size="default"
-    className={cn("gap-1 pr-2.5", className)}
-    {...props}
-  >
-    <span>Next</span>
-    <ChevronRight className="h-4 w-4" />
-  </PaginationLink>
-);
-PaginationNext.displayName = "PaginationNext";
+  const handleInputSubmit = () => {
+    const page = parseInt(inputValue);
+    if (page && page >= 1 && page <= totalPages && page !== currentPage) {
+      onPageChange(page);
+    }
+    setShowInput(false);
+    setInputValue("");
+  };
 
-const PaginationEllipsis = ({
-  className,
-  ...props
-}: React.ComponentProps<"span">) => (
-  <span
-    aria-hidden
-    className={cn("flex h-9 w-9 items-center justify-center", className)}
-    {...props}
-  >
-    <MoreHorizontal className="h-4 w-4" />
-    <span className="sr-only">More pages</span>
-  </span>
-);
-PaginationEllipsis.displayName = "PaginationEllipsis";
+  const handleInputKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleInputSubmit();
+    } else if (e.key === "Escape") {
+      setShowInput(false);
+      setInputValue("");
+    }
+  };
 
-export {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-};
+  const getVisiblePages = () => {
+    const pages: (number | string)[] = [];
+    const maxVisible = 3; // Show first 3 pages
+
+    // Always show first few pages
+    for (let i = 1; i <= Math.min(maxVisible, totalPages); i++) {
+      pages.push(i);
+    }
+
+    // Add ellipsis if there are more pages
+    if (totalPages > maxVisible + 1) {
+      pages.push("...");
+    }
+
+    // Always show last page if it's not already shown
+    if (totalPages > maxVisible && totalPages !== maxVisible + 1) {
+      pages.push(totalPages);
+    }
+
+    return pages;
+  };
+
+  const visiblePages = getVisiblePages();
+
+  return (
+    <div
+      className={cn("flex items-center justify-center gap-1 mt-6", className)}
+    >
+      {/* Previous Button - only show from page 2 onwards */}
+      {currentPage > 1 && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => onPageChange(currentPage - 1)}
+          className="mr-2"
+        >
+          Anterior
+        </Button>
+      )}
+
+      {/* Page Numbers */}
+      {visiblePages.map((page, index) => (
+        <React.Fragment key={index}>
+          {typeof page === "number" ? (
+            <Button
+              variant={currentPage === page ? "default" : "outline"}
+              size="sm"
+              onClick={() => onPageChange(page)}
+              className={cn(
+                "min-w-[40px]",
+                currentPage === page && "bg-black text-white hover:bg-gray-800",
+              )}
+            >
+              {page}
+            </Button>
+          ) : (
+            <div
+              className="relative"
+              onMouseEnter={() => setShowInput(true)}
+              onMouseLeave={() => {
+                if (!inputValue) setShowInput(false);
+              }}
+            >
+              {showInput ? (
+                <div className="flex items-center gap-1 bg-white border rounded px-2 py-1">
+                  <input
+                    type="number"
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyDown={handleInputKeyPress}
+                    onBlur={() => {
+                      if (!inputValue) setShowInput(false);
+                    }}
+                    placeholder="Página"
+                    className="w-16 text-sm text-center border-none outline-none"
+                    min="1"
+                    max={totalPages}
+                    autoFocus
+                  />
+                  <button
+                    onClick={handleInputSubmit}
+                    className="text-xs bg-black text-white px-2 py-1 rounded hover:bg-gray-800"
+                  >
+                    Ir
+                  </button>
+                </div>
+              ) : (
+                <span className="px-2 py-1 text-gray-500 cursor-pointer hover:text-black">
+                  ...
+                </span>
+              )}
+            </div>
+          )}
+        </React.Fragment>
+      ))}
+
+      {/* Next Button */}
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={currentPage >= totalPages}
+        className="ml-2"
+      >
+        Próximo
+      </Button>
+    </div>
+  );
+}

@@ -24,7 +24,7 @@ export const getTopicsStorage = () => topics;
 
 // Validation schemas
 const createTopicSchema = z.object({
-  title: z.string().min(1).max(40),
+  title: z.string().min(1).max(70),
   description: z.string().min(1).max(200),
   content: z.string().min(1).max(50000), // Increased limit for rich content with HTML/images
   category: z.string().min(1),
@@ -37,7 +37,7 @@ const createCommentSchema = z.object({
 });
 
 const editTopicSchema = z.object({
-  title: z.string().min(1).max(40).optional(),
+  title: z.string().min(1).max(70).optional(),
   description: z.string().min(1).max(200).optional(),
   content: z.string().min(1).max(50000).optional(),
   category: z.string().min(1).optional(),
@@ -454,6 +454,9 @@ export const handleGetTopics: RequestHandler = (req, res) => {
   const category = req.query.category as string;
   const search = req.query.search as string;
   const categories = req.query.categories as string;
+  const sortBy = (req.query.sortBy as string) || "recent";
+  const startDate = req.query.startDate as string;
+  const endDate = req.query.endDate as string;
 
   let filteredTopics = Array.from(topics.values());
 
@@ -478,6 +481,19 @@ export const handleGetTopics: RequestHandler = (req, res) => {
     }
   }
 
+  // Apply date range filter for likes and comments sorting
+  if ((sortBy === "likes" || sortBy === "comments") && startDate && endDate) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    end.setHours(23, 59, 59, 999); // Include the entire end date
+
+    filteredTopics = filteredTopics.filter((topic) => {
+      const topicDate = new Date(topic.createdAt);
+      return topicDate >= start && topicDate <= end;
+    });
+  }
+
+  // Sort topics based on filter type
   if (search) {
     filteredTopics.sort((a, b) => b.likes - a.likes);
   } else {
@@ -485,15 +501,21 @@ export const handleGetTopics: RequestHandler = (req, res) => {
       if (a.isPinned && !b.isPinned) return -1;
       if (!a.isPinned && b.isPinned) return 1;
 
-      // Sort by most recent activity (creation date or last comment)
-      const aActivity = getMostRecentActivity(a);
-      const bActivity = getMostRecentActivity(b);
+      if (sortBy === "likes") {
+        return b.likes - a.likes;
+      } else if (sortBy === "comments") {
+        return b.replies - a.replies;
+      } else {
+        // Sort by most recent activity (creation date or last comment)
+        const aActivity = getMostRecentActivity(a);
+        const bActivity = getMostRecentActivity(b);
 
-      console.log(
-        `[SORT] Comparing "${a.title}" (${new Date(aActivity).toLocaleString()}) vs "${b.title}" (${new Date(bActivity).toLocaleString()}) - Result: ${bActivity - aActivity}`,
-      );
+        console.log(
+          `[SORT] Comparing "${a.title}" (${new Date(aActivity).toLocaleString()}) vs "${b.title}" (${new Date(bActivity).toLocaleString()}) - Result: ${bActivity - aActivity}`,
+        );
 
-      return bActivity - aActivity;
+        return bActivity - aActivity;
+      }
     });
   }
 

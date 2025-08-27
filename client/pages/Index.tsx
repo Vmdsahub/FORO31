@@ -21,6 +21,8 @@ import {
 import CreateTopicModal from "@/components/CreateTopicModal";
 import FeaturedTopicModal from "@/components/FeaturedTopicModal";
 import FeaturedCarousel from "@/components/FeaturedCarousel";
+import { Pagination } from "@/components/ui/pagination";
+import TopicFilters from "@/components/TopicFilters";
 
 // Category icon mapping
 const categoryIcons: Record<string, string> = {
@@ -157,6 +159,20 @@ export default function Index(props: IndexProps) {
 
   const [realTopics, setRealTopics] = useState<Topic[]>([]);
   const [isLoadingTopics, setIsLoadingTopics] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalTopics, setTotalTopics] = useState(0);
+
+  // Estados para filtros
+  const [filterType, setFilterType] = useState<"recent" | "likes" | "comments">(
+    "recent",
+  );
+  const [dateRange, setDateRange] = useState({
+    start: new Date(new Date().setDate(new Date().getDate() - 30))
+      .toISOString()
+      .split("T")[0],
+    end: new Date().toISOString().split("T")[0],
+  });
 
   // Estados para modais admin
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
@@ -182,9 +198,18 @@ export default function Index(props: IndexProps) {
   // Buscar tópicos reais da API quando uma categoria é selecionada
   useEffect(() => {
     if (selectedCategory && activeSection === "forum") {
-      fetchTopics(selectedCategory);
+      setCurrentPage(1); // Reset to first page when changing category
+      fetchTopics(selectedCategory, 1);
     }
   }, [selectedCategory, activeSection]);
+
+  // Refazer busca quando filtros mudarem
+  useEffect(() => {
+    if (selectedCategory && activeSection === "forum") {
+      setCurrentPage(1); // Reset to first page when filters change
+      fetchTopics(selectedCategory, 1);
+    }
+  }, [filterType, dateRange]);
 
   // Carregar ícones salvos ao montar componente
   useEffect(() => {
@@ -236,11 +261,26 @@ export default function Index(props: IndexProps) {
     }
   };
 
-  const fetchTopics = async (category: string, retryCount = 0) => {
+  const fetchTopics = async (category: string, page = 1, retryCount = 0) => {
     setIsLoadingTopics(true);
     try {
       const params = new URLSearchParams();
       params.append("category", category);
+      params.append("page", page.toString());
+      params.append("limit", "12"); // 12 topics per page
+
+      // Add filter parameters
+      if (filterType === "likes") {
+        params.append("sortBy", "likes");
+        params.append("startDate", dateRange.start);
+        params.append("endDate", dateRange.end);
+      } else if (filterType === "comments") {
+        params.append("sortBy", "comments");
+        params.append("startDate", dateRange.start);
+        params.append("endDate", dateRange.end);
+      } else {
+        params.append("sortBy", "recent");
+      }
 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
@@ -257,6 +297,9 @@ export default function Index(props: IndexProps) {
       if (response.ok) {
         const data = await response.json();
         setRealTopics(data.topics || []);
+        setTotalTopics(data.total || 0);
+        setCurrentPage(data.page || 1);
+        setTotalPages(Math.ceil((data.total || 0) / (data.limit || 12)));
       } else {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
@@ -269,7 +312,7 @@ export default function Index(props: IndexProps) {
         (error instanceof TypeError || error.name === "AbortError")
       ) {
         console.log(`Retrying fetch topics (attempt ${retryCount + 1}/3)...`);
-        setTimeout(() => fetchTopics(category, retryCount + 1), 1000);
+        setTimeout(() => fetchTopics(category, page, retryCount + 1), 1000);
         return;
       }
 
@@ -283,6 +326,8 @@ export default function Index(props: IndexProps) {
 
       // Set empty array on error to prevent UI issues
       setRealTopics([]);
+      setTotalTopics(0);
+      setTotalPages(1);
     } finally {
       setIsLoadingTopics(false);
     }
@@ -290,12 +335,10 @@ export default function Index(props: IndexProps) {
 
   const handleTopicCreated = (newTopic: Topic) => {
     console.log("Novo tópico criado na Index:", newTopic);
-    // Adicionar o novo tópico ao início da lista
-    setRealTopics((prev) => {
-      const updated = [newTopic, ...prev];
-      console.log("Tópicos atualizados:", updated);
-      return updated;
-    });
+    // Refresh the current page to show the new topic
+    if (selectedCategory) {
+      fetchTopics(selectedCategory, currentPage);
+    }
   };
 
   const handleCreateCategory = () => {
@@ -384,7 +427,10 @@ export default function Index(props: IndexProps) {
       });
 
       if (response.ok) {
-        setRealTopics((prev) => prev.filter((topic) => topic.id !== topicId));
+        // Refresh the current page after deleting a topic
+        if (selectedCategory) {
+          fetchTopics(selectedCategory, currentPage);
+        }
         toast.success("Tópico excluído com sucesso!");
       } else {
         toast.error("Erro ao excluir tópico");
@@ -405,11 +451,25 @@ export default function Index(props: IndexProps) {
   const handleFeaturedUpdate = () => {
     // Recarregar os tópicos para refletir mudanças de destaque
     if (selectedCategory) {
-      fetchTopics(selectedCategory);
+      fetchTopics(selectedCategory, currentPage);
     }
   };
 
-  // Função para lidar com upload de ícone
+  const handlePageChange = (page: number) => {
+    if (selectedCategory && page !== currentPage) {
+      setCurrentPage(page);
+      fetchTopics(selectedCategory, page);
+      // Scroll to top of filters when changing pages
+      const filtersContainer = document.querySelector(
+        "[data-filters-container]",
+      );
+      if (filtersContainer) {
+        filtersContainer.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+  };
+
+  // Fun��ão para lidar com upload de ícone
   const handleIconUpload = async (file: File, categoryId: string) => {
     const formData = new FormData();
     formData.append("file", file);
@@ -1284,6 +1344,17 @@ export default function Index(props: IndexProps) {
                 ))}
               </div>
             </div>
+
+            {/* Bottom Pagination */}
+            {!isLoadingTopics && totalPages > 1 && (
+              <div className="flex justify-center mt-6">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
+              </div>
+            )}
           </div>
         )}
 
@@ -1301,6 +1372,17 @@ export default function Index(props: IndexProps) {
               onClick={() => {
                 props.setSelectedCategory(null);
                 setRealTopics([]); // Limpar tópicos ao voltar
+                setCurrentPage(1); // Reset pagination
+                setTotalPages(1);
+                setTotalTopics(0);
+                // Reset filters
+                setFilterType("recent");
+                setDateRange({
+                  start: new Date(new Date().setDate(new Date().getDate() - 30))
+                    .toISOString()
+                    .split("T")[0],
+                  end: new Date().toISOString().split("T")[0],
+                });
               }}
               className="flex items-center gap-2 text-gray-600 hover:text-black transition-all duration-300 ease-in-out hover:translate-x-1"
             >
@@ -1340,6 +1422,36 @@ export default function Index(props: IndexProps) {
                     onStatsRefresh={refreshCategoryStats}
                   />
                 )}
+              </div>
+            </div>
+
+            {/* Filters and Pagination */}
+            <div
+              className="flex flex-col gap-4 mb-6 lg:flex-row lg:items-center"
+              data-filters-container
+            >
+              {/* Empty space for left alignment */}
+              <div className="hidden lg:block lg:flex-1"></div>
+
+              {/* Pagination - Center */}
+              <div className="flex justify-center order-2 lg:order-1">
+                {!isLoadingTopics && totalPages > 1 && (
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                )}
+              </div>
+
+              {/* Filters - Right */}
+              <div className="order-1 lg:order-2 lg:flex-1 lg:flex lg:justify-end">
+                <TopicFilters
+                  filterType={filterType}
+                  onFilterTypeChange={setFilterType}
+                  dateRange={dateRange}
+                  onDateRangeChange={setDateRange}
+                />
               </div>
             </div>
 
@@ -1503,26 +1615,16 @@ export default function Index(props: IndexProps) {
               </div>
             </div>
 
-            {/* Pagination */}
-            <div className="flex justify-center">
-              <div className="flex items-center gap-2">
-                <button className="px-3 py-2 rounded-md border border-gray-300 text-gray-600 hover:bg-gray-50 transition-all duration-200">
-                  Anterior
-                </button>
-                <button className="px-3 py-2 rounded-md bg-black text-white">
-                  1
-                </button>
-                <button className="px-3 py-2 rounded-md border border-gray-300 text-gray-600 hover:bg-gray-50 transition-all duration-200">
-                  2
-                </button>
-                <button className="px-3 py-2 rounded-md border border-gray-300 text-gray-600 hover:bg-gray-50 transition-all duration-200">
-                  3
-                </button>
-                <button className="px-3 py-2 rounded-md border border-gray-300 text-gray-600 hover:bg-gray-50 transition-all duration-200">
-                  Próximo
-                </button>
+            {/* Bottom Pagination */}
+            {!isLoadingTopics && totalPages > 1 && (
+              <div className="flex justify-center mt-6">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
               </div>
-            </div>
+            )}
           </div>
         )}
       </div>
