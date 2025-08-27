@@ -1306,9 +1306,6 @@ export default function Header({ activeSection }: HeaderProps) {
                         </select>
                       </div>
                       {fieldMessages.birthDate &&
-                        registerBirthDay &&
-                        registerBirthMonth &&
-                        registerBirthYear &&
                         validationErrors.birthDate && (
                           <p className="text-xs mt-1 text-red-600">
                             {fieldMessages.birthDate}
