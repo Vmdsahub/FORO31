@@ -632,7 +632,7 @@ export default function Index(props: IndexProps) {
                   title={
                     user?.name === "Vitoca"
                       ? "Voltar para semanas anteriores (Admin)"
-                      : "Voltar para semanas anteriores (só se houver not��cias)"
+                      : "Voltar para semanas anteriores (só se houver notícias)"
                   }
                 >
                   <svg
@@ -665,7 +665,7 @@ export default function Index(props: IndexProps) {
                       de {currentNewsletter.year}
                       <br />
                       <span className="text-sm text-gray-500">
-                        Atualiza��ões todos os domingos
+                        Atualizações todos os domingos
                       </span>
                     </p>
                   )}
@@ -1338,6 +1338,17 @@ export default function Index(props: IndexProps) {
                 ))}
               </div>
             </div>
+
+            {/* Bottom Pagination */}
+            {!isLoadingTopics && totalPages > 1 && (
+              <div className="flex justify-center mt-6">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
+              </div>
+            )}
           </div>
         )}
 
@@ -1407,26 +1418,26 @@ export default function Index(props: IndexProps) {
             </div>
 
             {/* Filters and Pagination */}
-            <div className="bg-white rounded-lg border border-gray-200 p-4 mb-4" data-filters-container>
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex flex-col gap-4 mb-6 lg:flex-row lg:items-center lg:justify-between" data-filters-container>
+              {/* Pagination - Center */}
+              <div className="flex-1 flex justify-center order-2 lg:order-1">
+                {!isLoadingTopics && totalPages > 1 && (
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                )}
+              </div>
+
+              {/* Filters - Right */}
+              <div className="order-1 lg:order-2">
                 <TopicFilters
                   filterType={filterType}
                   onFilterTypeChange={setFilterType}
-                  likesRange={likesRange}
-                  onLikesRangeChange={setLikesRange}
-                  commentsRange={commentsRange}
-                  onCommentsRangeChange={setCommentsRange}
+                  dateRange={dateRange}
+                  onDateRangeChange={setDateRange}
                 />
-
-                {!isLoadingTopics && totalPages > 1 && (
-                  <div className="flex justify-center lg:justify-end">
-                    <Pagination
-                      currentPage={currentPage}
-                      totalPages={totalPages}
-                      onPageChange={handlePageChange}
-                    />
-                  </div>
-                )}
               </div>
             </div>
 
