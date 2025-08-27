@@ -45,7 +45,6 @@ export default function TopicView() {
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState("");
   const [editTitle, setEditTitle] = useState("");
-  const [editDescription, setEditDescription] = useState("");
   const [editCategory, setEditCategory] = useState("");
 
   useEffect(() => {
@@ -236,7 +235,7 @@ export default function TopicView() {
         },
         body: JSON.stringify({
           title: editTitle,
-          description: editDescription,
+          description: topic.description,
           content: editContent,
           category: editCategory,
         }),
