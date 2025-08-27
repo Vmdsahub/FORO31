@@ -345,7 +345,7 @@ export default function TopicView() {
                   onChange={(e) => setEditTitle(e.target.value)}
                   className="text-2xl font-bold"
                   placeholder="Título do tópico"
-                  maxLength={40}
+                  maxLength={200}
                 />
                 <Input
                   value={editDescription}
@@ -356,11 +356,8 @@ export default function TopicView() {
             ) : (
               <h1
                 className="text-2xl font-bold text-black mb-4 break-words leading-tight"
-                title={topic.title.length > 40 ? topic.title : undefined}
               >
-                {topic.title.length > 40
-                  ? `${topic.title.substring(0, 40)}...`
-                  : topic.title}
+                {topic.title}
               </h1>
             )}
           </div>
