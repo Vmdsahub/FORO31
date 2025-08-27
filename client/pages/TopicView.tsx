@@ -215,7 +215,8 @@ export default function TopicView() {
   const handleEditTopic = () => {
     if (!topic) return;
     setEditTitle(topic.title);
-    setEditDescription(topic.description);
+    // Se a descrição for igual ao título, deixar vazia para evitar duplicação
+    setEditDescription(topic.description === topic.title ? "" : topic.description);
     // Limpar conteúdo antes de editar para evitar HTML bugado
     const cleanContent = topic.content
       .replace(/data-edit-mode="[^"]*"/g, "")
@@ -345,7 +346,7 @@ export default function TopicView() {
                   onChange={(e) => setEditTitle(e.target.value)}
                   className="text-2xl font-bold"
                   placeholder="Título do tópico"
-                  maxLength={200}
+                  maxLength={70}
                 />
                 <Input
                   value={editDescription}
