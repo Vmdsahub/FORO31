@@ -1192,6 +1192,9 @@ export default function EnhancedRichTextEditor({
           videoPreview.appendChild(deleteButton);
         }
 
+        // Make the video preview draggable
+        makeDraggable(videoPreview);
+
         lastMediaContainer.appendChild(videoPreview);
 
         // Position cursor after the container
@@ -1301,6 +1304,9 @@ export default function EnhancedRichTextEditor({
 
       videoPreview.appendChild(deleteButton);
     }
+
+    // Make the video preview draggable
+    makeDraggable(videoPreview);
 
     mediaContainer.appendChild(videoPreview);
 
