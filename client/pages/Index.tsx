@@ -632,7 +632,7 @@ export default function Index(props: IndexProps) {
                   title={
                     user?.name === "Vitoca"
                       ? "Voltar para semanas anteriores (Admin)"
-                      : "Voltar para semanas anteriores (só se houver notícias)"
+                      : "Voltar para semanas anteriores (só se houver not��cias)"
                   }
                 >
                   <svg
@@ -665,7 +665,7 @@ export default function Index(props: IndexProps) {
                       de {currentNewsletter.year}
                       <br />
                       <span className="text-sm text-gray-500">
-                        Atualizações todos os domingos
+                        Atualiza��ões todos os domingos
                       </span>
                     </p>
                   )}
@@ -1360,8 +1360,10 @@ export default function Index(props: IndexProps) {
                 setTotalTopics(0);
                 // Reset filters
                 setFilterType('recent');
-                setLikesRange({ min: 0, max: 1000 });
-                setCommentsRange({ min: 0, max: 100 });
+                setDateRange({
+                  start: new Date(new Date().setDate(new Date().getDate() - 30)).toISOString().split('T')[0],
+                  end: new Date().toISOString().split('T')[0]
+                });
               }}
               className="flex items-center gap-2 text-gray-600 hover:text-black transition-all duration-300 ease-in-out hover:translate-x-1"
             >
