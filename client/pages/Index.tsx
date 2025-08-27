@@ -360,8 +360,8 @@ export default function Index(props: IndexProps) {
       return;
     }
 
-    if (newNewsletter.title.length > 100) {
-      toast.error("Título deve ter no máximo 100 caracteres");
+    if (newNewsletter.title.length > 70) {
+      toast.error("Título deve ter no máximo 70 caracteres");
       return;
     }
 
@@ -864,14 +864,14 @@ export default function Index(props: IndexProps) {
                           htmlFor="news-title"
                           className="text-gray-900 font-medium"
                         >
-                          Título do Artigo (máx. 100 caracteres)
+                          Título do Artigo (máx. 70 caracteres)
                         </Label>
                         <Input
                           id="news-title"
                           value={newNewsletter.title}
                           onChange={(e) => {
                             const value = e.target.value;
-                            if (value.length <= 100) {
+                            if (value.length <= 70) {
                               setNewNewsletter({
                                 ...newNewsletter,
                                 title: value,
@@ -883,7 +883,7 @@ export default function Index(props: IndexProps) {
                           maxLength={100}
                         />
                         <div className="text-xs text-gray-500 mt-1">
-                          {newNewsletter.title.length}/100 caracteres
+                          {newNewsletter.title.length}/70 caracteres
                         </div>
                       </div>
                       <div className="space-y-2">
