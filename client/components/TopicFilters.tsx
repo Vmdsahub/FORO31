@@ -18,33 +18,33 @@ import {
 interface TopicFiltersProps {
   filterType: 'recent' | 'likes' | 'comments';
   onFilterTypeChange: (type: 'recent' | 'likes' | 'comments') => void;
-  likesRange: { min: number; max: number };
-  onLikesRangeChange: (range: { min: number; max: number }) => void;
-  commentsRange: { min: number; max: number };
-  onCommentsRangeChange: (range: { min: number; max: number }) => void;
+  dateRange: { start: string; end: string };
+  onDateRangeChange: (range: { start: string; end: string }) => void;
 }
 
 export default function TopicFilters({
   filterType,
   onFilterTypeChange,
-  likesRange,
-  onLikesRangeChange,
-  commentsRange,
-  onCommentsRangeChange,
+  dateRange,
+  onDateRangeChange,
 }: TopicFiltersProps) {
-  const [tempLikesRange, setTempLikesRange] = useState(likesRange);
-  const [tempCommentsRange, setTempCommentsRange] = useState(commentsRange);
+  const [tempDateRange, setTempDateRange] = useState(dateRange);
 
-  const handleLikesRangeApply = () => {
-    onLikesRangeChange(tempLikesRange);
+  const handleDateRangeApply = () => {
+    onDateRangeChange(tempDateRange);
   };
 
-  const handleCommentsRangeApply = () => {
-    onCommentsRangeChange(tempCommentsRange);
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('pt-BR', { 
+      day: '2-digit', 
+      month: '2-digit', 
+      year: 'numeric' 
+    });
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-4">
+    <div className="flex items-center gap-4">
       <div className="flex items-center gap-2">
         <Label className="text-sm font-medium text-gray-600 whitespace-nowrap">Ordenar por:</Label>
         <Select value={filterType} onValueChange={onFilterTypeChange}>
@@ -59,103 +59,57 @@ export default function TopicFilters({
         </Select>
       </div>
 
-      {filterType === 'likes' && (
+      {(filterType === 'likes' || filterType === 'comments') && (
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" size="sm" className="h-9">
-              {likesRange.min} - {likesRange.max} likes
+              {formatDate(dateRange.start)} - {formatDate(dateRange.end)}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-80">
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label className="text-sm font-medium">Filtrar por likes</Label>
+                <Label className="text-sm font-medium">
+                  Período para {filterType === 'likes' ? 'ordenar por likes' : 'ordenar por comentários'}
+                </Label>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label className="text-xs text-gray-500">Mínimo</Label>
+                    <Label className="text-xs text-gray-500">Data inicial</Label>
                     <Input
-                      type="number"
-                      value={tempLikesRange.min}
+                      type="date"
+                      value={tempDateRange.start}
                       onChange={(e) =>
-                        setTempLikesRange({
-                          ...tempLikesRange,
-                          min: parseInt(e.target.value) || 0,
+                        setTempDateRange({
+                          ...tempDateRange,
+                          start: e.target.value,
                         })
                       }
                       className="h-8"
-                      min="0"
                     />
                   </div>
                   <div>
-                    <Label className="text-xs text-gray-500">Máximo</Label>
+                    <Label className="text-xs text-gray-500">Data final</Label>
                     <Input
-                      type="number"
-                      value={tempLikesRange.max}
+                      type="date"
+                      value={tempDateRange.end}
                       onChange={(e) =>
-                        setTempLikesRange({
-                          ...tempLikesRange,
-                          max: parseInt(e.target.value) || 1000,
+                        setTempDateRange({
+                          ...tempDateRange,
+                          end: e.target.value,
                         })
                       }
                       className="h-8"
-                      min="0"
                     />
                   </div>
                 </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  {filterType === 'likes' 
+                    ? 'Tópicos serão ordenados por mais likes no período selecionado'
+                    : 'Tópicos serão ordenados por mais comentários no período selecionado'
+                  }
+                </p>
               </div>
-              <Button onClick={handleLikesRangeApply} className="w-full h-8">
-                Aplicar filtro
-              </Button>
-            </div>
-          </PopoverContent>
-        </Popover>
-      )}
-
-      {filterType === 'comments' && (
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" size="sm" className="h-9">
-              {commentsRange.min} - {commentsRange.max} comentários
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-80">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label className="text-sm font-medium">Filtrar por comentários</Label>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <Label className="text-xs text-gray-500">Mínimo</Label>
-                    <Input
-                      type="number"
-                      value={tempCommentsRange.min}
-                      onChange={(e) =>
-                        setTempCommentsRange({
-                          ...tempCommentsRange,
-                          min: parseInt(e.target.value) || 0,
-                        })
-                      }
-                      className="h-8"
-                      min="0"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-xs text-gray-500">Máximo</Label>
-                    <Input
-                      type="number"
-                      value={tempCommentsRange.max}
-                      onChange={(e) =>
-                        setTempCommentsRange({
-                          ...tempCommentsRange,
-                          max: parseInt(e.target.value) || 100,
-                        })
-                      }
-                      className="h-8"
-                      min="0"
-                    />
-                  </div>
-                </div>
-              </div>
-              <Button onClick={handleCommentsRangeApply} className="w-full h-8">
+              <Button onClick={handleDateRangeApply} className="w-full h-8">
                 Aplicar filtro
               </Button>
             </div>
