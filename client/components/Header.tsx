@@ -103,13 +103,6 @@ export default function Header({ activeSection }: HeaderProps) {
     removeNotification(notificationId);
   };
 
-  const toggleCategory = (categoryId: string) => {
-    setSelectedCategories((prev) =>
-      prev.includes(categoryId)
-        ? prev.filter((id) => id !== categoryId)
-        : [...prev, categoryId],
-    );
-  };
 
   // Real-time validation functions
   const checkUsernameAvailable = async (username: string) => {
