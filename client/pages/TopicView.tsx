@@ -215,8 +215,6 @@ export default function TopicView() {
   const handleEditTopic = () => {
     if (!topic) return;
     setEditTitle(topic.title);
-    // Se a descrição for igual ao título, deixar vazia para evitar duplicação
-    setEditDescription(topic.description === topic.title ? "" : topic.description);
     // Limpar conteúdo antes de editar para evitar HTML bugado
     const cleanContent = topic.content
       .replace(/data-edit-mode="[^"]*"/g, "")
@@ -262,7 +260,6 @@ export default function TopicView() {
   const handleCancelEdit = () => {
     setIsEditing(false);
     setEditTitle("");
-    setEditDescription("");
     setEditContent("");
     setEditCategory("");
   };
