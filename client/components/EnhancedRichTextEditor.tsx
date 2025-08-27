@@ -168,6 +168,9 @@ export default function EnhancedRichTextEditor({
 
       // Mark as processed
       imgElement.setAttribute("data-has-delete", "true");
+
+      // Make existing images draggable
+      makeDraggable(wrapper);
     });
 
     // Find videos without delete buttons
@@ -202,6 +205,9 @@ export default function EnhancedRichTextEditor({
 
       videoElement.appendChild(deleteButton);
       videoElement.setAttribute("data-has-delete", "true");
+
+      // Make existing videos draggable
+      makeDraggable(videoElement as HTMLElement);
     });
   };
 
@@ -718,6 +724,119 @@ export default function EnhancedRichTextEditor({
     toast.error("❌ Falha na verificação de segurança. Tente outro arquivo.");
   };
 
+  // Function to make media elements draggable horizontally
+  const makeDraggable = (element: HTMLElement) => {
+    if (!isEditMode) return;
+
+    let isDragging = false;
+    let startX = 0;
+    let startLeft = 0;
+    let dragHandle: HTMLElement | null = null;
+
+    // Create drag handle
+    const createDragHandle = () => {
+      const handle = document.createElement('div');
+      handle.innerHTML = '⋮⋮';
+      handle.title = 'Arrastar horizontalmente';
+      handle.style.cssText = `
+        position: absolute;
+        top: 50%;
+        left: -15px;
+        transform: translateY(-50%);
+        background: rgba(0,0,0,0.7);
+        color: white;
+        width: 12px;
+        height: 24px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 8px;
+        cursor: grab;
+        opacity: 0;
+        transition: opacity 0.2s;
+        z-index: 15;
+        user-select: none;
+        font-family: monospace;
+        line-height: 1;
+      `;
+      return handle;
+    };
+
+    // Show drag handle on hover
+    element.addEventListener('mouseenter', () => {
+      if (!dragHandle && isEditMode) {
+        dragHandle = createDragHandle();
+        element.appendChild(dragHandle);
+
+        // Add drag functionality
+        dragHandle.addEventListener('mousedown', startDrag);
+      }
+      if (dragHandle) {
+        dragHandle.style.opacity = '1';
+      }
+    });
+
+    element.addEventListener('mouseleave', () => {
+      if (dragHandle && !isDragging) {
+        dragHandle.style.opacity = '0';
+      }
+    });
+
+    const startDrag = (e: MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      isDragging = true;
+      startX = e.clientX;
+
+      // Get current position
+      const rect = element.getBoundingClientRect();
+      const parentRect = element.parentElement!.getBoundingClientRect();
+      startLeft = rect.left - parentRect.left;
+
+      // Set initial position
+      element.style.position = 'relative';
+      element.style.left = '0px';
+
+      if (dragHandle) {
+        dragHandle.style.cursor = 'grabbing';
+      }
+
+      document.addEventListener('mousemove', drag);
+      document.addEventListener('mouseup', stopDrag);
+
+      // Prevent text selection
+      document.body.style.userSelect = 'none';
+    };
+
+    const drag = (e: MouseEvent) => {
+      if (!isDragging) return;
+
+      const deltaX = e.clientX - startX;
+      const newLeft = Math.max(-100, Math.min(200, deltaX)); // Limit horizontal movement
+
+      element.style.left = newLeft + 'px';
+    };
+
+    const stopDrag = () => {
+      isDragging = false;
+
+      if (dragHandle) {
+        dragHandle.style.cursor = 'grab';
+        dragHandle.style.opacity = '0';
+      }
+
+      document.removeEventListener('mousemove', drag);
+      document.removeEventListener('mouseup', stopDrag);
+
+      // Restore text selection
+      document.body.style.userSelect = '';
+
+      handleInput();
+    };
+  };
+
   const insertImageHtml = (src: string, alt: string) => {
     const editor = editorRef.current;
     if (!editor) return;
@@ -810,6 +929,10 @@ export default function EnhancedRichTextEditor({
 
           imageWrapper.appendChild(imageElement);
           imageWrapper.appendChild(deleteButton);
+
+          // Make the image wrapper draggable
+          makeDraggable(imageWrapper);
+
           lastImageContainer.appendChild(imageWrapper);
         } else {
           lastImageContainer.appendChild(imageElement);
@@ -902,6 +1025,10 @@ export default function EnhancedRichTextEditor({
 
       imageWrapper.appendChild(imageElement);
       imageWrapper.appendChild(deleteButton);
+
+      // Make the image wrapper draggable
+      makeDraggable(imageWrapper);
+
       imageContainer.appendChild(imageWrapper);
     } else {
       imageContainer.appendChild(imageElement);
