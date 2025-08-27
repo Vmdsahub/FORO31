@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import SearchResults from "@/components/SearchResults";
+import NewSearchSystem from "@/components/NewSearchSystem";
 import {
   Dialog,
   DialogContent,
@@ -33,15 +33,6 @@ export default function Header({ activeSection }: HeaderProps) {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
 
-  // Search states
-  const [searchQuery, setSearchQuery] = useState("");
-  const [showAdvancedDropdown, setShowAdvancedDropdown] = useState(false);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [showSearchResults, setShowSearchResults] = useState(false);
-  const [activeSearchQuery, setActiveSearchQuery] = useState("");
-  const [activeSearchCategories, setActiveSearchCategories] = useState<
-    string[]
-  >([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const {
     notifications,
@@ -51,7 +42,6 @@ export default function Header({ activeSection }: HeaderProps) {
     unreadCount,
     addNotification,
   } = useNotifications();
-  const dropdownRef = useRef<HTMLDivElement>(null);
   const notificationRef = useRef<HTMLDivElement>(null);
 
   // Login form state
@@ -83,24 +73,6 @@ export default function Header({ activeSection }: HeaderProps) {
     {},
   );
 
-  // Categories for advanced search
-  const categories = [
-    { id: "ia-hub", name: "IA HUB" },
-    { id: "imagem", name: "IMAGEM" },
-    { id: "video", name: "VÍDEO" },
-    { id: "seguranca", name: "SEGURANÇA" },
-    { id: "musica-audio", name: "MÚSICA/ÁUDIO" },
-    { id: "vibe-coding", name: "VIBE CODING" },
-  ];
-
-  const handleSearch = () => {
-    if (!searchQuery.trim()) return;
-
-    setActiveSearchQuery(searchQuery);
-    setActiveSearchCategories([...selectedCategories]);
-    setShowSearchResults(true);
-    setShowAdvancedDropdown(false);
-  };
 
   const handleAccountClick = () => {
     navigate("/account");
@@ -113,12 +85,6 @@ export default function Header({ activeSection }: HeaderProps) {
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setShowAdvancedDropdown(false);
-      }
       if (
         notificationRef.current &&
         !notificationRef.current.contains(event.target as Node)
