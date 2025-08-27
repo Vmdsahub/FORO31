@@ -455,10 +455,8 @@ export const handleGetTopics: RequestHandler = (req, res) => {
   const search = req.query.search as string;
   const categories = req.query.categories as string;
   const sortBy = req.query.sortBy as string || 'recent';
-  const minLikes = parseInt(req.query.minLikes as string) || 0;
-  const maxLikes = parseInt(req.query.maxLikes as string) || 999999;
-  const minComments = parseInt(req.query.minComments as string) || 0;
-  const maxComments = parseInt(req.query.maxComments as string) || 999999;
+  const startDate = req.query.startDate as string;
+  const endDate = req.query.endDate as string;
 
   let filteredTopics = Array.from(topics.values());
 
