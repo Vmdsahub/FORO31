@@ -205,7 +205,7 @@ export default function Index(props: IndexProps) {
       setCurrentPage(1); // Reset to first page when filters change
       fetchTopics(selectedCategory, 1);
     }
-  }, [filterType, likesRange, commentsRange]);
+  }, [filterType, dateRange]);
 
   // Carregar ícones salvos ao montar componente
   useEffect(() => {
