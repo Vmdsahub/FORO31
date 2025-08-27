@@ -1522,13 +1522,13 @@ export default function Index(props: IndexProps) {
                               <h3
                                 className="font-semibold text-black hover:text-blue-600 cursor-pointer break-words leading-tight transition-colors duration-200"
                                 title={
-                                  topic.title.length > 65
+                                  topic.title.length > 70
                                     ? topic.title
                                     : undefined
                                 }
                               >
-                                {topic.title.length > 65
-                                  ? `${topic.title.substring(0, 65)}...`
+                                {topic.title.length > 70
+                                  ? `${topic.title.substring(0, 70)}...`
                                   : topic.title}
                               </h3>
                               <div className="flex items-center justify-between mt-2">
