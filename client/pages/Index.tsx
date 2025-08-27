@@ -162,6 +162,11 @@ export default function Index(props: IndexProps) {
   const [totalPages, setTotalPages] = useState(1);
   const [totalTopics, setTotalTopics] = useState(0);
 
+  // Estados para filtros
+  const [filterType, setFilterType] = useState<'recent' | 'likes' | 'comments'>('recent');
+  const [likesRange, setLikesRange] = useState({ min: 0, max: 1000 });
+  const [commentsRange, setCommentsRange] = useState({ min: 0, max: 100 });
+
   // Estados para modais admin
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [iconModalOpen, setIconModalOpen] = useState(false);
@@ -247,7 +252,20 @@ export default function Index(props: IndexProps) {
       const params = new URLSearchParams();
       params.append("category", category);
       params.append("page", page.toString());
-      params.append("limit", "10"); // 10 topics per page
+      params.append("limit", "15"); // 15 topics per page
+
+      // Add filter parameters
+      if (filterType === 'likes') {
+        params.append("sortBy", "likes");
+        params.append("minLikes", likesRange.min.toString());
+        params.append("maxLikes", likesRange.max.toString());
+      } else if (filterType === 'comments') {
+        params.append("sortBy", "comments");
+        params.append("minComments", commentsRange.min.toString());
+        params.append("maxComments", commentsRange.max.toString());
+      } else {
+        params.append("sortBy", "recent");
+      }
 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
@@ -266,7 +284,7 @@ export default function Index(props: IndexProps) {
         setRealTopics(data.topics || []);
         setTotalTopics(data.total || 0);
         setCurrentPage(data.page || 1);
-        setTotalPages(Math.ceil((data.total || 0) / (data.limit || 10)));
+        setTotalPages(Math.ceil((data.total || 0) / (data.limit || 15)));
       } else {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
