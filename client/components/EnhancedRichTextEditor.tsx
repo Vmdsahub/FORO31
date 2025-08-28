@@ -1689,7 +1689,7 @@ export default function EnhancedRichTextEditor({
         style={{
           lineHeight: "1.6", // Melhor para legibilidade com quebras de linha
           fontSize: "16px", // Tamanho base padrão
-          wordWrap: "break-word",
+          wordBreak: "break-word",
           overflowWrap: "break-word",
           whiteSpace: "pre-wrap",
         }}
