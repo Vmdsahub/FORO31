@@ -324,7 +324,7 @@ export default function CreateTopicModal({
 
           <div className="space-y-2">
             <Label className="text-gray-900 font-medium">Conteúdo</Label>
-            <div style={{ maxWidth: "640px" }}>
+            <div style={{ maxWidth: "848px", width: "100%" }}>
               <EnhancedRichTextEditor
                 value={formData.content}
                 onChange={(value) => handleInputChange("content", value)}
