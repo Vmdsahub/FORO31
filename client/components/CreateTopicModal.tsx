@@ -332,6 +332,8 @@ export default function CreateTopicModal({
                   background: transparent !important;
                   min-height: 150px !important;
                   width: 100% !important;
+                  font-size: large !important;
+                  color: rgb(0, 0, 0) !important;
                 }
 
                 .markdown-preview-content {
@@ -340,7 +342,8 @@ export default function CreateTopicModal({
                   overflow-wrap: break-word;
                   white-space: pre-wrap;
                   line-height: 1.6;
-                  color: rgb(55, 65, 81);
+                  color: rgb(0, 0, 0);
+                  font-size: large;
                 }
               `}</style>
               <div className="markdown-preview-content">
