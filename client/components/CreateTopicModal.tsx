@@ -324,37 +324,35 @@ export default function CreateTopicModal({
 
           <div className="space-y-2">
             <Label className="text-gray-900 font-medium">Conteúdo</Label>
-            <div className="border border-gray-300 rounded-md">
-              <style>{`
-                .topic-preview-container {
-                  max-width: 896px; /* max-w-4xl = 896px */
-                  margin: 0 auto;
-                  padding: 0 24px; /* px-6 = 24px each side */
-                  box-sizing: border-box;
-                }
+            <style>{`
+              .topic-preview-editor .rich-editor {
+                max-width: none !important;
+                word-break: break-word !important;
+                overflow-wrap: break-word !important;
+                white-space: pre-wrap !important;
+                line-height: 1.6 !important;
+                font-size: 16px !important;
+                color: rgb(55, 65, 81) !important;
+                width: 100% !important;
+                padding: 0 !important;
+                border: none !important;
+                background: transparent !important;
+                min-height: 150px !important;
+              }
 
-                .topic-preview-editor .rich-editor {
-                  max-width: none !important;
-                  word-break: break-word !important;
-                  overflow-wrap: break-word !important;
-                  white-space: pre-wrap !important;
-                  line-height: 1.6 !important;
-                  font-size: 16px !important;
-                  color: rgb(55, 65, 81) !important;
-                  width: 100% !important;
-                  padding: 16px !important;
-                  border: none !important;
-                }
-              `}</style>
-              <div className="topic-preview-container">
-                <div className="topic-preview-editor">
-                  <EnhancedRichTextEditor
-                    value={formData.content}
-                    onChange={(value) => handleInputChange("content", value)}
-                    placeholder="Descreva seu tópico em detalhes... Use as ferramentas acima para formatar o texto, adicionar código, escolher cores e fazer upload de arquivos."
-                  />
-                </div>
-              </div>
+              .topic-preview-editor {
+                background: white;
+                border: 1px solid #d1d5db;
+                border-radius: 6px;
+                padding: 16px;
+              }
+            `}</style>
+            <div className="topic-preview-editor">
+              <EnhancedRichTextEditor
+                value={formData.content}
+                onChange={(value) => handleInputChange("content", value)}
+                placeholder="Descreva seu tópico em detalhes... Use as ferramentas acima para formatar o texto, adicionar código, escolher cores e fazer upload de arquivos."
+              />
             </div>
             <p className="text-xs text-gray-500">
               {formData.content.length} caracteres
