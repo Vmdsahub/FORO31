@@ -324,36 +324,36 @@ export default function CreateTopicModal({
 
           <div className="space-y-2">
             <Label className="text-gray-900 font-medium">Conteúdo</Label>
-            <div className="border border-gray-300 rounded-md p-4">
+            <div className="border border-gray-300 rounded-md">
               <style>{`
-                .markdown-preview-editor .rich-editor {
-                  padding: 0 !important;
+                .topic-content-simulator {
+                  max-width: 896px; /* max-w-4xl */
+                  margin: 0 auto;
+                  padding: 0 24px; /* px-6 */
+                  box-sizing: border-box;
+                }
+
+                .topic-content-simulator .rich-editor {
+                  padding: 16px 0 !important;
                   border: none !important;
                   background: transparent !important;
                   min-height: 150px !important;
                   width: 100% !important;
-                  font-size: large !important;
-                  color: rgb(0, 0, 0) !important;
-                }
-
-                .markdown-preview-content {
-                  max-width: none;
-                  word-break: break-word;
-                  overflow-wrap: break-word;
-                  white-space: pre-wrap;
-                  line-height: 1.6;
-                  color: rgb(0, 0, 0);
-                  font-size: large;
+                  max-width: none !important;
+                  font-size: 16px !important;
+                  color: rgb(55, 65, 81) !important;
+                  line-height: 1.6 !important;
+                  word-break: break-word !important;
+                  overflow-wrap: break-word !important;
+                  white-space: pre-wrap !important;
                 }
               `}</style>
-              <div className="markdown-preview-content">
-                <div className="markdown-preview-editor">
-                  <EnhancedRichTextEditor
-                    value={formData.content}
-                    onChange={(value) => handleInputChange("content", value)}
-                    placeholder="Descreva seu tópico em detalhes... Use as ferramentas acima para formatar o texto, adicionar código, escolher cores e fazer upload de arquivos."
-                  />
-                </div>
+              <div className="topic-content-simulator">
+                <EnhancedRichTextEditor
+                  value={formData.content}
+                  onChange={(value) => handleInputChange("content", value)}
+                  placeholder="Descreva seu tópico em detalhes... Use as ferramentas acima para formatar o texto, adicionar código, escolher cores e fazer upload de arquivos."
+                />
               </div>
             </div>
             <p className="text-xs text-gray-500">
