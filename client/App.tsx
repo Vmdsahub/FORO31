@@ -272,6 +272,24 @@ function App() {
       : null,
   });
 
+  // Sync URL params with state
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const section = urlParams.get("section");
+    const category = urlParams.get("category");
+
+    if (section === "forum") {
+      setActiveSection("forum");
+    } else if (section === "newsletter") {
+      setActiveSection("newsletter");
+    }
+
+    if (category) {
+      setActiveSection("forum");
+      setSelectedCategory(category);
+    }
+  }, []);
+
   // Listen for global category stats refresh events
   useEffect(() => {
     const handleRefreshStats = () => {
