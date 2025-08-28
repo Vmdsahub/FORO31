@@ -324,11 +324,13 @@ export default function CreateTopicModal({
 
           <div className="space-y-2">
             <Label className="text-gray-900 font-medium">Conteúdo</Label>
-            <EnhancedRichTextEditor
-              value={formData.content}
-              onChange={(value) => handleInputChange("content", value)}
-              placeholder="Descreva seu tópico em detalhes... Use as ferramentas acima para formatar o texto, adicionar código, escolher cores e fazer upload de arquivos."
-            />
+            <div style={{ maxWidth: "640px" }}>
+              <EnhancedRichTextEditor
+                value={formData.content}
+                onChange={(value) => handleInputChange("content", value)}
+                placeholder="Descreva seu tópico em detalhes... Use as ferramentas acima para formatar o texto, adicionar código, escolher cores e fazer upload de arquivos."
+              />
+            </div>
             <p className="text-xs text-gray-500">
               {formData.content.length} caracteres
             </p>
