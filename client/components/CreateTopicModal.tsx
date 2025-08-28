@@ -340,12 +340,14 @@ export default function CreateTopicModal({
                   min-height: 150px !important;
                   width: 100% !important;
                   max-width: none !important;
-                  font-size: 16px !important;
-                  color: rgb(55, 65, 81) !important;
                   line-height: 1.6 !important;
                   word-break: break-word !important;
                   overflow-wrap: break-word !important;
                   white-space: pre-wrap !important;
+                }
+
+                .topic-content-simulator .rich-editor * {
+                  max-width: none !important;
                 }
               `}</style>
               <div className="topic-content-simulator">
