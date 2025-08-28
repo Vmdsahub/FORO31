@@ -275,17 +275,17 @@ function App() {
   // Sync URL params with state
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const section = urlParams.get('section');
-    const category = urlParams.get('category');
+    const section = urlParams.get("section");
+    const category = urlParams.get("category");
 
-    if (section === 'forum') {
-      setActiveSection('forum');
-    } else if (section === 'newsletter') {
-      setActiveSection('newsletter');
+    if (section === "forum") {
+      setActiveSection("forum");
+    } else if (section === "newsletter") {
+      setActiveSection("newsletter");
     }
 
     if (category) {
-      setActiveSection('forum');
+      setActiveSection("forum");
       setSelectedCategory(category);
     }
   }, []);
