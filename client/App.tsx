@@ -22,7 +22,6 @@ import { useAuth } from "@/contexts/AuthContext";
 interface ForumPost {
   id: string;
   title: string;
-  description: string;
   author: string;
   authorAvatar: string;
   replies: number;

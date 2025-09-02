@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNotifications } from "@/contexts/NotificationContext";
 import { toast } from "sonner";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
 import UserHoverCard from "@/components/UserHoverCard";
-import EnhancedRichTextEditor from "@/components/EnhancedRichTextEditor";
-import { cleanContentForSaving } from "@/utils/contentCleaner";
 import ReportModal from "@/components/ReportModal";
 
 interface Comment {
@@ -151,11 +150,11 @@ function CommentItem({
           {/* Conteúdo do coment��rio */}
           {isEditing ? (
             <div className="mb-8 space-y-3">
-              <EnhancedRichTextEditor
+              <Textarea
                 value={editContent}
-                onChange={setEditContent}
+                onChange={(e) => setEditContent(e.target.value)}
                 placeholder="Editar comentário..."
-                isEditMode={true}
+                className="min-h-[100px]"
               />
               <div className="flex items-center gap-2">
                 <Button
@@ -468,7 +467,7 @@ export default function SimpleCommentSystem({
           Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
         },
         body: JSON.stringify({
-          content: cleanContentForSaving(newComment), // Clean edit-mode attributes
+          content: newComment,
           quotedCommentId: quotedComment?.id || null,
         }),
       });
@@ -556,10 +555,11 @@ export default function SimpleCommentSystem({
           )}
 
           <div className="bg-white rounded-lg border border-gray-200 p-4">
-            <EnhancedRichTextEditor
+            <Textarea
               value={newComment}
-              onChange={setNewComment}
-              placeholder="Escreva seu comentário... Código ser�� detectado automaticamente! Use as ferramentas para cores, upload de arquivos e mais."
+              onChange={(e) => setNewComment(e.target.value)}
+              placeholder="Escreva seu comentário..."
+              className="min-h-[100px]"
             />
             <div className="flex items-center justify-between mt-3">
               <span className="text-xs text-gray-500">

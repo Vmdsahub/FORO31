@@ -25,10 +25,9 @@ export const getTopicsStorage = () => topics;
 // Validation schemas
 const createTopicSchema = z.object({
   title: z.string().min(1).max(70),
-  description: z.string().min(1).max(200),
   content: z.string().min(1).max(50000), // Increased limit for rich content with HTML/images
   category: z.string().min(1),
-  avatarUrl: z.string().optional(),
+  image: z.string().optional(), // URL da imagem do tópico
 });
 
 const createCommentSchema = z.object({
@@ -38,7 +37,6 @@ const createCommentSchema = z.object({
 
 const editTopicSchema = z.object({
   title: z.string().min(1).max(70).optional(),
-  description: z.string().min(1).max(200).optional(),
   content: z.string().min(1).max(50000).optional(),
   category: z.string().min(1).optional(),
 });
@@ -280,8 +278,6 @@ function initializeDemoData() {
     {
       id: "1",
       title: "Midjourney vs DALL-E 3: Comparativo de qualidade",
-      description:
-        "Teste side-by-side das principais ferramentas de geração de imagem",
       content:
         "Pessoal, fiz alguns testes comparativos entre o Midjourney v6 e o DALL-E 3 para entender qual produz melhores resultados.\n\nPrincipais diferenças que notei:\n\n**Midjourney v6:**\n- Melhor para arte conceitual e estilos artísticos\n- Interface no Discord pode ser confusa\n- Resultados mais consistentes em prompts complexos\n\n**DALL-E 3:**\n- Melhor integração com ChatGPT\n- Mais preciso para descrições textuais\n- Interface web mais intuitiva\n\nO que vocês acham? Qual preferem usar?",
       author: "VisualAI",
@@ -302,7 +298,6 @@ function initializeDemoData() {
     {
       id: "2",
       title: "Stable Diffusion XL: Novidades e melhorias",
-      description: "Análise das novas funcionalidades do SDXL",
       content:
         "O Stable Diffusion XL trouxe várias melhorias significativas:\n\n1. **Resolução nativa 1024x1024**: Muito melhor que os 512x512 do modelo original\n2. **Modelo de refino**: Permite melhorar os detalhes das imagens geradas\n3. **Melhor compreensão de texto**: Prompts mais complexos funcionam melhor\n4. **Controle de aspectos**: Diferentes proporções funcionam melhor\n\nTestei bastante e os resultados são impressionantes. Algu��m mais teve experiências similares?",
       author: "ImageGen",
@@ -323,7 +318,6 @@ function initializeDemoData() {
     {
       id: "3",
       title: "Como resolver erro de VRAM insuficiente no Stable Diffusion?",
-      description: "Dicas para otimizar o uso de memória da GPU",
       content:
         "Pessoal, estou tentando rodar o Stable Diffusion localmente mas sempre recebo erro de VRAM insuficiente. Minha GPU tem 8GB mas mesmo assim não consegui gerar imagens em alta resolução.\n\nJá tentei:\n- Reduzir o batch size\n- Usar o parâmetro --lowvram\n- Gerar em resolução menor\n\nAlguém tem mais dicas? É normal precisar de mais de 8GB para funcionar bem?",
       author: "TechNewbie",
@@ -650,12 +644,12 @@ export const handleCreateTopic: RequestHandler = (req, res) => {
     const newTopic: Topic = {
       id: generateId(),
       title: data.title,
-      description: data.description,
+      description: data.title, // Usar título como descrição
       content: data.content,
       author: req.user.name,
       authorId: req.user.id,
       authorAvatar: getUserAvatar(req.user),
-      topicAvatarUrl: data.avatarUrl || undefined,
+      topicAvatarUrl: data.image || undefined,
       category: data.category,
       replies: 0,
       views: 0,

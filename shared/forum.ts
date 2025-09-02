@@ -17,7 +17,6 @@ export interface Comment {
 export interface Topic {
   id: string;
   title: string;
-  description: string;
   content: string;
   author: string;
   authorId: string;
@@ -45,10 +44,9 @@ export interface Topic {
 
 export interface CreateTopicRequest {
   title: string;
-  description: string;
   content: string;
   category: string;
-  avatarUrl?: string;
+  image?: string;
 }
 
 export interface CreateCommentRequest {

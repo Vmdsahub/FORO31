@@ -9,8 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import EnhancedRichTextEditor from "@/components/EnhancedRichTextEditor";
-import { cleanContentForSaving } from "@/utils/contentCleaner";
+// EnhancedRichTextEditor e cleanContentForSaving removidos - usando sistema ReactQuill
 import {
   Dialog,
   DialogContent,
@@ -71,7 +70,6 @@ const categoryIcons: Record<string, string> = {
 interface ForumPost {
   id: string;
   title: string;
-  description: string;
   author: string;
   authorAvatar: string;
   replies: number;
@@ -367,10 +365,9 @@ export default function Index(props: IndexProps) {
 
     try {
       // Se admin e há uma semana selecionada, usar essa semana. Senão, criar na semana atual
-      const cleanedContent = cleanContentForSaving(newNewsletter.content);
       const requestBody: any = {
         title: newNewsletter.title,
-        content: cleanedContent,
+        content: newNewsletter.content,
       };
 
       // Se admin está visualizando uma semana específica, criar artigo nessa semana
@@ -893,19 +890,17 @@ export default function Index(props: IndexProps) {
                         >
                           Conteúdo do Artigo
                         </Label>
-                        <div className="border border-gray-300 rounded-md">
-                          <EnhancedRichTextEditor
-                            value={newNewsletter.content}
-                            onChange={(content) =>
-                              setNewNewsletter({
-                                ...newNewsletter,
-                                content,
-                              })
-                            }
-                            placeholder="Escreva o conteúdo completo do artigo..."
-                            isEditMode={true}
-                          />
-                        </div>
+                        <Textarea
+                          value={newNewsletter.content}
+                          onChange={(e) =>
+                            setNewNewsletter({
+                              ...newNewsletter,
+                              content: e.target.value,
+                            })
+                          }
+                          placeholder="Escreva o conteúdo completo do artigo..."
+                          className="min-h-[200px] border border-gray-300 rounded-md"
+                        />
                       </div>
                       <div className="flex justify-end gap-3 pt-4">
                         <Button

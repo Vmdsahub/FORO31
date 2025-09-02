@@ -1,0 +1,61 @@
+.topic-shell {
+  max-width: 790px;
+  margin: 24px auto;
+  padding: 0 16px;
+}
+
+/* Classe específica para visualização de tópicos postados */
+.topic-shell.topic-view {
+  margin: 0 auto 24px auto;
+}
+
+/* Ajustes para o modal - aumentar altura e largura do editor */
+.topic-shell .ql-container {
+  border: none;
+  min-height: 220px;
+}
+
+.topic-shell .ql-editor {
+  min-height: 220px;
+}
+
+.ql-toolbar {
+  border: none;
+  padding: 8px 0;
+}
+
+
+
+.topic-shell .ql-editor {
+  padding: 0;
+  line-height: 1.7;
+  text-align: left;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: auto;
+}
+
+.topic-shell .ql-editor h1,
+.topic-shell .ql-editor h2,
+.topic-shell .ql-editor h3,
+.topic-shell .ql-editor h4,
+.topic-shell .ql-editor h5,
+.topic-shell .ql-editor h6 {
+  margin-top: 16px;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.topic-shell .ql-editor ul,
+.topic-shell .ql-editor ol {
+  margin-bottom: 8px;
+}
+
+.topic-shell .ql-editor blockquote {
+  border-left: 4px solid #e2e8f0;
+  padding-left: 16px;
+  margin: 16px 0;
+  font-style: italic;
+  color: #64748b;
+}

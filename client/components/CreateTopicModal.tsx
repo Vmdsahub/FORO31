@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,8 +13,19 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { Topic } from "@shared/forum";
-import EnhancedRichTextEditor from "@/components/EnhancedRichTextEditor";
-import { cleanContentForSaving } from "@/utils/contentCleaner";
+import TopicCreate from "@/components/TopicCreate";
+
+// Função para upload de imagem (placeholder - implementar conforme necessário)
+async function uploadImage(file: File): Promise<string | null> {
+  try {
+    // Por enquanto, criar uma URL temporária para a imagem
+    // Em produção, implementar upload real para servidor/cloud
+    return URL.createObjectURL(file);
+  } catch (error) {
+    console.error('Erro ao fazer upload da imagem:', error);
+    return null;
+  }
+}
 
 interface ForumCategory {
   id: string;
@@ -33,110 +45,37 @@ export default function CreateTopicModal({
   onStatsRefresh,
 }: CreateTopicModalProps) {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    content: "",
-  });
-  const [avatarFile, setAvatarFile] = useState<File | null>(null);
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [title, setTitle] = useState("");
+  const [topicImage, setTopicImage] = useState<File | null>(null);
 
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setAvatarFile(file);
-
-      // Criar preview da imagem
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setAvatarPreview(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const uploadAvatar = async (file: File): Promise<string | null> => {
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
-        },
-        body: formData,
-      });
-
-      if (response.ok) {
-        try {
-          const result = await response.json();
-          return result.url;
-        } catch (parseError) {
-          console.error("Error parsing upload response:", parseError);
-          toast.error("Erro ao processar resposta do upload");
-          return null;
-        }
-      } else {
-        let errorMessage = "Erro ao fazer upload da imagem";
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.message || errorMessage;
-        } catch {
-          // If JSON parsing fails, use text response
-          const errorText = await response.text();
-          errorMessage = errorText || errorMessage;
-        }
-        console.error("Erro no upload:", response.status, response.statusText);
-        toast.error(errorMessage);
-      }
-    } catch (error) {
-      console.error("Erro ao fazer upload do avatar:", error);
-      toast.error("Erro ao fazer upload da imagem");
-    }
-    return null;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSave = async (data: { delta: any; image: File | null }) => {
     if (!user) {
       toast.error("Faça login para criar tópicos");
       return;
     }
 
-    // Validar conteúdo removendo HTML
-    const contentText = formData.content.replace(/<[^>]*>/g, "").trim();
+    // Validar se há conteúdo real no delta
+    const hasContent = data.delta && 
+      data.delta.ops && 
+      data.delta.ops.length > 0 && 
+      data.delta.ops.some((op: any) => op.insert && op.insert.trim && op.insert.trim().length > 0);
 
-    if (!formData.title.trim() || !contentText) {
-      toast.error("Preencha todos os campos");
+    if (!title.trim() || !hasContent) {
+      toast.error("Preencha o título e o conteúdo");
       return;
     }
 
     setIsSubmitting(true);
     try {
-      let avatarUrl = null;
-
-      console.log("[DEBUG] Iniciando criação de tópico...");
-      console.log("[DEBUG] avatarFile:", avatarFile);
-
-      // Upload do avatar se foi selecionado
-      if (avatarFile) {
-        console.log("[DEBUG] Fazendo upload do avatar...");
-        avatarUrl = await uploadAvatar(avatarFile);
-        console.log("[DEBUG] Avatar uploadado:", avatarUrl);
-      }
-
       const topicData = {
-        ...formData,
-        content: cleanContentForSaving(formData.content), // Clean edit-mode attributes
-        description: formData.title, // Use title as description for backend compatibility
+        title: title.trim(),
+        content: JSON.stringify(data.delta), // Salvar Delta como JSON
         category: currentCategory.id,
-        ...(avatarUrl && { avatarUrl }),
+        image: topicImage ? await uploadImage(topicImage) : null,
       };
-
-      console.log("[DEBUG] Dados do tópico:", topicData);
 
       const response = await fetch("/api/topics", {
         method: "POST",
@@ -147,240 +86,91 @@ export default function CreateTopicModal({
         body: JSON.stringify(topicData),
       });
 
-      console.log("Response status:", response.status);
-
       if (response.ok) {
-        try {
-          const newTopic = await response.json();
-          console.log("Tópico criado:", newTopic);
-          toast.success("Tópico criado com sucesso!");
-          setFormData({ title: "", description: "", content: "" });
-          setAvatarFile(null);
-          setAvatarPreview(null);
-          setIsOpen(false);
-          onTopicCreated?.(newTopic);
-          onStatsRefresh?.(); // Refresh category statistics
-        } catch (parseError) {
-          console.error("Error parsing success response:", parseError);
-          toast.error("Erro ao processar resposta do servidor");
-        }
+        const newTopic = await response.json();
+        toast.success("Tópico criado com sucesso!");
+        setTitle("");
+        setTopicImage(null);
+        setIsOpen(false);
+        onTopicCreated?.(newTopic);
+        onStatsRefresh?.();
+        // Redirecionar para a página do tópico criado
+        navigate(`/topic/${newTopic.id}`);
       } else {
-        let displayMessage = "Erro ao criar tópico";
-        try {
-          const errorData = await response.json();
-          console.error("Erro ao criar tópico:", errorData);
-
-          if (errorData?.message) {
-            displayMessage = errorData.message;
-          } else if (errorData?.error) {
-            displayMessage = errorData.error;
-          } else if (errorData?.errors && Array.isArray(errorData.errors)) {
-            displayMessage = errorData.errors.join(", ");
-          }
-        } catch (parseError) {
-          console.error("Error parsing error response:", parseError);
-          try {
-            const errorText = await response.text();
-            displayMessage =
-              errorText ||
-              `Erro HTTP ${response.status}: ${response.statusText}`;
-          } catch {
-            displayMessage = `Erro HTTP ${response.status}: ${response.statusText}`;
-          }
-        }
-
-        toast.error(displayMessage);
+        const errorData = await response.json();
+        toast.error(errorData.message || "Erro ao criar tópico");
       }
     } catch (error) {
       console.error("Error creating topic:", error);
-      console.error("Error type:", typeof error);
-      console.error("Error constructor:", error?.constructor?.name);
-
-      let errorMessage = "Erro ao criar tópico";
-
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      } else if (typeof error === "string") {
-        errorMessage = error;
-      } else if (error && typeof error === "object") {
-        // Better handling of error objects
-        if ("message" in error) {
-          errorMessage = String(error.message);
-        } else if ("error" in error) {
-          errorMessage = String(error.error);
-        } else {
-          // Convert error object to readable string
-          try {
-            errorMessage = JSON.stringify(error);
-          } catch {
-            errorMessage = "Erro desconhecido";
-          }
-        }
-      }
-
-      toast.error(errorMessage);
+      toast.error("Erro ao criar tópico");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
-
-  if (!user) {
-    return null;
-  }
-
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-black text-white hover:bg-black/90 font-medium">
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 16 16"
-            fill="currentColor"
-            className="mr-2"
-          >
-            <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM8 3a1 1 0 0 0-1 1v3H4a1 1 0 0 0 0 2h3v3a1 1 0 0 0 2 0V9h3a1 1 0 1 0 0-2H9V4a1 1 0 0 0-1-1z" />
-          </svg>
+        <Button className="bg-black text-white hover:bg-gray-800">
           Criar Tópico
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto bg-white border border-gray-200 shadow-lg">
+      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-gray-900 text-xl font-semibold">
-            Criar Novo Tópico em {currentCategory.name}
-          </DialogTitle>
+          <DialogTitle>Criar Novo Tópico em {currentCategory.name}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4 py-4">
-          <div className="space-y-2">
-            <div className="text-sm text-gray-700 bg-gray-50 p-3 rounded-lg border border-gray-200">
-              <strong className="text-gray-900">Categoria:</strong>{" "}
-              {currentCategory.name} - {currentCategory.description}
-            </div>
+
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="title">Título</Label>
+            <div className="flex items-center gap-3">
+               <button
+                 type="button"
+                 onClick={() => document.getElementById('topic-image-upload')?.click()}
+                 className="w-12 h-12 rounded-full border-2 border-dashed border-gray-300 hover:border-gray-400 flex items-center justify-center bg-gray-50 hover:bg-gray-100 transition-colors flex-shrink-0"
+               >
+                 {topicImage ? (
+                   <img 
+                     src={URL.createObjectURL(topicImage)} 
+                     alt="" 
+                     className="w-full h-full rounded-full object-cover" 
+                   />
+                 ) : (
+                   <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                   </svg>
+                 )}
+               </button>
+               <Input
+                 id="title"
+                 value={title}
+                 onChange={(e) => setTitle(e.target.value)}
+                 placeholder="Digite o título do tópico"
+                 maxLength={70}
+                 className="flex-1"
+               />
+               <input
+                 id="topic-image-upload"
+                 type="file"
+                 accept="image/*"
+                 onChange={(e) => setTopicImage(e.target.files?.[0] || null)}
+                 className="hidden"
+               />
+             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="title" className="text-gray-900 font-medium">
-              Título
-            </Label>
-            <Input
-              id="title"
-              placeholder="Digite o título do tópico"
-              value={formData.title}
-              onChange={(e) => handleInputChange("title", e.target.value)}
-              className="border-gray-300 focus:border-gray-500 focus:ring-gray-500 bg-white"
-              required
-              maxLength={70}
+          <div>
+            <Label className="mb-4 block">Conteúdo</Label>
+            <TopicCreate 
+              onSave={handleSave} 
+              onCancel={() => setIsOpen(false)}
+              image={topicImage}
+              onImageChange={setTopicImage}
             />
-            <p className="text-xs text-gray-500">
-              {formData.title.length}/70 caracteres
-            </p>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="avatar" className="text-gray-900 font-medium">
-              Avatar do Tópico (Opcional)
-            </Label>
-            <div className="flex items-center gap-4">
-              {avatarPreview ? (
-                <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-gray-300">
-                  <img
-                    src={avatarPreview}
-                    alt="Preview do avatar"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              ) : (
-                <div className="w-16 h-16 rounded-full bg-gray-200 border-2 border-gray-300 flex items-center justify-center">
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    className="text-gray-400"
-                  >
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                  </svg>
-                </div>
-              )}
-              <div className="flex-1">
-                <Input
-                  id="avatar"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleAvatarChange}
-                  className="border-gray-300 focus:border-gray-500 focus:ring-gray-500 bg-white"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Selecione uma imagem para o avatar do tópico. Será exibida em
-                  formato circular.
-                </p>
-              </div>
-            </div>
-          </div>
 
-          <div className="space-y-2">
-            <Label className="text-gray-900 font-medium">Conteúdo</Label>
-            <div className="border border-gray-300 rounded-md">
-              <style>{`
-                .topic-content-simulator {
-                  max-width: 896px; /* max-w-4xl */
-                  margin: 0 auto;
-                  padding: 0 24px; /* px-6 */
-                  box-sizing: border-box;
-                }
-
-                .topic-content-simulator .rich-editor {
-                  padding: 16px 0 !important;
-                  border: none !important;
-                  background: transparent !important;
-                  min-height: 150px !important;
-                  width: 100% !important;
-                  max-width: none !important;
-                  line-height: 1.6 !important;
-                  word-break: break-word !important;
-                  overflow-wrap: break-word !important;
-                  white-space: pre-wrap !important;
-                }
-
-                .topic-content-simulator .rich-editor * {
-                  max-width: none !important;
-                }
-              `}</style>
-              <div className="topic-content-simulator">
-                <EnhancedRichTextEditor
-                  value={formData.content}
-                  onChange={(value) => handleInputChange("content", value)}
-                  placeholder="Descreva seu tópico em detalhes... Use as ferramentas acima para formatar o texto, adicionar código, escolher cores e fazer upload de arquivos."
-                />
-              </div>
-            </div>
-            <p className="text-xs text-gray-500">
-              {formData.content.length} caracteres
-            </p>
-          </div>
-
-          <div className="flex justify-end gap-3 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setIsOpen(false)}
-              className="border-gray-300 text-gray-700 hover:bg-gray-50"
-            >
-              Cancelar
-            </Button>
-            <Button
-              type="submit"
-              className="bg-gray-900 text-white hover:bg-gray-800 font-medium"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Criando..." : "Criar Tópico"}
-            </Button>
-          </div>
-        </form>
+        </div>
       </DialogContent>
     </Dialog>
   );

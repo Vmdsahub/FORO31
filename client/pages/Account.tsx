@@ -11,7 +11,6 @@ import { toast } from "sonner";
 interface Topic {
   id: string;
   title: string;
-  description: string;
   category: string;
   createdAt: string;
   views: number;

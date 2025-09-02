@@ -5,17 +5,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import MarkdownRenderer from "@/components/MarkdownRenderer";
+import { TopicView as TopicViewComponent } from "@/components/TopicView";
+import TopicCreate from "@/components/TopicCreate";
 import SimpleCommentSystem from "@/components/SimpleCommentSystem";
 import UserPointsBadge from "@/components/UserPointsBadge";
 import UserHoverCard from "@/components/UserHoverCard";
 import ReportModal from "@/components/ReportModal";
-import EnhancedRichTextEditor from "@/components/EnhancedRichTextEditor";
 
 interface Topic {
   id: string;
   title: string;
-  description: string;
   author: string;
   authorId: string;
   authorAvatar: string;
@@ -43,7 +42,6 @@ export default function TopicView() {
   const [savedTopicIds, setSavedTopicIds] = useState<string[]>([]);
   const [showReportModal, setShowReportModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [editContent, setEditContent] = useState("");
   const [editTitle, setEditTitle] = useState("");
 
   useEffect(() => {
@@ -213,16 +211,22 @@ export default function TopicView() {
   const handleEditTopic = () => {
     if (!topic) return;
     setEditTitle(topic.title);
-    // Limpar conteúdo antes de editar para evitar HTML bugado
-    const cleanContent = topic.content
-      .replace(/data-edit-mode="[^"]*"/g, "")
-      .replace(/data-has-delete="[^"]*"/g, "");
-    setEditContent(cleanContent);
     setIsEditing(true);
   };
 
-  const handleSaveEdit = async () => {
-    if (!topic || !user) return;
+  const handleSaveEdit = async (delta: any) => {
+    // Validar se há conteúdo real no delta
+    const hasContent = delta && 
+      delta.ops && 
+      delta.ops.length > 0 && 
+      delta.ops.some((op: any) => op.insert && op.insert.trim && op.insert.trim().length > 0);
+
+    if (!topic || !user || !hasContent) {
+      if (!hasContent) {
+        toast.error("Adicione conteúdo ao tópico");
+      }
+      return;
+    }
 
     try {
       const response = await fetch(`/api/topics/${topic.id}`, {
@@ -234,7 +238,7 @@ export default function TopicView() {
         body: JSON.stringify({
           title: editTitle,
           description: topic.description,
-          content: editContent,
+          content: JSON.stringify(delta), // Salvar Delta como JSON
           category: topic.category,
         }),
       });
@@ -257,7 +261,6 @@ export default function TopicView() {
   const handleCancelEdit = () => {
     setIsEditing(false);
     setEditTitle("");
-    setEditContent("");
   };
 
   if (isLoading) {
@@ -341,22 +344,11 @@ export default function TopicView() {
           </div>
 
           {/* Topic Content */}
-          <div className="border-t border-gray-100 pt-4 mb-4">
+          <div className="border-t border-gray-100 pt-6 mb-4">
             {isEditing ? (
               <div className="space-y-4">
-                <EnhancedRichTextEditor
-                  value={editContent}
-                  onChange={setEditContent}
-                  placeholder="Conteúdo do tópico..."
-                  isEditMode={true}
-                />
+                <TopicCreate onSave={handleSaveEdit} />
                 <div className="flex items-center gap-3">
-                  <Button
-                    onClick={handleSaveEdit}
-                    className="bg-black text-white hover:bg-gray-800"
-                  >
-                    Salvar Edições
-                  </Button>
                   <Button
                     onClick={handleCancelEdit}
                     className="bg-black text-white hover:bg-gray-800"
@@ -366,7 +358,7 @@ export default function TopicView() {
                 </div>
               </div>
             ) : (
-              <MarkdownRenderer content={topic.content} />
+              <TopicViewComponent delta={topic.content ? JSON.parse(topic.content) : null} />
             )}
           </div>
 
