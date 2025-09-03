@@ -1,14 +1,14 @@
 export const modules = {
   toolbar: [
-    [{ size: ['small', false, 'large'] }],
-    ['bold', 'italic', 'underline', 'strike', { color: [] }, { background: [] }],
+    [{ size: [false, 'large'] }],
+    ['bold', 'italic', { color: [] }, { background: [] }],
     [{ list: 'ordered' }, { list: 'bullet' }, { align: [] }],
     ['link']
   ],
 };
 
 export const formats = [
-  'size', 'bold', 'italic', 'underline', 'strike',
+  'size', 'bold', 'italic',
   'color', 'background', 'list', 'bullet', 'align',
   'link'
 ];

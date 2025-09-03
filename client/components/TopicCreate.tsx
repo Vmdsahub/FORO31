@@ -8,9 +8,11 @@ interface TopicCreateProps {
   onCancel?: () => void;
   image?: File | null;
   onImageChange?: (image: File | null) => void;
+  hasError?: boolean;
+  onContentChange?: () => void;
 }
 
-export default function TopicCreate({ onSave, onCancel, image: externalImage, onImageChange }: TopicCreateProps) {
+export default function TopicCreate({ onSave, onCancel, image: externalImage, onImageChange, hasError, onContentChange }: TopicCreateProps) {
   const [delta, setDelta] = useState(null);
   const [image, setImage] = useState<File | null>(externalImage || null);
   const [characterCount, setCharacterCount] = useState(0);
@@ -25,6 +27,7 @@ export default function TopicCreate({ onSave, onCancel, image: externalImage, on
     if (count <= 5000) {
       setDelta(newDelta);
       setCharacterCount(count);
+      onContentChange?.();
     }
   };
 
@@ -35,7 +38,7 @@ export default function TopicCreate({ onSave, onCancel, image: externalImage, on
   };
 
   return (
-    <div className="topic-shell">
+    <div className={`topic-shell ${hasError ? 'error' : ''}`}>
       <input 
         ref={fileInputRef}
         type="file" 

@@ -50,6 +50,11 @@ export default function CreateTopicModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [title, setTitle] = useState("");
   const [topicImage, setTopicImage] = useState<File | null>(null);
+  const [errors, setErrors] = useState({
+    title: false,
+    content: false,
+    image: false
+  });
 
   const handleSave = async (data: { delta: any; image: File | null }) => {
     if (!user) {
@@ -63,8 +68,17 @@ export default function CreateTopicModal({
       data.delta.ops.length > 0 && 
       data.delta.ops.some((op: any) => op.insert && op.insert.trim && op.insert.trim().length > 0);
 
-    if (!title.trim() || !hasContent) {
-      toast.error("Preencha o título e o conteúdo");
+    // Verificar erros
+    const newErrors = {
+      title: !title.trim(),
+      content: !hasContent,
+      image: !topicImage // Validar se há imagem selecionada
+    };
+
+    setErrors(newErrors);
+
+    if (newErrors.title || newErrors.content || newErrors.image) {
+      toast.error("Preencha todos os campos obrigatórios");
       return;
     }
 
@@ -115,18 +129,18 @@ export default function CreateTopicModal({
           Criar Tópico
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto px-3 py-6">
+        <DialogHeader className="pb-4">
           <DialogTitle>Criar Novo Tópico em {currentCategory.name}</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-6">
           {/* Título com imagem circular ao lado - alinhado com as bordas do editor */}
-          <div className="max-w-[790px] mx-auto px-4 flex items-center gap-3">
+          <div className="max-w-[790px] mx-auto flex items-center gap-6">
             <button
               type="button"
               onClick={() => document.getElementById('topic-image-upload')?.click()}
-              className="w-12 h-12 rounded-full border-2 border-dashed border-gray-300 hover:border-gray-400 flex items-center justify-center bg-gray-50 hover:bg-gray-100 transition-colors flex-shrink-0"
+              className={`w-16 h-16 rounded-full border-2 border-dashed ${errors.image ? 'border-red-300 hover:border-red-400' : 'border-gray-300 hover:border-gray-400'} flex items-center justify-center ${errors.image ? 'bg-red-50 hover:bg-red-100' : 'bg-gray-50 hover:bg-gray-100'} transition-colors flex-shrink-0`}
             >
               {topicImage ? (
                 <img 
@@ -135,7 +149,7 @@ export default function CreateTopicModal({
                   className="w-full h-full rounded-full object-cover" 
                 />
               ) : (
-                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
               )}
@@ -143,10 +157,15 @@ export default function CreateTopicModal({
             <Input
               id="title"
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={(e) => {
+                setTitle(e.target.value);
+                if (errors.title && e.target.value.trim()) {
+                  setErrors(prev => ({ ...prev, title: false }));
+                }
+              }}
               placeholder="Digite o título do tópico"
               maxLength={70}
-              className="flex-1 text-base"
+              className={`flex-1 text-lg h-12 font-bold ${errors.title ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : ''}`}
             />
             <input
               id="topic-image-upload"
@@ -161,7 +180,18 @@ export default function CreateTopicModal({
             onSave={handleSave} 
             onCancel={() => setIsOpen(false)}
             image={topicImage}
-            onImageChange={setTopicImage}
+            onImageChange={(image) => {
+              setTopicImage(image);
+              if (errors.image && image) {
+                setErrors(prev => ({ ...prev, image: false }));
+              }
+            }}
+            hasError={errors.content}
+            onContentChange={() => {
+              if (errors.content) {
+                setErrors(prev => ({ ...prev, content: false }));
+              }
+            }}
           />
         </div>
       </DialogContent>

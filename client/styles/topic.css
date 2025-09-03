@@ -1,7 +1,7 @@
 .topic-shell {
   max-width: 790px;
   margin: 24px auto;
-  padding: 0 16px;
+  padding: 0;
 }
 
 /* Classe específica para visualização de tópicos postados */
@@ -20,8 +20,18 @@
 }
 
 .ql-toolbar {
-  border: none;
+  border: 1px solid #e2e8f0;
+  border-bottom: none;
   padding: 8px 0;
+  border-radius: 8px 8px 0 0;
+  background-color: #f8fafc;
+}
+
+.topic-shell .ql-container {
+  border: 1px solid #e2e8f0;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  min-height: 220px;
 }
 
 
@@ -50,6 +60,38 @@
 .topic-shell .ql-editor ul,
 .topic-shell .ql-editor ol {
   margin-bottom: 8px;
+  padding-left: 1.2em;
+  list-style-position: outside;
+}
+
+.topic-shell .ql-editor ol {
+  list-style-type: decimal;
+}
+
+.topic-shell .ql-editor ul {
+  list-style-type: disc;
+}
+
+.topic-shell .ql-editor li {
+  display: list-item;
+  margin-bottom: 4px;
+  padding-left: 0;
+  text-indent: -0.2em;
+  margin-left: 0.2em;
+}
+
+.topic-shell .ql-editor ol > li {
+  list-style-type: decimal;
+}
+
+.topic-shell .ql-editor ul > li {
+  list-style-type: disc;
+}
+
+.topic-shell .ql-editor li::marker {
+  font-weight: inherit;
+  font-size: inherit;
+  color: inherit;
 }
 
 .topic-shell .ql-editor blockquote {
@@ -58,4 +100,14 @@
   margin: 16px 0;
   font-style: italic;
   color: #64748b;
+}
+
+/* Estilos para estados de erro */
+.topic-shell.error .ql-toolbar {
+  border-color: #fca5a5;
+  background-color: #fef2f2;
+}
+
+.topic-shell.error .ql-container {
+  border-color: #fca5a5;
 }
