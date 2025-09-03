@@ -121,55 +121,48 @@ export default function CreateTopicModal({
         </DialogHeader>
 
         <div className="space-y-4">
-          <div>
-            <Label htmlFor="title">Título</Label>
-            <div className="flex items-center gap-3">
-               <button
-                 type="button"
-                 onClick={() => document.getElementById('topic-image-upload')?.click()}
-                 className="w-12 h-12 rounded-full border-2 border-dashed border-gray-300 hover:border-gray-400 flex items-center justify-center bg-gray-50 hover:bg-gray-100 transition-colors flex-shrink-0"
-               >
-                 {topicImage ? (
-                   <img 
-                     src={URL.createObjectURL(topicImage)} 
-                     alt="" 
-                     className="w-full h-full rounded-full object-cover" 
-                   />
-                 ) : (
-                   <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                   </svg>
-                 )}
-               </button>
-               <Input
-                 id="title"
-                 value={title}
-                 onChange={(e) => setTitle(e.target.value)}
-                 placeholder="Digite o título do tópico"
-                 maxLength={70}
-                 className="flex-1"
-               />
-               <input
-                 id="topic-image-upload"
-                 type="file"
-                 accept="image/*"
-                 onChange={(e) => setTopicImage(e.target.files?.[0] || null)}
-                 className="hidden"
-               />
-             </div>
-          </div>
-
-          <div>
-            <Label className="mb-4 block">Conteúdo</Label>
-            <TopicCreate 
-              onSave={handleSave} 
-              onCancel={() => setIsOpen(false)}
-              image={topicImage}
-              onImageChange={setTopicImage}
+          {/* Título com imagem circular ao lado - alinhado com as bordas do editor */}
+          <div className="max-w-[790px] mx-auto px-4 flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => document.getElementById('topic-image-upload')?.click()}
+              className="w-12 h-12 rounded-full border-2 border-dashed border-gray-300 hover:border-gray-400 flex items-center justify-center bg-gray-50 hover:bg-gray-100 transition-colors flex-shrink-0"
+            >
+              {topicImage ? (
+                <img 
+                  src={URL.createObjectURL(topicImage)} 
+                  alt="Preview" 
+                  className="w-full h-full rounded-full object-cover" 
+                />
+              ) : (
+                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+              )}
+            </button>
+            <Input
+              id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Digite o título do tópico"
+              maxLength={70}
+              className="flex-1 text-base"
+            />
+            <input
+              id="topic-image-upload"
+              type="file"
+              accept="image/*"
+              onChange={(e) => setTopicImage(e.target.files?.[0] || null)}
+              className="hidden"
             />
           </div>
 
-
+          <TopicCreate 
+            onSave={handleSave} 
+            onCancel={() => setIsOpen(false)}
+            image={topicImage}
+            onImageChange={setTopicImage}
+          />
         </div>
       </DialogContent>
     </Dialog>
