@@ -25,6 +25,97 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
     setModalImage({ src, alt, isVideo: false });
   };
 
+  // Criar thumbnail de vídeo com DOM
+  const createVideoThumbnail = (id: string, url: string, filename: string) => {
+    const videoId = `video_${id}`;
+    const decodedUrl = decodeURIComponent(url);
+    const decodedFilename = decodeURIComponent(filename);
+    
+    // Registrar handler globalmente
+    setTimeout(() => {
+      const element = document.getElementById(videoId);
+      if (element) {
+        element.onclick = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          handleVideoClick(decodedUrl, decodedFilename);
+        };
+        
+        // Adicionar eventos de hover
+        element.addEventListener('mouseenter', () => {
+          element.style.transform = 'scale(1.05)';
+          element.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+          const overlay = element.querySelector('.video-overlay') as HTMLElement;
+          if (overlay) overlay.style.background = 'rgba(0,0,0,0.5)';
+          const playBtn = element.querySelector('.play-button') as HTMLElement;
+          if (playBtn) playBtn.style.transform = 'scale(1.1)';
+        });
+        
+        element.addEventListener('mouseleave', () => {
+          element.style.transform = 'scale(1)';
+          element.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+          const overlay = element.querySelector('.video-overlay') as HTMLElement;
+          if (overlay) overlay.style.background = 'rgba(0,0,0,0.3)';
+          const playBtn = element.querySelector('.play-button') as HTMLElement;
+          if (playBtn) playBtn.style.transform = 'scale(1)';
+        });
+      }
+    }, 0);
+
+    return `
+      <div id="${videoId}" class="video-thumbnail-container" style="
+        position: relative;
+        display: inline-block;
+        width: 200px;
+        height: 150px;
+        margin: 8px 4px;
+        border-radius: 8px;
+        overflow: hidden;
+        cursor: pointer;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: all 0.2s ease;
+        background: #000;
+      ">
+        <video style="
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+        " preload="metadata" muted>
+          <source src="${decodedUrl}#t=1" type="video/mp4">
+        </video>
+        <div class="video-overlay" style="
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: rgba(0,0,0,0.3);
+          transition: background 0.2s ease;
+        ">
+          <div class="play-button" style="
+            width: 48px;
+            height: 48px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+          ">
+            <svg width="20" height="20" viewBox="0 0 24 24" style="margin-left: 2px;">
+              <path d="M8 5v14l11-7z" fill="#000"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    `;
+  };
+
   // Process content and add click handlers
   const processContent = () => {
     // First clean any edit-mode attributes from content
@@ -61,35 +152,20 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
       },
     );
 
-    // Replace video patterns with clickable video previews
+    // Replace video patterns with clickable video previews (old format)
     processedContent = processedContent.replace(
       /\[Vídeo: (.*?)\]\((.*?)\)/g,
       (match, name, src) => {
-        const videoId = `video_${Math.random().toString(36).substr(2, 9)}`;
-        // Store handler in a global registry
-        setTimeout(() => {
-          const element = document.getElementById(videoId);
-          if (element) {
-            element.onclick = (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              handleVideoClick(src, name);
-            };
-          }
-        }, 0);
+        const videoId = Math.random().toString(36).substr(2, 9);
+        return createVideoThumbnail(videoId, src, name);
+      },
+    );
 
-        return `
-          <div id="${videoId}" class="video-preview" style="position: relative; max-width: 240px; width: 240px; height: 180px; border-radius: 8px; border: 1px solid #e5e7eb; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin: 0 4px 4px 0; display: inline-block; vertical-align: top; background: #000; cursor: pointer; overflow: hidden;">
-            <video style="width: 100%; height: 100%; object-fit: cover; display: block;" muted preload="metadata">
-              <source src="${src}" type="video/mp4">
-            </video>
-            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center;">
-              <svg width="48" height="48" viewBox="0 0 24 24" style="filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));">
-                <path d="M8 5v14l11-7z" fill="rgba(255,255,255,0.9)"/>
-              </svg>
-            </div>
-          </div>
-        `;
+    // Replace new video placeholder format: [VIDEO:id:url:filename]
+    processedContent = processedContent.replace(
+      /\[VIDEO:([^:]+):([^:]+):([^\]]+)\]/g,
+      (match, id, url, filename) => {
+        return createVideoThumbnail(id, url, filename);
       },
     );
 
@@ -101,27 +177,24 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
     setModalImage(null);
   };
 
-  // Setup global function if not exists (avoid conflicts)
+  // Setup global function for image modal
   useEffect(() => {
-    // Only set if not already defined to avoid conflicts with RichTextEditor
-    if (!(window as any).openImageModal) {
-      (window as any).openImageModal = (
-        src: string,
-        alt: string,
-        isVideo: boolean,
-      ) => {
-        setModalImage({ src, alt, isVideo });
-      };
-    }
+    (window as any).openImageModal = (
+      src: string,
+      alt: string,
+      isVideo: boolean,
+    ) => {
+      setModalImage({ src, alt, isVideo });
+    };
+
+    // Setup global function for video modal
+    (window as any).openVideoModal = (src: string, alt: string) => {
+      setModalImage({ src, alt, isVideo: true });
+    };
 
     return () => {
-      // Only clean up if we were the ones who set it
-      if (
-        (window as any).openImageModal &&
-        !document.querySelector(".rich-editor")
-      ) {
-        delete (window as any).openImageModal;
-      }
+      delete (window as any).openImageModal;
+      delete (window as any).openVideoModal;
     };
   }, []);
 

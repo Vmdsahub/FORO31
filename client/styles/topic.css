@@ -111,3 +111,20 @@
 .topic-shell.error .ql-container {
   border-color: #fca5a5;
 }
+
+/* Estilos para imagens no ReactQuill - miniaturas */
+.topic-shell .ql-editor img {
+  max-width: 200px;
+  max-height: 150px;
+  width: auto;
+  height: auto;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.topic-shell .ql-editor img:hover {
+  transform: scale(1.05);
+  border-color: #3b82f6;
+}

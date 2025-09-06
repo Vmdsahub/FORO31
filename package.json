@@ -113,5 +113,8 @@
     "vaul": "^0.9.3",
     "vite": "^6.2.2",
     "vitest": "^3.1.4"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-win32-x64-msvc": "^4.50.0"
   }
 }

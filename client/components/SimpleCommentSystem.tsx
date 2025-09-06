@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
 import UserHoverCard from "@/components/UserHoverCard";
 import ReportModal from "@/components/ReportModal";
+import SecureUploadWidget, { UploadedFileInfo } from "./SecureUploadWidget";
 
 interface Comment {
   id: string;
@@ -562,9 +563,27 @@ export default function SimpleCommentSystem({
               className="min-h-[100px]"
             />
             <div className="flex items-center justify-between mt-3">
-              <span className="text-xs text-gray-500">
-                Editor rico - suporte a imagens, vídeos, formatação e Markdown
-              </span>
+              <div className="flex items-center gap-2">
+                <SecureUploadWidget
+                   onSuccess={(fileInfo: UploadedFileInfo) => {
+                     console.log('Arquivo carregado no comentário:', fileInfo);
+                     // Inserir link do arquivo no comentário de forma mais elegante
+                     if (fileInfo.isImage) {
+                       const imageMarkdown = `\n![${fileInfo.originalName}](${fileInfo.url})\n`;
+                       setNewComment(prev => prev + imageMarkdown);
+                     } else {
+                       const linkMarkdown = `\n[📎 ${fileInfo.originalName}](${fileInfo.url})\n`;
+                       setNewComment(prev => prev + linkMarkdown);
+                     }
+                   }}
+                  onError={(error) => console.error('Erro no upload:', error)}
+                  buttonText="📎 Upload"
+                  className="mr-2"
+                />
+                <span className="text-xs text-gray-500">
+                  Editor rico - suporte a imagens, vídeos, formatação e Markdown
+                </span>
+              </div>
               <Button
                 type="submit"
                 disabled={

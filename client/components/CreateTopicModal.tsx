@@ -62,23 +62,37 @@ export default function CreateTopicModal({
       return;
     }
 
-    // Validar se há conteúdo real no delta
+    // Validar se há conteúdo real no delta (texto, imagens ou vídeos)
     const hasContent = data.delta && 
       data.delta.ops && 
       data.delta.ops.length > 0 && 
-      data.delta.ops.some((op: any) => op.insert && op.insert.trim && op.insert.trim().length > 0);
+      data.delta.ops.some((op: any) => {
+        // Verificar se há texto
+        if (op.insert && typeof op.insert === 'string' && op.insert.trim().length > 0) {
+          return true;
+        }
+        // Verificar se há imagens
+        if (op.insert && typeof op.insert === 'object' && op.insert.image) {
+          return true;
+        }
+        // Verificar se há vídeos
+        if (op.insert && typeof op.insert === 'object' && op.insert.video) {
+          return true;
+        }
+        return false;
+      });
 
     // Verificar erros
     const newErrors = {
       title: !title.trim(),
       content: !hasContent,
-      image: !topicImage // Validar se há imagem selecionada
+      image: false // Imagem não é mais obrigatória
     };
 
     setErrors(newErrors);
 
-    if (newErrors.title || newErrors.content || newErrors.image) {
-      toast.error("Preencha todos os campos obrigatórios");
+    if (newErrors.title || newErrors.content) {
+      toast.error("Preencha o título e adicione conteúdo (texto, imagem ou vídeo)");
       return;
     }
 
@@ -140,7 +154,7 @@ export default function CreateTopicModal({
             <button
               type="button"
               onClick={() => document.getElementById('topic-image-upload')?.click()}
-              className={`w-16 h-16 rounded-full border-2 border-dashed ${errors.image ? 'border-red-300 hover:border-red-400' : 'border-gray-300 hover:border-gray-400'} flex items-center justify-center ${errors.image ? 'bg-red-50 hover:bg-red-100' : 'bg-gray-50 hover:bg-gray-100'} transition-colors flex-shrink-0`}
+              className="w-16 h-16 rounded-full border-2 border-dashed border-gray-300 hover:border-gray-400 flex items-center justify-center bg-gray-50 hover:bg-gray-100 transition-colors flex-shrink-0"
             >
               {topicImage ? (
                 <img 
@@ -182,9 +196,6 @@ export default function CreateTopicModal({
             image={topicImage}
             onImageChange={(image) => {
               setTopicImage(image);
-              if (errors.image && image) {
-                setErrors(prev => ({ ...prev, image: false }));
-              }
             }}
             hasError={errors.content}
             onContentChange={() => {
