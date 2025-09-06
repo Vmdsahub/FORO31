@@ -39,7 +39,7 @@ interface SecurityWarning {
   quarantined: boolean;
 }
 
-export default function SecureUploadWidget({
+const SecureUploadWidget = React.forwardRef<HTMLButtonElement, SecureUploadWidgetProps>(function SecureUploadWidget({
   onSuccess,
   onError,
   accept = ".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.zip,.rar,.mp4,.mp3,.txt,.csv",
@@ -47,7 +47,7 @@ export default function SecureUploadWidget({
   className = "",
   buttonText = "Upload Seguro",
   icon,
-}: SecureUploadWidgetProps) {
+}, ref) {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [securityWarning, setSecurityWarning] = useState<SecurityWarning>({
@@ -204,6 +204,7 @@ export default function SecureUploadWidget({
   return (
     <>
       <Button
+        ref={ref}
         type="button"
         variant="outline"
         size="sm"
@@ -330,7 +331,9 @@ export default function SecureUploadWidget({
       </AlertDialog>
     </>
   );
-}
+});
+
+export default SecureUploadWidget;
 
 // Export helper functions
 export const formatFileSize = (bytes: number): string => {

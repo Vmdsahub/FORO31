@@ -27,6 +27,36 @@
   background-color: #f8fafc;
 }
 
+/* Estilo para o botão de upload customizado na toolbar */
+.ql-toolbar .ql-upload {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: 3px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #374151;
+  transition: all 0.2s ease;
+}
+
+.ql-toolbar .ql-upload:hover {
+  background-color: #e5e7eb;
+  color: #1f2937;
+}
+
+.ql-toolbar .ql-upload:active {
+  background-color: #d1d5db;
+}
+
+.ql-toolbar .ql-upload::before {
+  content: "📎";
+  font-size: 14px;
+  line-height: 1;
+}
+
 .topic-shell .ql-container {
   border: 1px solid #e2e8f0;
   border-top: none;

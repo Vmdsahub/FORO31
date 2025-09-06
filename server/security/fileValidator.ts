@@ -153,7 +153,11 @@ export class AdvancedFileValidator {
             (detectedType.mime.includes("zip") ||
               detectedType.mime === "application/octet-stream");
 
-          if (!isImageMismatch && !isZipMismatch) {
+          // Be more permissive with video files (MP4 can have different MIME types)
+          const isVideoMismatch =
+            this.isVideoFile(fileExt) && detectedType.mime.startsWith("video/");
+
+          if (!isImageMismatch && !isZipMismatch && !isVideoMismatch) {
             result.isValid = false;
             result.reasons.push(
               `MIME type mismatch: expected ${expectedMimeForExt}, got ${detectedType.mime}`,
@@ -447,6 +451,11 @@ export class AdvancedFileValidator {
     };
 
     return mimeTypes[ext.toLowerCase()] || null;
+  }
+
+  private isVideoFile(ext: string): boolean {
+    const videoExtensions = [".mp4", ".webm", ".mov", ".avi", ".wmv"];
+    return videoExtensions.includes(ext.toLowerCase());
   }
 
   // Method to get quarantine stats
