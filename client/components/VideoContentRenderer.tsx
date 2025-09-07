@@ -64,7 +64,7 @@ const VideoContentRenderer: React.FC<VideoContentRendererProps> = ({ content, cl
         } else if (part.type === 'video') {
           // Renderizar componente de vídeo
           return (
-            <div key={part.id} className="my-4">
+            <div key={part.id}>
               <VideoThumbnail
                 videoUrl={part.url}
                 fileName={part.filename}

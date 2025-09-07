@@ -370,7 +370,7 @@
     display: inline-block;
     width: 200px;
     height: 150px;
-    margin: 8px 4px;
+    margin: 4px !important;
     border-radius: 8px;
     overflow: hidden;
     cursor: pointer;
@@ -391,6 +391,7 @@
     padding: 0 !important;
     line-height: 0 !important;
     display: inline-block !important;
+    vertical-align: top !important;
   }
 
   .ql-video-embed p {
@@ -405,6 +406,18 @@
     padding: 0 !important;
   }
 
+  /* Forçar comportamento inline para containers de vídeo */
+  .prose .ql-video-embed,
+  .text-gray-700 .ql-video-embed,
+  .leading-relaxed .ql-video-embed,
+  .prose .video-thumbnail-container,
+  .text-gray-700 .video-thumbnail-container,
+  .leading-relaxed .video-thumbnail-container {
+    display: inline-block !important;
+    vertical-align: top !important;
+    line-height: 0 !important;
+  }
+
   /* Preserve line breaks in rendered content */
   .prose br,
   .text-gray-700 br,
@@ -415,16 +428,16 @@
   }
 
   /* Ensure divs create proper spacing */
-  .prose div,
-  .text-gray-700 div,
-  .leading-relaxed div {
+  .prose div:not(.ql-video-embed):not(.video-thumbnail-container),
+  .text-gray-700 div:not(.ql-video-embed):not(.video-thumbnail-container),
+  .leading-relaxed div:not(.ql-video-embed):not(.video-thumbnail-container) {
     display: block !important;
   }
 
   /* Better spacing for line breaks in content */
-  .prose div + div:empty,
-  .text-gray-700 div + div:empty,
-  .leading-relaxed div + div:empty {
+  .prose div + div:empty:not(.ql-video-embed):not(.video-thumbnail-container),
+  .text-gray-700 div + div:empty:not(.ql-video-embed):not(.video-thumbnail-container),
+  .leading-relaxed div + div:empty:not(.ql-video-embed):not(.video-thumbnail-container) {
     height: 1.2em !important;
     margin: 0 !important;
   }

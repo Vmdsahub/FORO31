@@ -11,15 +11,15 @@ class VideoBlot extends BlockEmbed {
     node.setAttribute('data-video-url', url);
     node.setAttribute('data-video-filename', filename);
     
-    // Criar container principal
-    const container = document.createElement('div');
-    container.className = 'video-thumbnail-container';
-    container.style.cssText = `
+    // Aplicar estilos diretamente no node (sem container wrapper)
+    node.className = 'video-thumbnail-container';
+    node.style.cssText = `
       position: relative;
       display: inline-block;
+      vertical-align: top;
       width: 200px;
       height: 150px;
-      margin: 8px 4px;
+      margin: 0 8px 8px 0;
       border-radius: 8px;
       overflow: hidden;
       cursor: pointer;
@@ -27,6 +27,7 @@ class VideoBlot extends BlockEmbed {
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       transition: all 0.2s ease;
       background: #000;
+      line-height: 0;
     `;
     
     // Criar elemento de vídeo para thumbnail
@@ -84,28 +85,27 @@ class VideoBlot extends BlockEmbed {
     playButton.appendChild(playIcon);
     overlay.appendChild(playButton);
     
-    // Montar estrutura
-    container.appendChild(video);
-    container.appendChild(overlay);
-    node.appendChild(container);
+    // Montar estrutura diretamente no node
+    node.appendChild(video);
+    node.appendChild(overlay);
     
     // Adicionar eventos de hover
-    container.addEventListener('mouseenter', () => {
-      container.style.transform = 'scale(1.05)';
-      container.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+    node.addEventListener('mouseenter', () => {
+      node.style.transform = 'scale(1.05)';
+      node.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
       overlay.style.background = 'rgba(0,0,0,0.5)';
       playButton.style.transform = 'scale(1.1)';
     });
     
-    container.addEventListener('mouseleave', () => {
-      container.style.transform = 'scale(1)';
-      container.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+    node.addEventListener('mouseleave', () => {
+      node.style.transform = 'scale(1)';
+      node.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
       overlay.style.background = 'rgba(0,0,0,0.3)';
       playButton.style.transform = 'scale(1)';
     });
     
     // Adicionar evento de clique
-    container.addEventListener('click', (e) => {
+    node.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
       
