@@ -142,19 +142,74 @@
   border-color: #fca5a5;
 }
 
-/* Estilos para imagens no ReactQuill - miniaturas */
-.topic-shell .ql-editor img {
-  max-width: 200px;
-  max-height: 150px;
-  width: auto;
-  height: auto;
+/* ===== SISTEMA DE MÍDIA REFATORADO ===== */
+
+/* 1. CONFIGURAÇÃO BÁSICA - Mídia fica lado a lado */
+.topic-shell .ql-editor img,
+.topic-shell .ql-editor .ql-video-embed,
+.topic-shell .ql-editor .video-thumbnail-container {
+  display: inline-block !important;
+  vertical-align: top;
+  margin: 4px;
   border-radius: 8px;
   border: 1px solid #e2e8f0;
-  cursor: pointer;
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
-.topic-shell .ql-editor img:hover {
-  transform: scale(1.05);
+/* 2. ALTURA FIXA PARA CONSISTÊNCIA VISUAL */
+.topic-shell .ql-editor img {
+  height: 150px !important;
+  width: auto !important;
+  object-fit: cover;
+}
+
+.topic-shell .ql-editor .ql-video-embed,
+.topic-shell .ql-editor .video-thumbnail-container {
+  width: 200px;
+  height: 150px;
+  overflow: hidden;
+}
+
+.topic-shell .ql-editor .ql-video-embed iframe,
+.topic-shell .ql-editor .video-thumbnail-container img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+}
+
+/* 3. QUEBRA DE LINHA APÓS MÍDIA APENAS QUANDO SEGUIDA POR TEXTO */
+.topic-shell .ql-editor img + p,
+.topic-shell .ql-editor img + div:not(.ql-video-embed):not(.video-thumbnail-container),
+.topic-shell .ql-editor .ql-video-embed + p,
+.topic-shell .ql-editor .ql-video-embed + div:not(.ql-video-embed):not(.video-thumbnail-container),
+.topic-shell .ql-editor .video-thumbnail-container + p,
+.topic-shell .ql-editor .video-thumbnail-container + div:not(.ql-video-embed):not(.video-thumbnail-container) {
+  display: block !important;
+  clear: both;
+  margin-top: 12px !important;
+}
+
+/* 4. GARANTIR QUE TEXTO SEJA SEMPRE BLOCO */
+.topic-shell .ql-editor p {
+  display: block !important;
+  width: 100% !important;
+  clear: both;
+}
+
+/* 5. EFEITOS VISUAIS */
+.topic-shell .ql-editor img:hover,
+.topic-shell .ql-editor .video-thumbnail-container:hover {
+  transform: scale(1.02);
   border-color: #3b82f6;
+}
+
+.topic-shell .ql-editor .video-thumbnail-container {
+  cursor: pointer;
+}
+
+/* 6. LIMPEZA DE LAYOUT */
+.topic-shell .ql-editor::after {
+  content: "";
+  display: table;
+  clear: both;
 }

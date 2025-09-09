@@ -22,7 +22,7 @@ export default function TopicCreate({ onSave, onCancel, image: externalImage, on
   const quillRef = useRef<ReactQuill>(null);
   const uploadWidgetRef = useRef<HTMLButtonElement>(null);
 
-  // Escutar evento customizado da toolbar
+  // Escutar evento customizado da toolbar e configurar observer de imagens
   useEffect(() => {
     const handleUploadClick = (event: CustomEvent) => {
       // Acionar o SecureUploadWidget quando o botão da toolbar for clicado

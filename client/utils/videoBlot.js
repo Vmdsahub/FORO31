@@ -1,8 +1,8 @@
 import { Quill } from 'react-quill';
 
-const BlockEmbed = Quill.import('blots/block/embed');
+const Embed = Quill.import('blots/embed');
 
-class VideoBlot extends BlockEmbed {
+class VideoBlot extends Embed {
   static create(value) {
     const node = super.create();
     const { id, url, filename } = value;
@@ -19,7 +19,7 @@ class VideoBlot extends BlockEmbed {
       vertical-align: top;
       width: 200px;
       height: 150px;
-      margin: 0 8px 8px 0;
+      margin: 4px;
       border-radius: 8px;
       overflow: hidden;
       cursor: pointer;
@@ -89,6 +89,15 @@ class VideoBlot extends BlockEmbed {
     node.appendChild(video);
     node.appendChild(overlay);
     
+    // Adicionar quebra de linha após o vídeo
+    const lineBreak = document.createElement('br');
+    lineBreak.className = 'video-line-break';
+    lineBreak.style.display = 'block';
+    lineBreak.style.width = '100%';
+    lineBreak.style.height = '1px';
+    lineBreak.style.clear = 'both';
+    node.appendChild(lineBreak);
+    
     // Adicionar eventos de hover
     node.addEventListener('mouseenter', () => {
       node.style.transform = 'scale(1.05)';
@@ -139,7 +148,7 @@ class VideoBlot extends BlockEmbed {
 }
 
 VideoBlot.blotName = 'video';
-VideoBlot.tagName = 'div';
+VideoBlot.tagName = 'span';
 VideoBlot.className = 'ql-video-embed';
 
 export default VideoBlot;
