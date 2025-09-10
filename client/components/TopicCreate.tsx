@@ -192,20 +192,33 @@ export default function TopicCreate({ onSave, onCancel, image: externalImage, on
                   const isVideo = fileInfo.mimeType?.startsWith('video/') || 
                                  /\.(mp4|webm|ogg|avi|mov|wmv|flv|mkv)$/i.test(fileInfo.originalName);
                   
+                  // Verificar se há texto na linha atual antes de inserir mídia
+                  const currentLine = quill.getLine(index);
+                  const lineText = currentLine && currentLine[0] ? currentLine[0].domNode.textContent : '';
+                  const hasTextInLine = lineText && lineText.trim().length > 0;
+                  
+                  let insertIndex = index;
+                  
+                  // Se há texto na linha atual, inserir quebra de linha antes da mídia
+                  if (hasTextInLine) {
+                    quill.insertText(index, '\n');
+                    insertIndex = index + 1;
+                  }
+                  
                   if (fileInfo.isImage) {
-                    quill.insertEmbed(index, 'image', fileInfo.url);
+                    quill.insertEmbed(insertIndex, 'image', fileInfo.url);
                   } else if (isVideo) {
                     // Para vídeos, inserir usando o blot customizado
                     const videoId = `video-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-                    quill.insertEmbed(index, 'video', {
+                    quill.insertEmbed(insertIndex, 'video', {
                       id: videoId,
                       url: fileInfo.url,
                       filename: fileInfo.originalName
                     });
                   } else {
-                    quill.insertText(index, `📎 `);
-                    quill.insertText(index + 2, fileInfo.originalName, 'link', fileInfo.url);
-                    quill.insertText(index + 2 + fileInfo.originalName.length, `\n`);
+                    quill.insertText(insertIndex, `📎 `);
+                    quill.insertText(insertIndex + 2, fileInfo.originalName, 'link', fileInfo.url);
+                    quill.insertText(insertIndex + 2 + fileInfo.originalName.length, `\n`);
                   }
                   
                   // Atualizar o delta corretamente

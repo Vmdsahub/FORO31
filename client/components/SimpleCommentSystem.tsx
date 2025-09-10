@@ -157,17 +157,47 @@ function CommentItem({
                 placeholder="Editar comentário..."
                 className="min-h-[100px]"
               />
-              <div className="flex items-center gap-2">
-                <Button
-                  onClick={handleSaveEdit}
-                  size="sm"
-                  className="bg-green-600 hover:bg-green-700"
-                >
-                  Salvar
-                </Button>
-                <Button onClick={handleCancelEdit} size="sm" variant="outline">
-                  Cancelar
-                </Button>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <SecureUploadWidget
+                    onSuccess={(fileInfo: UploadedFileInfo) => {
+                      console.log('Arquivo carregado na edição:', fileInfo);
+                      // Inserir link do arquivo no comentário em edição
+                      setEditContent(prev => {
+                        // Verificar se há texto na linha atual
+                        const lines = prev.split('\n');
+                        const lastLine = lines[lines.length - 1];
+                        const hasTextInLastLine = lastLine && lastLine.trim().length > 0;
+                        
+                        if (fileInfo.isImage) {
+                          const imageMarkdown = `![${fileInfo.originalName}](${fileInfo.url})`;
+                          // Se há texto na linha atual, adicionar quebra antes da imagem
+                          return hasTextInLastLine ? prev + '\n' + imageMarkdown + '\n' : prev + imageMarkdown + '\n';
+                        } else {
+                          const linkMarkdown = `[📎 ${fileInfo.originalName}](${fileInfo.url})`;
+                          // Se há texto na linha atual, adicionar quebra antes do link
+                          return hasTextInLastLine ? prev + '\n' + linkMarkdown + '\n' : prev + linkMarkdown + '\n';
+                        }
+                      });
+                    }}
+                    onError={(error) => console.error('Erro no upload:', error)}
+                    buttonText="📎"
+                    className="mr-2"
+                  />
+                  <span className="text-xs text-gray-500">Upload de mídia</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    onClick={handleSaveEdit}
+                    size="sm"
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    Salvar
+                  </Button>
+                  <Button onClick={handleCancelEdit} size="sm" variant="outline">
+                    Cancelar
+                  </Button>
+                </div>
               </div>
             </div>
           ) : (
@@ -568,13 +598,22 @@ export default function SimpleCommentSystem({
                    onSuccess={(fileInfo: UploadedFileInfo) => {
                      console.log('Arquivo carregado no comentário:', fileInfo);
                      // Inserir link do arquivo no comentário de forma mais elegante
-                     if (fileInfo.isImage) {
-                       const imageMarkdown = `\n![${fileInfo.originalName}](${fileInfo.url})\n`;
-                       setNewComment(prev => prev + imageMarkdown);
-                     } else {
-                       const linkMarkdown = `\n[📎 ${fileInfo.originalName}](${fileInfo.url})\n`;
-                       setNewComment(prev => prev + linkMarkdown);
-                     }
+                     setNewComment(prev => {
+                       // Verificar se há texto na linha atual
+                       const lines = prev.split('\n');
+                       const lastLine = lines[lines.length - 1];
+                       const hasTextInLastLine = lastLine && lastLine.trim().length > 0;
+                       
+                       if (fileInfo.isImage) {
+                         const imageMarkdown = `![${fileInfo.originalName}](${fileInfo.url})`;
+                         // Se há texto na linha atual, adicionar quebra antes da imagem
+                         return hasTextInLastLine ? prev + '\n' + imageMarkdown + '\n' : prev + imageMarkdown + '\n';
+                       } else {
+                         const linkMarkdown = `[📎 ${fileInfo.originalName}](${fileInfo.url})`;
+                         // Se há texto na linha atual, adicionar quebra antes do link
+                         return hasTextInLastLine ? prev + '\n' + linkMarkdown + '\n' : prev + linkMarkdown + '\n';
+                       }
+                     });
                    }}
                   onError={(error) => console.error('Erro no upload:', error)}
                   buttonText="📎 Upload"
