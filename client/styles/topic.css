@@ -144,16 +144,28 @@
 
 /* ===== SISTEMA DE MÍDIA REFATORADO ===== */
 
-/* 1. CONFIGURAÇÃO BÁSICA - Mídia fica lado a lado */
+/* 1. CONFIGURAÇÃO BÁSICA - Container para centralização automática */
+.topic-shell .ql-editor p:has(img),
+.topic-shell .ql-editor p:has(.ql-video-embed),
+.topic-shell .ql-editor p:has(.video-thumbnail-container) {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+  margin: 12px 0 !important;
+}
+
+/* Mídia individual */
 .topic-shell .ql-editor img,
 .topic-shell .ql-editor .ql-video-embed,
 .topic-shell .ql-editor .video-thumbnail-container {
-  display: inline-block !important;
-  vertical-align: top;
-  margin: 4px;
+  display: block !important;
+  margin: 0 !important;
   border-radius: 8px;
   border: 1px solid #e2e8f0;
   transition: transform 0.2s ease, border-color 0.2s ease;
+  flex-shrink: 0;
 }
 
 /* 2. ALTURA FIXA PARA CONSISTÊNCIA VISUAL */
@@ -178,22 +190,16 @@
 }
 
 /* 3. QUEBRA DE LINHA APÓS MÍDIA APENAS QUANDO SEGUIDA POR TEXTO */
-.topic-shell .ql-editor img + p,
-.topic-shell .ql-editor img + div:not(.ql-video-embed):not(.video-thumbnail-container),
-.topic-shell .ql-editor .ql-video-embed + p,
-.topic-shell .ql-editor .ql-video-embed + div:not(.ql-video-embed):not(.video-thumbnail-container),
-.topic-shell .ql-editor .video-thumbnail-container + p,
-.topic-shell .ql-editor .video-thumbnail-container + div:not(.ql-video-embed):not(.video-thumbnail-container) {
-  display: block !important;
-  clear: both;
+.topic-shell .ql-editor p:has(img) + p:not(:has(img)):not(:has(.ql-video-embed)):not(:has(.video-thumbnail-container)),
+.topic-shell .ql-editor p:has(.ql-video-embed) + p:not(:has(img)):not(:has(.ql-video-embed)):not(:has(.video-thumbnail-container)),
+.topic-shell .ql-editor p:has(.video-thumbnail-container) + p:not(:has(img)):not(:has(.ql-video-embed)):not(:has(.video-thumbnail-container)) {
   margin-top: 12px !important;
 }
 
-/* 4. GARANTIR QUE TEXTO SEJA SEMPRE BLOCO */
-.topic-shell .ql-editor p {
+/* 4. GARANTIR QUE TEXTO SEJA SEMPRE BLOCO (exceto containers de mídia) */
+.topic-shell .ql-editor p:not(:has(img)):not(:has(.ql-video-embed)):not(:has(.video-thumbnail-container)) {
   display: block !important;
   width: 100% !important;
-  clear: both;
 }
 
 /* 5. EFEITOS VISUAIS */
@@ -214,7 +220,7 @@
   clear: both;
 }
 
-/* 7. SISTEMA ANTI-TEXTO EM PARÁGRAFOS COM MÍDIA */
+/* 7. SISTEMA DE INTERAÇÃO COM MÍDIA CENTRALIZADA */
 .topic-shell .ql-editor p:has(img),
 .topic-shell .ql-editor p:has(.ql-video-embed),
 .topic-shell .ql-editor p:has(.video-thumbnail-container) {
@@ -236,11 +242,26 @@
   -ms-user-select: auto;
 }
 
-/* Garantir que parágrafos após mídia sejam editáveis */
+/* Garantir que parágrafos de texto sejam editáveis */
 .topic-shell .ql-editor p:not(:has(img)):not(:has(.ql-video-embed)):not(:has(.video-thumbnail-container)) {
   pointer-events: auto;
   user-select: text;
   -webkit-user-select: text;
   -moz-user-select: text;
   -ms-user-select: text;
+}
+
+/* 8. RESPONSIVIDADE PARA MÚLTIPLAS MÍDIAS */
+@media (max-width: 768px) {
+  .topic-shell .ql-editor p:has(img),
+  .topic-shell .ql-editor p:has(.ql-video-embed),
+  .topic-shell .ql-editor p:has(.video-thumbnail-container) {
+    flex-direction: column !important;
+  }
+  
+  .topic-shell .ql-editor img,
+  .topic-shell .ql-editor .ql-video-embed,
+  .topic-shell .ql-editor .video-thumbnail-container {
+    max-width: 100% !important;
+  }
 }
