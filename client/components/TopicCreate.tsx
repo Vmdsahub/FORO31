@@ -38,6 +38,104 @@ export default function TopicCreate({ onSave, onCancel, image: externalImage, on
     };
   }, []);
 
+  // Sistema para impedir texto em parágrafos com mídia
+  useEffect(() => {
+    if (!quillRef.current) return;
+
+    const quill = quillRef.current.getEditor();
+    
+    const preventTextInMediaParagraphs = () => {
+      const editor = quill.container.querySelector('.ql-editor');
+      if (!editor) return;
+
+      // Interceptar eventos de teclado
+      const handleKeyDown = (e: KeyboardEvent) => {
+        const selection = quill.getSelection();
+        if (!selection) return;
+
+        const [blot] = quill.getLeaf(selection.index);
+        if (!blot || !blot.domNode) return;
+
+        const paragraph = blot.domNode.closest('p');
+        if (!paragraph) return;
+
+        const hasMedia = paragraph.querySelector('img, .ql-video-embed, .video-thumbnail-container');
+        
+        if (hasMedia && e.key.length === 1) {
+          // Impedir digitação de caracteres
+          e.preventDefault();
+          
+          // Criar ou encontrar parágrafo vazio após a mídia
+          let nextP = paragraph.nextElementSibling as HTMLElement;
+          
+          if (!nextP || nextP.tagName !== 'P') {
+            // Inserir novo parágrafo via Quill para manter consistência
+            const paragraphIndex = quill.getIndex(blot);
+            const paragraphLength = quill.getLength(paragraph);
+            quill.insertText(paragraphIndex + paragraphLength, '\n');
+            nextP = paragraph.nextElementSibling as HTMLElement;
+          }
+          
+          // Mover cursor e inserir o caractere no novo parágrafo
+          if (nextP) {
+            const nextIndex = quill.getIndex(quill.getLeaf(quill.getLength() - 1)[0]);
+            quill.setSelection(nextIndex);
+            quill.insertText(nextIndex, e.key);
+          }
+        }
+      };
+
+      // Interceptar tentativas de colar
+      const handlePaste = (e: ClipboardEvent) => {
+        const selection = quill.getSelection();
+        if (!selection) return;
+
+        const [blot] = quill.getLeaf(selection.index);
+        if (!blot || !blot.domNode) return;
+
+        const paragraph = blot.domNode.closest('p');
+        if (!paragraph) return;
+
+        const hasMedia = paragraph.querySelector('img, .ql-video-embed, .video-thumbnail-container');
+        
+        if (hasMedia) {
+          e.preventDefault();
+          
+          const clipboardData = e.clipboardData?.getData('text/plain') || '';
+          if (clipboardData) {
+            // Criar novo parágrafo e colar lá
+            let nextP = paragraph.nextElementSibling as HTMLElement;
+            
+            if (!nextP || nextP.tagName !== 'P') {
+              const paragraphIndex = quill.getIndex(blot);
+              const paragraphLength = quill.getLength(paragraph);
+              quill.insertText(paragraphIndex + paragraphLength, '\n');
+              nextP = paragraph.nextElementSibling as HTMLElement;
+            }
+            
+            if (nextP) {
+              const nextIndex = quill.getIndex(quill.getLeaf(quill.getLength() - 1)[0]);
+              quill.setSelection(nextIndex);
+              quill.insertText(nextIndex, clipboardData);
+            }
+          }
+        }
+      };
+
+      editor.addEventListener('keydown', handleKeyDown);
+      editor.addEventListener('paste', handlePaste);
+      
+      return () => {
+        editor.removeEventListener('keydown', handleKeyDown);
+        editor.removeEventListener('paste', handlePaste);
+      };
+    };
+
+    const cleanup = preventTextInMediaParagraphs();
+    
+    return cleanup;
+  }, []);
+
   const handleQuillChange = (content: string, delta: any, source: any, editor: any) => {
     const newDelta = editor.getContents();
     const text = editor.getText();

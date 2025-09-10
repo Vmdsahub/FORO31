@@ -213,3 +213,34 @@
   display: table;
   clear: both;
 }
+
+/* 7. SISTEMA ANTI-TEXTO EM PARÁGRAFOS COM MÍDIA */
+.topic-shell .ql-editor p:has(img),
+.topic-shell .ql-editor p:has(.ql-video-embed),
+.topic-shell .ql-editor p:has(.video-thumbnail-container) {
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* Permitir interação apenas com a mídia */
+.topic-shell .ql-editor p img,
+.topic-shell .ql-editor p .ql-video-embed,
+.topic-shell .ql-editor p .video-thumbnail-container {
+  pointer-events: auto;
+  user-select: auto;
+  -webkit-user-select: auto;
+  -moz-user-select: auto;
+  -ms-user-select: auto;
+}
+
+/* Garantir que parágrafos após mídia sejam editáveis */
+.topic-shell .ql-editor p:not(:has(img)):not(:has(.ql-video-embed)):not(:has(.video-thumbnail-container)) {
+  pointer-events: auto;
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+}
