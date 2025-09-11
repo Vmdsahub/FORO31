@@ -66,8 +66,8 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
       <div id="${videoId}" class="video-thumbnail-container" style="
         position: relative;
         display: inline-block;
-        width: 200px;
-        height: 150px;
+        width: var(--thumbnail-width, 200px);
+        height: var(--thumbnail-height, 150px);
         margin: 8px 4px;
         border-radius: 8px;
         overflow: hidden;
@@ -82,8 +82,28 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
           height: 100%;
           object-fit: cover;
           display: block;
-        " preload="metadata" muted>
-          <source src="${decodedUrl}#t=1" type="video/mp4">
+        " preload="metadata" muted onloadedmetadata="
+          const video = this;
+          const container = this.parentElement;
+          if (video.videoWidth && video.videoHeight) {
+            const aspectRatio = video.videoWidth / video.videoHeight;
+            const isVertical = aspectRatio < 1;
+            // Altura fixa de 150px para todos os tipos de mídia
+            const fixedHeight = 150;
+            const width = Math.round(fixedHeight * aspectRatio);
+            
+            container.style.setProperty('--thumbnail-width', width + 'px');
+            container.style.setProperty('--thumbnail-height', fixedHeight + 'px');
+            container.style.width = width + 'px';
+            container.style.height = fixedHeight + 'px';
+            // Generate random time for thumbnail
+            const minTime = video.duration * 0.1;
+            const maxTime = video.duration * 0.9;
+            const randomTime = Math.random() * (maxTime - minTime) + minTime;
+            video.currentTime = randomTime;
+          }
+        ">
+          <source src="${decodedUrl}" type="video/mp4">
         </video>
         <div class="video-overlay" style="
           position: absolute;

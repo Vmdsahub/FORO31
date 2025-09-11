@@ -37,7 +37,7 @@ export const handleUploadcareConfig: RequestHandler = (req, res) => {
       multipleMax: 10,
       imagesOnly: false,
       inputAcceptTypes:
-        ".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.zip,.rar,.mp4,.mp3,.txt,.csv",
+        ".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.zip,.rar,.mp4,.mov,.mkv,.mp3,.txt,.csv",
     },
   });
 };

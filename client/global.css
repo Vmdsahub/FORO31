@@ -361,7 +361,6 @@
   .text-gray-700 img:hover,
   .leading-relaxed img:hover {
     transform: scale(1.05) !important;
-    border-color: #3b82f6 !important;
   }
 
   /* Estilos para containers de vídeo */

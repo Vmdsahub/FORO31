@@ -416,6 +416,7 @@ export class AdvancedFileValidator {
       ".mov": "video/quicktime",
       ".avi": "video/x-msvideo",
       ".wmv": "video/x-ms-wmv",
+      ".mkv": "video/x-matroska",
 
       // Audio
       ".mp3": "audio/mpeg",
@@ -454,7 +455,7 @@ export class AdvancedFileValidator {
   }
 
   private isVideoFile(ext: string): boolean {
-    const videoExtensions = [".mp4", ".webm", ".mov", ".avi", ".wmv"];
+    const videoExtensions = [".mp4", ".webm", ".mov", ".avi", ".wmv", ".mkv"];
     return videoExtensions.includes(ext.toLowerCase());
   }
 
@@ -497,6 +498,7 @@ export const SECURITY_CONFIG: SecurityConfig = {
     "video/quicktime", // .mov files
     "video/x-msvideo", // .avi files
     "video/x-ms-wmv", // .wmv files
+    "video/x-matroska", // .mkv files
     "audio/mpeg",
     "audio/wav",
     "audio/mp4", // .m4a files
@@ -541,6 +543,7 @@ export const SECURITY_CONFIG: SecurityConfig = {
     ".mov",
     ".avi",
     ".wmv",
+    ".mkv",
     ".m4a",
     ".mp3",
     ".wav",

@@ -81,8 +81,44 @@ export default function SimpleMarkdownRenderer({
         }, 0);
 
         return `
-          <div id="${videoId}" style="position: relative; max-width: 240px; width: 240px; height: 180px; border-radius: 8px; border: 1px solid #e5e7eb; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin: 0 4px 4px 0; display: inline-block; vertical-align: top; background: #000; cursor: pointer; overflow: hidden;">
-            <video style="width: 100%; height: 100%; object-fit: cover;" muted preload="metadata">
+          <div id="${videoId}" style="
+            position: relative;
+            max-width: var(--thumbnail-max-width, 240px);
+            width: var(--thumbnail-width, 240px);
+            height: var(--thumbnail-height, 180px);
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin: 0 4px 4px 0;
+            display: inline-block;
+            vertical-align: top;
+            background: #000;
+            cursor: pointer;
+            overflow: hidden;
+          ">
+            <video style="width: 100%; height: 100%; object-fit: cover;" muted preload="metadata" onloadedmetadata="
+              const video = this;
+              const container = this.parentElement;
+              if (video.videoWidth && video.videoHeight) {
+                const aspectRatio = video.videoWidth / video.videoHeight;
+                const isVertical = aspectRatio < 1;
+                // Altura fixa de 150px para todos os tipos de mídia
+                const fixedHeight = 150;
+                const width = Math.round(fixedHeight * aspectRatio);
+                
+                container.style.setProperty('--thumbnail-max-width', width + 'px');
+                container.style.setProperty('--thumbnail-width', width + 'px');
+                container.style.setProperty('--thumbnail-height', fixedHeight + 'px');
+                container.style.maxWidth = width + 'px';
+                container.style.width = width + 'px';
+                container.style.height = fixedHeight + 'px';
+                // Generate random time for thumbnail
+                const minTime = video.duration * 0.1;
+                const maxTime = video.duration * 0.9;
+                const randomTime = Math.random() * (maxTime - minTime) + minTime;
+                video.currentTime = randomTime;
+              }
+            ">
               <source src="${src}" type="video/mp4">
             </video>
             <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center;">

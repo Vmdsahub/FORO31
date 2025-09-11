@@ -27,20 +27,88 @@ class VideoBlot extends Embed {
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       transition: all 0.2s ease;
       background: #000;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
       line-height: 0;
     `;
     
-    // Criar elemento de vídeo para thumbnail
+    // Criar elemento de vídeo oculto para gerar thumbnail
     const video = document.createElement('video');
     video.style.cssText = `
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
     `;
     video.setAttribute('preload', 'metadata');
     video.setAttribute('muted', 'true');
-    video.src = `${url}#t=1`;
+    video.src = url;
+    
+    // Criar canvas oculto para capturar frame
+    const canvas = document.createElement('canvas');
+    canvas.style.cssText = `
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+      opacity: 0;
+      pointer-events: none;
+    `;
+    
+    // Detectar orientação do vídeo e gerar thumbnail
+    video.addEventListener('loadedmetadata', () => {
+      const aspectRatio = video.videoWidth / video.videoHeight;
+      const isVertical = aspectRatio < 1;
+      
+      console.log('VideoBlot - Video orientation:', { aspectRatio, isVertical, videoWidth: video.videoWidth, videoHeight: video.videoHeight });
+      
+      // Altura fixa de 150px para todos os tipos de vídeo
+      const fixedHeight = 150;
+      let width;
+      
+      if (isVertical) {
+        // Vídeo vertical: calcular largura baseada na altura fixa
+        width = Math.round(fixedHeight * aspectRatio);
+      } else {
+        // Vídeo horizontal: calcular largura baseada na altura fixa
+        width = Math.round(fixedHeight * aspectRatio);
+      }
+      
+      node.style.width = width + 'px';
+      node.style.height = fixedHeight + 'px';
+      
+      // Configurar canvas com as dimensões do vídeo
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      
+      // Gerar frame aleatório
+      if (video.duration && !isNaN(video.duration) && video.duration > 0) {
+        const minTime = video.duration * 0.1;
+        const maxTime = video.duration * 0.9;
+        const randomTime = Math.random() * (maxTime - minTime) + minTime;
+        video.currentTime = randomTime;
+      } else {
+        video.currentTime = 1;
+      }
+    });
+    
+    // Capturar frame quando o vídeo for posicionado no tempo correto
+    video.addEventListener('seeked', () => {
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+      
+      // Desenhar frame do vídeo no canvas
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      
+      // Converter canvas para data URL e definir como background
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+      node.style.backgroundImage = `url(${dataUrl})`;
+      
+      console.log('VideoBlot - Thumbnail gerado com sucesso');
+    });
     
     // Criar overlay com botão play
     const overlay = document.createElement('div');
@@ -86,7 +154,8 @@ class VideoBlot extends Embed {
     overlay.appendChild(playButton);
     
     // Montar estrutura diretamente no node
-    node.appendChild(video);
+    document.body.appendChild(video); // Adicionar vídeo oculto ao body
+    document.body.appendChild(canvas); // Adicionar canvas oculto ao body
     node.appendChild(overlay);
     
     // Adicionar quebra de linha após o vídeo

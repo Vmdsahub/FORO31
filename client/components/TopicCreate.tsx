@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import ReactQuill from 'react-quill';
 import { modules, formats } from '../utils/quillConfig';
 import SecureUploadWidget, { UploadedFileInfo } from './SecureUploadWidget';
-import VideoThumbnail from './VideoThumbnail';
+
+import ImageModal from './ImageModal';
 import '../styles/topic.css';
 
 interface TopicCreateProps {
@@ -18,6 +19,7 @@ export default function TopicCreate({ onSave, onCancel, image: externalImage, on
   const [delta, setDelta] = useState('');
   const [image, setImage] = useState<File | null>(externalImage || null);
   const [characterCount, setCharacterCount] = useState(0);
+  const [modalVideo, setModalVideo] = useState<{ src: string; alt: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const quillRef = useRef<ReactQuill>(null);
   const uploadWidgetRef = useRef<HTMLButtonElement>(null);
@@ -33,8 +35,14 @@ export default function TopicCreate({ onSave, onCancel, image: externalImage, on
 
     document.addEventListener('quill-upload-click', handleUploadClick as EventListener);
     
+    // Definir função global para abrir modal de vídeo
+    (window as any).openVideoModal = (src: string, filename: string) => {
+      setModalVideo({ src, alt: filename });
+    };
+    
     return () => {
       document.removeEventListener('quill-upload-click', handleUploadClick as EventListener);
+      delete (window as any).openVideoModal;
     };
   }, []);
 
@@ -56,6 +64,9 @@ export default function TopicCreate({ onSave, onCancel, image: externalImage, on
         const [blot] = quill.getLeaf(selection.index);
         if (!blot || !blot.domNode) return;
 
+        // Verificar se domNode tem o método closest
+        if (typeof blot.domNode.closest !== 'function') return;
+        
         const paragraph = blot.domNode.closest('p');
         if (!paragraph) return;
 
@@ -262,6 +273,15 @@ export default function TopicCreate({ onSave, onCancel, image: externalImage, on
           Publicar
         </button>
       </div>
+      
+      {/* Modal de vídeo */}
+      <ImageModal
+        isOpen={!!modalVideo}
+        onClose={() => setModalVideo(null)}
+        src={modalVideo?.src || ""}
+        alt={modalVideo?.alt || ""}
+        isVideo={true}
+      />
     </div>
   );
 }

@@ -32,6 +32,7 @@ export default function ImageModal({
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [showControls, setShowControls] = useState(true);
+  const [videoAspectRatio, setVideoAspectRatio] = useState<number | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const controlsTimeoutRef = useRef<NodeJS.Timeout>();
 
@@ -46,23 +47,61 @@ export default function ImageModal({
     const video = videoRef.current;
     if (!video) return;
 
-    const handleTimeUpdate = () => setCurrentTime(video.currentTime);
-    const handleDurationChange = () => setDuration(video.duration);
-    const handlePlay = () => setIsPlaying(true);
-    const handlePause = () => setIsPlaying(false);
+    let animationFrame: number;
+    
+    const updateProgress = () => {
+      if (video && !isNaN(video.currentTime)) {
+        setCurrentTime(video.currentTime);
+      }
+      if (isPlaying) {
+        animationFrame = requestAnimationFrame(updateProgress);
+      }
+    };
+
+    const handleTimeUpdate = () => {
+      if (video && !isNaN(video.currentTime)) {
+        setCurrentTime(video.currentTime);
+      }
+    };
+    const handleDurationChange = () => {
+      if (video && !isNaN(video.duration) && video.duration > 0) {
+        setDuration(video.duration);
+      }
+    };
+    const handlePlay = () => {
+      setIsPlaying(true);
+      animationFrame = requestAnimationFrame(updateProgress);
+    };
+    const handlePause = () => {
+      setIsPlaying(false);
+      if (animationFrame) {
+        cancelAnimationFrame(animationFrame);
+      }
+    };
+    const handleLoadedMetadata = () => {
+      if (video && !isNaN(video.duration) && video.duration > 0) {
+        setDuration(video.duration);
+        setCurrentTime(video.currentTime || 0);
+      }
+    };
 
     video.addEventListener("timeupdate", handleTimeUpdate);
     video.addEventListener("durationchange", handleDurationChange);
+    video.addEventListener("loadedmetadata", handleLoadedMetadata);
     video.addEventListener("play", handlePlay);
     video.addEventListener("pause", handlePause);
 
     return () => {
+      if (animationFrame) {
+        cancelAnimationFrame(animationFrame);
+      }
       video.removeEventListener("timeupdate", handleTimeUpdate);
       video.removeEventListener("durationchange", handleDurationChange);
+      video.removeEventListener("loadedmetadata", handleLoadedMetadata);
       video.removeEventListener("play", handlePlay);
       video.removeEventListener("pause", handlePause);
     };
-  }, [isOpen]);
+  }, [isOpen, isPlaying]);
 
   const togglePlay = () => {
     const video = videoRef.current;
@@ -93,13 +132,24 @@ export default function ImageModal({
     setIsMuted(newVolume === 0);
   };
 
+  const handleVideoLoadedMetadata = () => {
+    const video = videoRef.current;
+    if (video) {
+      setDuration(video.duration);
+      const aspectRatio = video.videoWidth / video.videoHeight;
+      setVideoAspectRatio(aspectRatio);
+    }
+  };
+
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
     const video = videoRef.current;
-    if (!video) return;
+    if (!video || !duration) return;
 
     const newTime = parseFloat(e.target.value);
-    video.currentTime = newTime;
-    setCurrentTime(newTime);
+    if (!isNaN(newTime) && newTime >= 0 && newTime <= duration) {
+      video.currentTime = newTime;
+      setCurrentTime(newTime);
+    }
   };
 
   const formatTime = (time: number) => {
@@ -172,7 +222,13 @@ export default function ImageModal({
       onClick={handleBackdropClick}
       style={{ animation: "none" }}
     >
-      <div className="relative max-w-[90vw] max-h-[90vh] rounded-2xl overflow-hidden">
+      <div 
+        className="relative rounded-2xl overflow-hidden"
+        style={{
+          maxWidth: videoAspectRatio !== null && videoAspectRatio < 1 ? "60vh" : "90vw",
+          maxHeight: "90vh",
+        }}
+      >
         {/* Glass container */}
         <div
           className="relative bg-black bg-opacity-20 backdrop-blur-xl border border-white border-opacity-20 rounded-2xl overflow-hidden"
@@ -208,10 +264,15 @@ export default function ImageModal({
                 className="max-w-full max-h-[80vh] object-contain rounded-2xl"
                 style={{
                   display: "block",
-                  minWidth: "400px",
-                  minHeight: "300px",
+                  ...(videoAspectRatio !== null && {
+                    minWidth: videoAspectRatio < 1 ? "300px" : "400px",
+                    minHeight: videoAspectRatio < 1 ? "400px" : "300px",
+                    maxWidth: videoAspectRatio < 1 ? "50vh" : "90vw",
+                    maxHeight: videoAspectRatio < 1 ? "80vh" : "70vh",
+                  }),
                 }}
                 onClick={togglePlay}
+                onLoadedMetadata={handleVideoLoadedMetadata}
                 preload="metadata"
                 playsInline
                 controls={false}
@@ -232,16 +293,31 @@ export default function ImageModal({
                 }}
               >
                 {/* Progress bar */}
-                <div className="mb-3">
+                <div className="mb-3 relative">
+                  {/* Background track */}
+                  <div className="w-full h-2 bg-white bg-opacity-30 rounded-lg">
+                    {/* Progress fill */}
+                    <div 
+                      className="h-full bg-white bg-opacity-90 rounded-lg transition-all duration-75 ease-linear"
+                      style={{
+                        width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%`
+                      }}
+                    />
+                  </div>
+                  {/* Invisible input for interaction */}
                   <input
                     type="range"
                     min="0"
                     max={duration || 0}
-                    value={currentTime}
+                    value={currentTime || 0}
                     onChange={handleSeek}
-                    className="w-full h-1 bg-white bg-opacity-30 rounded-lg appearance-none cursor-pointer slider"
+                    className="absolute inset-0 w-full h-2 opacity-0 cursor-pointer slider"
+                  />
+                  {/* Custom thumb */}
+                  <div 
+                    className="absolute top-1/2 w-4 h-4 bg-white rounded-full shadow-lg transform -translate-y-1/2 -translate-x-1/2 transition-all duration-75 ease-linear pointer-events-none"
                     style={{
-                      background: `linear-gradient(to right, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.8) ${(currentTime / duration) * 100}%, rgba(255,255,255,0.3) ${(currentTime / duration) * 100}%, rgba(255,255,255,0.3) 100%)`,
+                      left: `${duration > 0 ? (currentTime / duration) * 100 : 0}%`
                     }}
                   />
                 </div>
@@ -370,24 +446,26 @@ export default function ImageModal({
       <style
         dangerouslySetInnerHTML={{
           __html: `
+        .slider {
+          outline: none;
+        }
+        
         .slider::-webkit-slider-thumb {
           appearance: none;
-          height: 12px;
-          width: 12px;
-          border-radius: 50%;
-          background: rgba(255, 255, 255, 0.9);
-          cursor: pointer;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+          width: 0;
+          height: 0;
+          background: transparent;
         }
-
+        
         .slider::-moz-range-thumb {
-          height: 12px;
-          width: 12px;
-          border-radius: 50%;
-          background: rgba(255, 255, 255, 0.9);
-          cursor: pointer;
+          width: 0;
+          height: 0;
+          background: transparent;
           border: none;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .slider::-moz-range-track {
+          background: transparent;
         }
         `,
         }}

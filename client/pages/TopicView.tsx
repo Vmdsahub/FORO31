@@ -11,6 +11,7 @@ import SimpleCommentSystem from "@/components/SimpleCommentSystem";
 import UserPointsBadge from "@/components/UserPointsBadge";
 import UserHoverCard from "@/components/UserHoverCard";
 import ReportModal from "@/components/ReportModal";
+import ImageModal from "@/components/ImageModal";
 
 interface Topic {
   id: string;
@@ -41,12 +42,24 @@ export default function TopicView() {
   const [isLoading, setIsLoading] = useState(true);
   const [savedTopicIds, setSavedTopicIds] = useState<string[]>([]);
   const [showReportModal, setShowReportModal] = useState(false);
+  const [modalVideo, setModalVideo] = useState<{ src: string; alt: string } | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState("");
 
   useEffect(() => {
     fetchTopic();
   }, [topicId]);
+
+  // Setup global video modal function
+  useEffect(() => {
+    (window as any).openVideoModal = (src: string, filename: string) => {
+      setModalVideo({ src, alt: filename });
+    };
+    
+    return () => {
+      delete (window as any).openVideoModal;
+    };
+  }, []);
 
   // Load saved topics
   useEffect(() => {
@@ -548,6 +561,15 @@ export default function TopicView() {
           contentAuthor={topic.author}
         />
       )}
+      
+      {/* Modal de vídeo */}
+      <ImageModal
+        isOpen={!!modalVideo}
+        onClose={() => setModalVideo(null)}
+        src={modalVideo?.src || ""}
+        alt={modalVideo?.alt || ""}
+        isVideo={true}
+      />
     </div>
   );
 }

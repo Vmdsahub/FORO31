@@ -42,7 +42,7 @@ interface SecurityWarning {
 const SecureUploadWidget = React.forwardRef<HTMLButtonElement, SecureUploadWidgetProps>(function SecureUploadWidget({
   onSuccess,
   onError,
-  accept = ".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.zip,.rar,.mp4,.mp3,.txt,.csv",
+  accept = ".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.zip,.rar,.mp4,.mov,.mkv,.mp3,.txt,.csv",
   maxSize = 1024 * 1024 * 1024, // 1GB - Match server configuration
   className = "",
   buttonText = "Upload Seguro",

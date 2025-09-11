@@ -206,7 +206,6 @@
 .topic-shell .ql-editor img:hover,
 .topic-shell .ql-editor .video-thumbnail-container:hover {
   transform: scale(1.02);
-  border-color: #3b82f6;
 }
 
 .topic-shell .ql-editor .video-thumbnail-container {
