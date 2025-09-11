@@ -22,6 +22,7 @@ import FeaturedTopicModal from "@/components/FeaturedTopicModal";
 import FeaturedCarousel from "@/components/FeaturedCarousel";
 import { Pagination } from "@/components/ui/pagination";
 import TopicFilters from "@/components/TopicFilters";
+import CuriosityButton from "@/components/CuriosityButton";
 
 // Category icon mapping
 const categoryIcons: Record<string, string> = {
@@ -165,11 +166,18 @@ export default function Index(props: IndexProps) {
   const [filterType, setFilterType] = useState<"recent" | "likes" | "comments">(
     "recent",
   );
+  
+  // Função para obter data atual no timezone de Brasília
+  const getBrazilianDate = () => {
+    const now = new Date();
+    // Converter para timezone de Brasília (UTC-3)
+    const brazilTime = new Date(now.getTime() - (3 * 60 * 60 * 1000));
+    return brazilTime.toISOString().split("T")[0];
+  };
+  
   const [dateRange, setDateRange] = useState({
-    start: new Date(new Date().setDate(new Date().getDate() - 30))
-      .toISOString()
-      .split("T")[0],
-    end: new Date().toISOString().split("T")[0],
+    start: getBrazilianDate(),
+    end: getBrazilianDate(),
   });
 
   // Estados para modais admin
@@ -562,8 +570,8 @@ export default function Index(props: IndexProps) {
       </div>
 
       {/* Toggle Buttons */}
-      <div className="flex justify-center mb-12">
-        <div className="bg-white rounded-lg p-1 shadow-sm border border-gray-200 relative z-10">
+      <div className="flex justify-center mb-12 relative items-center">
+        <div className="bg-white rounded-lg p-1 shadow-sm border border-gray-200 relative z-10 w-fit">
           <div className="flex relative">
             {/* Sliding Background Indicator */}
             <div
@@ -602,6 +610,9 @@ export default function Index(props: IndexProps) {
             </button>
           </div>
         </div>
+        
+        {/* Botão de Curiosidades */}
+        <CuriosityButton className="ml-3" />
       </div>
 
       {/* Content with smooth transitions */}
@@ -1373,10 +1384,8 @@ export default function Index(props: IndexProps) {
                 // Reset filters
                 setFilterType("recent");
                 setDateRange({
-                  start: new Date(new Date().setDate(new Date().getDate() - 30))
-                    .toISOString()
-                    .split("T")[0],
-                  end: new Date().toISOString().split("T")[0],
+                  start: getBrazilianDate(),
+                  end: getBrazilianDate(),
                 });
               }}
               className="flex items-center gap-2 text-gray-600 hover:text-black transition-all duration-300 ease-in-out hover:translate-x-1"
@@ -1526,13 +1535,26 @@ export default function Index(props: IndexProps) {
                                   ? `${topic.title.substring(0, 70)}...`
                                   : topic.title}
                               </h3>
-                              <div className="flex items-center justify-between mt-2">
-                                <div className="text-xs text-gray-500">
-                                  por{" "}
-                                  <span className="font-medium">
-                                    {topic.author}
-                                  </span>
-                                </div>
+                              <div className="text-xs text-gray-500 mt-1 mb-1">
+                                por{" "}
+                                <span className="font-medium">
+                                  {topic.author}
+                                </span>
+                                {" • "}
+                                <span>
+                                  {new Date(topic.createdAt).toLocaleDateString("pt-BR", {
+                                    day: "2-digit",
+                                    month: "2-digit",
+                                    year: "numeric"
+                                  })}
+                                  {" às "}
+                                  {new Date(topic.createdAt).toLocaleTimeString("pt-BR", {
+                                    hour: "2-digit",
+                                    minute: "2-digit"
+                                  })}
+                                </span>
+                              </div>
+                              <div className="flex items-center justify-between">
                                 {isAdmin && (
                                   <div className="flex items-center gap-1">
                                     <button

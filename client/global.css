@@ -476,7 +476,7 @@
 
   .image-container img:hover,
   .image-container .video-preview:hover {
-    transform: scale(1.02) !important;
+    transform: scale(1.05) !important;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2) !important;
   }
 

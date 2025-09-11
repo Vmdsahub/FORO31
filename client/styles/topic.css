@@ -205,7 +205,7 @@
 /* 5. EFEITOS VISUAIS */
 .topic-shell .ql-editor img:hover,
 .topic-shell .ql-editor .video-thumbnail-container:hover {
-  transform: scale(1.02);
+  transform: scale(1.05);
 }
 
 .topic-shell .ql-editor .video-thumbnail-container {

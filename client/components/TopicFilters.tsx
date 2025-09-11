@@ -14,6 +14,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface TopicFiltersProps {
   filterType: "recent" | "likes" | "comments";
@@ -35,12 +40,17 @@ export default function TopicFilters({
   };
 
   const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString("pt-BR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
+    const date = new Date(dateStr + "T00:00:00");
+    return format(date, "dd/MM/yyyy", { locale: ptBR });
+  };
+
+  const formatDateForCalendar = (dateStr: string) => {
+    return new Date(dateStr + "T00:00:00");
+  };
+
+  const formatDateFromCalendar = (date: Date | undefined) => {
+    if (!date) return "";
+    return format(date, "yyyy-MM-dd");
   };
 
   return (
@@ -82,31 +92,73 @@ export default function TopicFilters({
                     <Label className="text-xs text-gray-500">
                       Data inicial
                     </Label>
-                    <Input
-                      type="date"
-                      value={tempDateRange.start}
-                      onChange={(e) =>
-                        setTempDateRange({
-                          ...tempDateRange,
-                          start: e.target.value,
-                        })
-                      }
-                      className="h-8"
-                    />
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-full h-8 justify-start text-left font-normal",
+                            !tempDateRange.start && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {tempDateRange.start ? (
+                            formatDate(tempDateRange.start)
+                          ) : (
+                            <span>Selecione a data</span>
+                          )}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={formatDateForCalendar(tempDateRange.start)}
+                          onSelect={(date) =>
+                            setTempDateRange({
+                              ...tempDateRange,
+                              start: formatDateFromCalendar(date),
+                            })
+                          }
+                          locale={ptBR}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
                   </div>
                   <div>
                     <Label className="text-xs text-gray-500">Data final</Label>
-                    <Input
-                      type="date"
-                      value={tempDateRange.end}
-                      onChange={(e) =>
-                        setTempDateRange({
-                          ...tempDateRange,
-                          end: e.target.value,
-                        })
-                      }
-                      className="h-8"
-                    />
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-full h-8 justify-start text-left font-normal",
+                            !tempDateRange.end && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {tempDateRange.end ? (
+                            formatDate(tempDateRange.end)
+                          ) : (
+                            <span>Selecione a data</span>
+                          )}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={formatDateForCalendar(tempDateRange.end)}
+                          onSelect={(date) =>
+                            setTempDateRange({
+                              ...tempDateRange,
+                              end: formatDateFromCalendar(date),
+                            })
+                          }
+                          locale={ptBR}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
                   </div>
                 </div>
                 <p className="text-xs text-gray-500 mt-2">

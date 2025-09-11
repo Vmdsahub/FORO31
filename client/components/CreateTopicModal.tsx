@@ -15,12 +15,27 @@ import { toast } from "sonner";
 import { Topic } from "@shared/forum";
 import TopicCreate from "@/components/TopicCreate";
 
-// Função para upload de imagem (placeholder - implementar conforme necessário)
+// Função para upload de imagem para o servidor
 async function uploadImage(file: File): Promise<string | null> {
   try {
-    // Por enquanto, criar uma URL temporária para a imagem
-    // Em produção, implementar upload real para servidor/cloud
-    return URL.createObjectURL(file);
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('type', 'topic-image');
+
+    const response = await fetch('/api/upload', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error('Erro no upload da imagem');
+    }
+
+    const result = await response.json();
+    return result.url; // Retorna a URL permanente do servidor
   } catch (error) {
     console.error('Erro ao fazer upload da imagem:', error);
     return null;

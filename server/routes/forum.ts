@@ -284,6 +284,8 @@ function initializeDemoData() {
       authorId: "user_visual_ai",
       authorAvatar:
         "https://cdn.builder.io/api/v1/image/assets%2F4339d2c6c4aa4bf4b61f03263843eb86%2F3a88d03f86164e47b982a4e1e72380a2?format=webp&width=800",
+      topicAvatarUrl:
+        "https://cdn.builder.io/api/v1/image/assets%2F4339d2c6c4aa4bf4b61f03263843eb86%2F3a88d03f86164e47b982a4e1e72380a2?format=webp&width=800",
       category: "imagem",
       replies: 4,
       views: 1823,
@@ -304,6 +306,8 @@ function initializeDemoData() {
       authorId: "user_image_gen",
       authorAvatar:
         "https://cdn.builder.io/api/v1/image/assets%2F4339d2c6c4aa4bf4b61f03263843eb86%2F1b6ba24486b4431bab6f7012645c0a61?format=webp&width=800",
+      topicAvatarUrl:
+        "https://cdn.builder.io/api/v1/image/assets%2F4339d2c6c4aa4bf4b61f03263843eb86%2F1b6ba24486b4431bab6f7012645c0a61?format=webp&width=800",
       category: "imagem",
       replies: 2,
       views: 945,
@@ -323,6 +327,8 @@ function initializeDemoData() {
       author: "TechNewbie",
       authorId: "user_tech_newbie",
       authorAvatar:
+        "https://cdn.builder.io/api/v1/image/assets%2F4339d2c6c4aa4bf4b61f03263843eb86%2F40c3e177f2e64d8ca305e2adfcc1a693?format=webp&width=800",
+      topicAvatarUrl:
         "https://cdn.builder.io/api/v1/image/assets%2F4339d2c6c4aa4bf4b61f03263843eb86%2F40c3e177f2e64d8ca305e2adfcc1a693?format=webp&width=800",
       category: "duvidas-erros",
       replies: 7,
@@ -477,14 +483,27 @@ export const handleGetTopics: RequestHandler = (req, res) => {
 
   // Apply date range filter for likes and comments sorting
   if ((sortBy === "likes" || sortBy === "comments") && startDate && endDate) {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    end.setHours(23, 59, 59, 999); // Include the entire end date
+    // Parse dates in local timezone to avoid timezone issues
+    const start = new Date(startDate + "T00:00:00");
+    const end = new Date(endDate + "T23:59:59.999");
+    
+    console.log(`[DATE_FILTER] Filtering from ${start.toISOString()} to ${end.toISOString()}`);
+    console.log(`[DATE_FILTER] Original params: startDate=${startDate}, endDate=${endDate}`);
 
     filteredTopics = filteredTopics.filter((topic) => {
       const topicDate = new Date(topic.createdAt);
-      return topicDate >= start && topicDate <= end;
+      const isInRange = topicDate >= start && topicDate <= end;
+      
+      if (!isInRange) {
+        console.log(`[DATE_FILTER] Topic "${topic.title}" (${topicDate.toISOString()}) excluded from range`);
+      } else {
+        console.log(`[DATE_FILTER] Topic "${topic.title}" (${topicDate.toISOString()}) included in range`);
+      }
+      
+      return isInRange;
     });
+    
+    console.log(`[DATE_FILTER] Filtered ${filteredTopics.length} topics in date range`);
   }
 
   // Sort topics based on filter type
