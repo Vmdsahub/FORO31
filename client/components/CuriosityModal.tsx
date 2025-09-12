@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Plus, Trash2, Edit3, Bold, Italic, Save, X } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Plus, Trash2, Edit3, Bold, Italic, Save, X, Smile } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -34,6 +34,23 @@ const CuriosityModal: React.FC<CuriosityModalProps> = ({
   const [editingContent, setEditingContent] = useState("");
   const [newTextContent, setNewTextContent] = useState("");
   const [isAddingNew, setIsAddingNew] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [activeTextarea, setActiveTextarea] = useState<string | null>(null);
+  const textareaRefs = useRef<{[key: string]: HTMLTextAreaElement | null}>({});
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showEmojiPicker && !(event.target as Element).closest('.emoji-picker')) {
+        setShowEmojiPicker(false);
+        setActiveTextarea(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showEmojiPicker]);
 
   const generateId = () => {
     return Date.now().toString() + Math.random().toString(36).substr(2, 9);
@@ -109,15 +126,22 @@ const CuriosityModal: React.FC<CuriosityModalProps> = ({
     setEditingContent("");
   };
 
-  const insertFormatting = (format: 'bold' | 'italic', textareaRef: HTMLTextAreaElement | null) => {
+  const insertFormatting = (format: 'bold' | 'italic', textareaId: string) => {
+    const textareaRef = textareaRefs.current[textareaId];
     if (!textareaRef) return;
 
     const start = textareaRef.selectionStart;
     const end = textareaRef.selectionEnd;
     const selectedText = textareaRef.value.substring(start, end);
     
-    const formatChar = format === 'bold' ? '**' : '*';
-    const formattedText = `${formatChar}${selectedText || 'texto'}${formatChar}`;
+    let formattedText = selectedText || 'texto';
+    
+    // Aplicar formatação direta baseada no tipo
+    if (format === 'bold') {
+      formattedText = `**${formattedText}**`;
+    } else if (format === 'italic') {
+      formattedText = `*${formattedText}*`;
+    }
     
     const newValue = textareaRef.value.substring(0, start) + formattedText + textareaRef.value.substring(end);
     
@@ -135,13 +159,67 @@ const CuriosityModal: React.FC<CuriosityModalProps> = ({
     }, 0);
   };
 
-  const renderTextPreview = (content: string) => {
-    // Converter **texto** para <strong>texto</strong>
-    let formatted = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    // Converter *texto* para <em>texto</em>
-    formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>');
+  const insertEmoji = (emoji: string) => {
+    const textareaRef = activeTextarea ? textareaRefs.current[activeTextarea] : null;
+    if (!textareaRef) return;
+
+    const start = textareaRef.selectionStart;
+    const end = textareaRef.selectionEnd;
+    const newValue = textareaRef.value.substring(0, start) + emoji + textareaRef.value.substring(end);
     
-    return <span dangerouslySetInnerHTML={{ __html: formatted }} />;
+    if (editingId) {
+      setEditingContent(newValue);
+    } else {
+      setNewTextContent(newValue);
+    }
+    
+    // Reposicionar cursor
+    setTimeout(() => {
+      const newCursorPos = start + emoji.length;
+      textareaRef.setSelectionRange(newCursorPos, newCursorPos);
+      textareaRef.focus();
+    }, 0);
+    
+    setShowEmojiPicker(false);
+  };
+
+  const commonEmojis = [
+    '😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣',
+    '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰',
+    '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜',
+    '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏',
+    '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣',
+    '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠',
+    '😡', '🤬', '🤯', '😳', '🥵', '🥶', '😱', '😨',
+    '😰', '😥', '😓', '🤗', '🤔', '🤭', '🤫', '🤥',
+    '😶', '😐', '😑', '😬', '🙄', '😯', '😦', '😧',
+    '😮', '😲', '🥱', '😴', '🤤', '😪', '😵', '🤐',
+    '🥴', '🤢', '🤮', '🤧', '😷', '🤒', '🤕', '🤑',
+    '🤠', '😈', '👿', '👹', '👺', '🤡', '💩', '👻',
+    '💀', '☠️', '👽', '👾', '🤖', '🎃', '😺', '😸',
+    '😹', '😻', '😼', '😽', '🙀', '😿', '😾', '❤️',
+    '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎',
+    '💔', '❣️', '💕', '💞', '💓', '💗', '💖', '💘',
+    '💝', '💟', '☮️', '✝️', '☪️', '🕉️', '☸️', '✡️',
+    '🔯', '🕎', '☯️', '☦️', '🛐', '⛎', '♈', '♉',
+    '♊', '♋', '♌', '♍', '♎', '♏', '♐', '♑',
+    '♒', '♓', '🆔', '⚛️', '🉑', '☢️', '☣️', '📴',
+    '📳', '🈶', '🈚', '🈸', '🈺', '🈷️', '✴️', '🆚',
+    '💮', '🉐', '㊙️', '㊗️', '🈴', '🈵', '🈹', '🈲'
+  ];
+
+  const renderTextPreview = (content: string) => {
+    // Primeiro converter **texto** para <strong>texto</strong>
+    let converted = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    // Depois converter *texto* para <em>texto</em> (evitando conflito com bold)
+    converted = converted.replace(/(?<!\*)\*([^*<>]+?)\*(?!\*)/g, '<em>$1</em>');
+    
+    return (
+      <div 
+        className="text-sm text-gray-700 whitespace-pre-wrap break-words"
+        dangerouslySetInnerHTML={{ __html: converted }}
+      />
+    );
   };
 
   return (
@@ -177,10 +255,7 @@ const CuriosityModal: React.FC<CuriosityModalProps> = ({
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => {
-                              const textarea = document.getElementById(`edit-textarea-${text.id}`) as HTMLTextAreaElement;
-                              insertFormatting('bold', textarea);
-                            }}
+                            onClick={() => insertFormatting('bold', `edit-${text.id}`)}
                             className="px-2 py-1"
                           >
                             <Bold className="w-3 h-3" />
@@ -188,20 +263,46 @@ const CuriosityModal: React.FC<CuriosityModalProps> = ({
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => {
-                              const textarea = document.getElementById(`edit-textarea-${text.id}`) as HTMLTextAreaElement;
-                              insertFormatting('italic', textarea);
-                            }}
+                            onClick={() => insertFormatting('italic', `edit-${text.id}`)}
                             className="px-2 py-1"
                           >
                             <Italic className="w-3 h-3" />
                           </Button>
+                          <div className="relative">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => {
+                                setActiveTextarea(`edit-${text.id}`);
+                                setShowEmojiPicker(!showEmojiPicker);
+                              }}
+                              className="px-2 py-1"
+                            >
+                              <Smile className="w-3 h-3" />
+                            </Button>
+                            {showEmojiPicker && activeTextarea === `edit-${text.id}` && (
+                               <div className="emoji-picker absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-2 z-50 w-64 max-h-48 overflow-y-auto">
+                                <div className="grid grid-cols-8 gap-1">
+                                  {commonEmojis.map((emoji, index) => (
+                                    <button
+                                      key={index}
+                                      type="button"
+                                      className="p-1 hover:bg-gray-100 rounded text-lg"
+                                      onClick={() => insertEmoji(emoji)}
+                                    >
+                                      {emoji}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
                           <span className="text-xs text-gray-500">
                             {editingContent.length}/200
                           </span>
                         </div>
                         <Textarea
-                          id={`edit-textarea-${text.id}`}
+                          ref={(el) => textareaRefs.current[`edit-${text.id}`] = el}
                           value={editingContent}
                           onChange={(e) => setEditingContent(e.target.value)}
                           placeholder="Digite o texto de curiosidade..."
@@ -275,10 +376,7 @@ const CuriosityModal: React.FC<CuriosityModalProps> = ({
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => {
-                      const textarea = document.getElementById('new-textarea') as HTMLTextAreaElement;
-                      insertFormatting('bold', textarea);
-                    }}
+                    onClick={() => insertFormatting('bold', 'new')}
                     className="px-2 py-1"
                   >
                     <Bold className="w-3 h-3" />
@@ -286,20 +384,46 @@ const CuriosityModal: React.FC<CuriosityModalProps> = ({
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => {
-                      const textarea = document.getElementById('new-textarea') as HTMLTextAreaElement;
-                      insertFormatting('italic', textarea);
-                    }}
+                    onClick={() => insertFormatting('italic', 'new')}
                     className="px-2 py-1"
                   >
                     <Italic className="w-3 h-3" />
                   </Button>
+                  <div className="relative">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setActiveTextarea('new');
+                        setShowEmojiPicker(!showEmojiPicker);
+                      }}
+                      className="px-2 py-1"
+                    >
+                      <Smile className="w-3 h-3" />
+                    </Button>
+                    {showEmojiPicker && activeTextarea === 'new' && (
+                       <div className="emoji-picker absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-2 z-50 w-64 max-h-48 overflow-y-auto">
+                        <div className="grid grid-cols-8 gap-1">
+                          {commonEmojis.map((emoji, index) => (
+                            <button
+                              key={index}
+                              type="button"
+                              className="p-1 hover:bg-gray-100 rounded text-lg"
+                              onClick={() => insertEmoji(emoji)}
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                   <span className="text-xs text-gray-500">
                     {newTextContent.length}/200
                   </span>
                 </div>
                 <Textarea
-                  id="new-textarea"
+                  ref={(el) => textareaRefs.current['new'] = el}
                   value={newTextContent}
                   onChange={(e) => setNewTextContent(e.target.value)}
                   placeholder="Digite um novo texto de curiosidade..."

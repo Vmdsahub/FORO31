@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { HelpCircle, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Settings } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -85,11 +85,11 @@ const CuriosityButton: React.FC<CuriosityButtonProps> = ({ className = "" }) => 
     
     // Mostrar tooltip
     setShowTooltip(true);
-    
-    // Esconder tooltip após 5 segundos
-    setTimeout(() => {
-      setShowTooltip(false);
-    }, 5000);
+  };
+
+  const handleMouseLeave = () => {
+    // Esconder tooltip quando o mouse sair do botão
+    setShowTooltip(false);
   };
 
   const updateTexts = (newTexts: CuriosityText[]) => {
@@ -112,7 +112,38 @@ const CuriosityButton: React.FC<CuriosityButtonProps> = ({ className = "" }) => 
   const currentText = curiosityTexts[currentTextIndex];
 
   return (
-    <div className={`flex flex-col items-center space-y-2 z-10 ${className}`}>
+    <div className={`flex items-center space-x-2 z-10 ${className}`}>
+      {/* Botão Principal de Curiosidade */}
+      <TooltipProvider>
+        <Tooltip open={showTooltip}>
+          <TooltipTrigger asChild>
+            <Button
+              onClick={handleCuriosityClick}
+              onMouseLeave={handleMouseLeave}
+              size="lg"
+              className="w-12 h-12 rounded-full p-0 bg-white hover:bg-gray-50 text-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 border border-gray-200 flex items-center justify-center"
+              disabled={curiosityTexts.length === 0}
+            >
+              <span className="text-2xl font-bold text-gray-700">?</span>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent 
+            key={currentTextIndex}
+            side="right" 
+            className="max-w-xs p-3 bg-white border border-gray-200 shadow-lg rounded-lg transition-all duration-300 ease-in-out animate-in fade-in-0 zoom-in-95"
+            sideOffset={5}
+          >
+            {currentText ? (
+              <div className="text-sm text-gray-700 leading-relaxed transition-all duration-300">
+                {renderTextWithFormatting(currentText.content)}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500">Nenhum texto de curiosidade disponível</p>
+            )}
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+
       {/* Botão de Configuração - Apenas para Admins */}
       {isAdmin && (
         <TooltipProvider>
@@ -122,7 +153,7 @@ const CuriosityButton: React.FC<CuriosityButtonProps> = ({ className = "" }) => 
                 onClick={() => setIsModalOpen(true)}
                 size="sm"
                 variant="outline"
-                className="w-8 h-8 rounded-full p-0 bg-white/90 backdrop-blur-sm border-gray-300 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 shadow-sm relative left-2"
+                className="w-8 h-8 rounded-full p-0 bg-white/90 backdrop-blur-sm border-gray-300 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 shadow-sm"
               >
                 <Settings className="w-4 h-4 text-gray-600" />
               </Button>
@@ -133,35 +164,6 @@ const CuriosityButton: React.FC<CuriosityButtonProps> = ({ className = "" }) => 
           </Tooltip>
         </TooltipProvider>
       )}
-
-      {/* Botão Principal de Curiosidade */}
-      <TooltipProvider>
-        <Tooltip open={showTooltip} onOpenChange={setShowTooltip}>
-          <TooltipTrigger asChild>
-            <Button
-              onClick={handleCuriosityClick}
-              size="lg"
-              className="w-12 h-12 rounded-full p-0 bg-white hover:bg-gray-50 text-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 border border-gray-200"
-              disabled={curiosityTexts.length === 0}
-            >
-              <HelpCircle className="w-6 h-6 text-gray-700" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent 
-            side="right" 
-            className="max-w-xs p-3 bg-white border border-gray-200 shadow-lg rounded-lg"
-            sideOffset={10}
-          >
-            {currentText ? (
-              <div className="text-sm text-gray-700 leading-relaxed">
-                {renderTextWithFormatting(currentText.content)}
-              </div>
-            ) : (
-              <p className="text-sm text-gray-500">Nenhum texto de curiosidade disponível</p>
-            )}
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
 
       {/* Modal de Configuração */}
       <CuriosityModal
