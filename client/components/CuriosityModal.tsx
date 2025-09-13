@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { useCuriosityTexts } from "@/hooks/useCuriosityTexts";
 
 interface CuriosityText {
   id: string;
@@ -20,16 +21,13 @@ interface CuriosityText {
 interface CuriosityModalProps {
   isOpen: boolean;
   onClose: () => void;
-  texts: CuriosityText[];
-  onUpdateTexts: (texts: CuriosityText[]) => void;
 }
 
 const CuriosityModal: React.FC<CuriosityModalProps> = ({
   isOpen,
   onClose,
-  texts,
-  onUpdateTexts,
 }) => {
+  const { texts, createText, updateText, deleteText, isLoading } = useCuriosityTexts();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingContent, setEditingContent] = useState("");
   const [newTextContent, setNewTextContent] = useState("");
@@ -56,7 +54,7 @@ const CuriosityModal: React.FC<CuriosityModalProps> = ({
     return Date.now().toString() + Math.random().toString(36).substr(2, 9);
   };
 
-  const handleAddText = () => {
+  const handleAddText = async () => {
     if (!newTextContent.trim()) {
       toast.error("Por favor, digite um texto para adicionar");
       return;
@@ -67,16 +65,13 @@ const CuriosityModal: React.FC<CuriosityModalProps> = ({
       return;
     }
 
-    const newText: CuriosityText = {
-      id: generateId(),
-      content: newTextContent.trim(),
-      createdAt: new Date(),
-    };
-
-    onUpdateTexts([...texts, newText]);
-    setNewTextContent("");
-    setIsAddingNew(false);
-    toast.success("Texto adicionado com sucesso!");
+    try {
+      await createText(newTextContent.trim());
+      setNewTextContent("");
+      setIsAddingNew(false);
+    } catch (error) {
+      // Erro já tratado no hook
+    }
   };
 
   const handleEditText = (id: string) => {
@@ -87,7 +82,7 @@ const CuriosityModal: React.FC<CuriosityModalProps> = ({
     }
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     if (!editingContent.trim()) {
       toast.error("O texto não pode estar vazio");
       return;
@@ -98,27 +93,28 @@ const CuriosityModal: React.FC<CuriosityModalProps> = ({
       return;
     }
 
-    const updatedTexts = texts.map((text) =>
-      text.id === editingId
-        ? { ...text, content: editingContent.trim() }
-        : text
-    );
+    if (!editingId) return;
 
-    onUpdateTexts(updatedTexts);
-    setEditingId(null);
-    setEditingContent("");
-    toast.success("Texto atualizado com sucesso!");
+    try {
+      await updateText(editingId, editingContent.trim());
+      setEditingId(null);
+      setEditingContent("");
+    } catch (error) {
+      // Erro já tratado no hook
+    }
   };
 
-  const handleDeleteText = (id: string) => {
+  const handleDeleteText = async (id: string) => {
     if (texts.length <= 1) {
       toast.error("Deve haver pelo menos um texto de curiosidade");
       return;
     }
 
-    const updatedTexts = texts.filter((text) => text.id !== id);
-    onUpdateTexts(updatedTexts);
-    toast.success("Texto removido com sucesso!");
+    try {
+      await deleteText(id);
+    } catch (error) {
+      // Erro já tratado no hook
+    }
   };
 
   const handleCancelEdit = () => {
@@ -184,10 +180,13 @@ const CuriosityModal: React.FC<CuriosityModalProps> = ({
   };
 
   const commonEmojis = [
+    // Rostos felizes
     '😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣',
     '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰',
     '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜',
     '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏',
+    
+    // Rostos tristes/neutros
     '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣',
     '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠',
     '😡', '🤬', '🤯', '😳', '🥵', '🥶', '😱', '😨',
@@ -195,17 +194,115 @@ const CuriosityModal: React.FC<CuriosityModalProps> = ({
     '😶', '😐', '😑', '😬', '🙄', '😯', '😦', '😧',
     '😮', '😲', '🥱', '😴', '🤤', '😪', '😵', '🤐',
     '🥴', '🤢', '🤮', '🤧', '😷', '🤒', '🤕', '🤑',
+    
+    // Personagens
     '🤠', '😈', '👿', '👹', '👺', '🤡', '💩', '👻',
     '💀', '☠️', '👽', '👾', '🤖', '🎃', '😺', '😸',
-    '😹', '😻', '😼', '😽', '🙀', '😿', '😾', '❤️',
-    '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎',
+    '😹', '😻', '😼', '😽', '🙀', '😿', '😾',
+    
+    // Corações e amor
+    '❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎',
     '💔', '❣️', '💕', '💞', '💓', '💗', '💖', '💘',
-    '💝', '💟', '☮️', '✝️', '☪️', '🕉️', '☸️', '✡️',
-    '🔯', '🕎', '☯️', '☦️', '🛐', '⛎', '♈', '♉',
-    '♊', '♋', '♌', '♍', '♎', '♏', '♐', '♑',
-    '♒', '♓', '🆔', '⚛️', '🉑', '☢️', '☣️', '📴',
-    '📳', '🈶', '🈚', '🈸', '🈺', '🈷️', '✴️', '🆚',
-    '💮', '🉐', '㊙️', '㊗️', '🈴', '🈵', '🈹', '🈲'
+    '💝', '💟', '💌', '💋', '💍', '💎',
+    
+    // Gestos e mãos
+    '👍', '👎', '👌', '🤌', '🤏', '✌️', '🤞', '🤟',
+    '🤘', '🤙', '👈', '👉', '👆', '🖕', '👇', '☝️',
+    '👋', '🤚', '🖐️', '✋', '🖖', '👏', '🙌', '🤲',
+    '🤝', '🙏', '✍️', '💅', '🤳', '💪', '🦾', '🦿',
+    
+    // Pessoas e profissões
+    '👶', '🧒', '👦', '👧', '🧑', '👱', '👨', '🧔',
+    '👩', '🧓', '👴', '👵', '🙍', '🙎', '🙅', '🙆',
+    '💁', '🙋', '🧏', '🙇', '🤦', '🤷', '👮', '🕵️',
+    '💂', '🥷', '👷', '🤴', '👸', '👳', '👲', '🧕',
+    '🤵', '👰', '🤰', '🤱', '👼', '🎅', '🤶', '🦸',
+    '🦹', '🧙', '🧚', '🧛', '🧜', '🧝', '🧞', '🧟',
+    
+    // Animais
+    '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼',
+    '🐨', '🐯', '🦁', '🐮', '🐷', '🐽', '🐸', '🐵',
+    '🙈', '🙉', '🙊', '🐒', '🐔', '🐧', '🐦', '🐤',
+    '🐣', '🐥', '🦆', '🦅', '🦉', '🦇', '🐺', '🐗',
+    '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞', '🐜',
+    '🦟', '🦗', '🕷️', '🕸️', '🦂', '🐢', '🐍', '🦎',
+    '🦖', '🦕', '🐙', '🦑', '🦐', '🦞', '🦀', '🐡',
+    '🐠', '🐟', '🐬', '🐳', '🐋', '🦈', '🐊', '🐅',
+    '🐆', '🦓', '🦍', '🦧', '🐘', '🦛', '🦏', '🐪',
+    '🐫', '🦒', '🦘', '🐃', '🐂', '🐄', '🐎', '🐖',
+    '🐏', '🐑', '🦙', '🐐', '🦌', '🐕', '🐩', '🦮',
+    '🐕‍🦺', '🐈', '🐓', '🦃', '🦚', '🦜', '🦢', '🦩',
+    '🕊️', '🐇', '🦝', '🦨', '🦡', '🦦', '🦥', '🐁',
+    '🐀', '🐿️', '🦔',
+    
+    // Comida e bebida
+    '🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓',
+    '🫐', '🍈', '🍒', '🍑', '🥭', '🍍', '🥥', '🥝',
+    '🍅', '🍆', '🥑', '🥦', '🥬', '🥒', '🌶️', '🫑',
+    '🌽', '🥕', '🫒', '🧄', '🧅', '🥔', '🍠', '🥐',
+    '🥯', '🍞', '🥖', '🥨', '🧀', '🥚', '🍳', '🧈',
+    '🥞', '🧇', '🥓', '🥩', '🍗', '🍖', '🦴', '🌭',
+    '🍔', '🍟', '🍕', '🥪', '🥙', '🧆', '🌮', '🌯',
+    '🫔', '🥗', '🥘', '🫕', '🥫', '🍝', '🍜', '🍲',
+    '🍛', '🍣', '🍱', '🥟', '🦪', '🍤', '🍙', '🍚',
+    '🍘', '🍥', '🥠', '🥮', '🍢', '🍡', '🍧', '🍨',
+    '🍦', '🥧', '🧁', '🍰', '🎂', '🍮', '🍭', '🍬',
+    '🍫', '🍿', '🍩', '🍪', '🌰', '🥜', '🍯', '🥛',
+    '🍼', '☕', '🍵', '🧃', '🥤', '🍶', '🍺', '🍻',
+    '🥂', '🍷', '🥃', '🍸', '🍹', '🧉', '🍾',
+    
+    // Atividades e esportes
+    '⚽', '🏀', '🏈', '⚾', '🥎', '🎾', '🏐', '🏉',
+    '🥏', '🎱', '🪀', '🏓', '🏸', '🏒', '🏑', '🥍',
+    '🏏', '🪃', '🥅', '⛳', '🪁', '🏹', '🎣', '🤿',
+    '🥊', '🥋', '🎽', '🛹', '🛷', '⛸️', '🥌', '🎿',
+    '⛷️', '🏂', '🪂', '🏋️', '🤼', '🤸', '⛹️', '🤺',
+    '🏇', '🧘', '🏄', '🏊', '🤽', '🚣', '🧗', '🚵',
+    '🚴', '🏆', '🥇', '🥈', '🥉', '🏅', '🎖️', '🏵️',
+    '🎗️', '🎫', '🎟️', '🎪', '🤹', '🎭', '🩰', '🎨',
+    '🎬', '🎤', '🎧', '🎼', '🎵', '🎶', '🥁', '🪘',
+    '🎹', '🥀', '🌸', '🌼', '🌻', '🌺', '🌷', '🌹',
+    
+    // Objetos e símbolos
+    '💎', '🔮', '🪬', '🧿', '📿', '🕯️', '💡', '🔦',
+    '🏮', '🪔', '📚', '📖', '📝', '✏️', '🖊️', '🖋️',
+    '✒️', '🖌️', '🖍️', '📏', '📐', '✂️', '🗃️', '🗄️',
+    '🗑️', '🔒', '🔓', '🔏', '🔐', '🔑', '🗝️', '🔨',
+    '🪓', '⛏️', '⚒️', '🛠️', '🗡️', '⚔️', '🔫', '🪃',
+    '🏹', '🛡️', '🪚', '🔧', '🪛', '🔩', '⚙️', '🗜️',
+    '⚖️', '🦯', '🔗', '⛓️', '🪝', '🧰', '🧲', '🪜',
+    
+    // Natureza
+    '🌍', '🌎', '🌏', '🌐', '🗺️', '🗾', '🧭', '🏔️',
+    '⛰️', '🌋', '🗻', '🏕️', '🏖️', '🏜️', '🏝️', '🏞️',
+    '🏟️', '🏛️', '🏗️', '🧱', '🪨', '🪵', '🛖', '🏘️',
+    '🏚️', '🏠', '🏡', '🏢', '🏣', '🏤', '🏥', '🏦',
+    '🏨', '🏩', '🏪', '🏫', '🏬', '🏭', '🏯', '🏰',
+    '💒', '🗼', '🗽', '⛪', '🕌', '🛕', '🕍', '⛩️',
+    '🕋', '⛲', '⛺', '🌁', '🌃', '🏙️', '🌄', '🌅',
+    '🌆', '🌇', '🌉', '♨️', '🎠', '🎡', '🎢', '💈',
+    '🎪', '🚂', '🚃', '🚄', '🚅', '🚆', '🚇', '🚈',
+    '🚉', '🚊', '🚝', '🚞', '🚋', '🚌', '🚍', '🎫',
+    '🎟️', '🎪', '🎭', '🎨', '🎬', '🎤', '🎧', '🎼',
+    
+    // Símbolos e sinais
+    '☮️', '✝️', '☪️', '🕉️', '☸️', '✡️', '🔯', '🕎',
+    '☯️', '☦️', '🛐', '⛎', '♈', '♉', '♊', '♋',
+    '♌', '♍', '♎', '♏', '♐', '♑', '♒', '♓',
+    '🆔', '⚛️', '🉑', '☢️', '☣️', '📴', '📳', '🈶',
+    '🈚', '🈸', '🈺', '🈷️', '✴️', '🆚', '💮', '🉐',
+    '㊙️', '㊗️', '🈴', '🈵', '🈹', '🈲', '🅰️', '🅱️',
+    '🆎', '🆑', '🅾️', '🆘', '❌', '⭕', '🛑', '⛔',
+    '📛', '🚫', '💯', '💢', '♨️', '🚷', '🚯', '🚳',
+    '🚱', '🔞', '📵', '🚭', '❗', '❕', '❓', '❔',
+    '‼️', '⁉️', '🔅', '🔆', '〽️', '⚠️', '🚸', '🔱',
+    '⚜️', '🔰', '♻️', '✅', '🈯', '💹', '❇️', '✳️',
+    '❎', '🌐', '💠', 'Ⓜ️', '🌀', '💤', '🏧', '🚾',
+    '♿', '🅿️', '🈳', '🈂️', '🛂', '🛃', '🛄', '🛅',
+    '🚹', '🚺', '🚼', '🚻', '🚮', '🎦', '📶', '🈁',
+    '🔣', 'ℹ️', '🔤', '🔡', '🔠', '🆖', '🆗', '🆙',
+    '🆒', '🆕', '🆓', '0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣',
+    '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟'
   ];
 
   const renderTextPreview = (content: string) => {
@@ -281,7 +378,7 @@ const CuriosityModal: React.FC<CuriosityModalProps> = ({
                               <Smile className="w-3 h-3" />
                             </Button>
                             {showEmojiPicker && activeTextarea === `edit-${text.id}` && (
-                               <div className="emoji-picker absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-2 z-50 w-64 max-h-48 overflow-y-auto">
+                               <div className="emoji-picker absolute bottom-full left-0 mb-1 bg-white border border-gray-200 rounded-lg shadow-lg p-2 z-50 w-80 max-h-60 overflow-y-auto">
                                 <div className="grid grid-cols-8 gap-1">
                                   {commonEmojis.map((emoji, index) => (
                                     <button
@@ -402,7 +499,7 @@ const CuriosityModal: React.FC<CuriosityModalProps> = ({
                       <Smile className="w-3 h-3" />
                     </Button>
                     {showEmojiPicker && activeTextarea === 'new' && (
-                       <div className="emoji-picker absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-2 z-50 w-64 max-h-48 overflow-y-auto">
+                       <div className="emoji-picker absolute bottom-full left-0 mb-1 bg-white border border-gray-200 rounded-lg shadow-lg p-2 z-50 w-80 max-h-60 overflow-y-auto">
                         <div className="grid grid-cols-8 gap-1">
                           {commonEmojis.map((emoji, index) => (
                             <button

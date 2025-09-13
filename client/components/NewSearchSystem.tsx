@@ -206,7 +206,7 @@ export default function NewSearchSystem({
   }
 
   return (
-    <div ref={searchRef} className="flex-1 max-w-[605px] mx-8 relative">
+    <div ref={searchRef} className="flex-1 relative">
       <div className="relative">
         <input
           ref={inputRef}

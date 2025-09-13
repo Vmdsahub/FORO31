@@ -267,21 +267,24 @@ export default function Header({ activeSection }: HeaderProps) {
           </Link>
         </div>
 
-        {/* New Search System */}
-        <NewSearchSystem activeSection={activeSection} />
-
-        {/* Saved Topics Button - Only show in forum */}
-        {activeSection === "forum" && (
-          <button
-            onClick={handleSavedTopicsClick}
-            className="px-3 py-2 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 transition-colors flex items-center"
-            title="Tópicos Salvos"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z" />
-            </svg>
-          </button>
-        )}
+        {/* Search System and Saved Topics Container */}
+        <div className="flex-1 flex items-center justify-center ml-16">
+          <div className="flex items-center gap-2 max-w-[605px] w-full">
+            <NewSearchSystem activeSection={activeSection} />
+            {/* Saved Topics Button - Only show in forum */}
+            {activeSection === "forum" && (
+              <button
+                onClick={handleSavedTopicsClick}
+                className="p-2 rounded-lg hover:bg-gray-100 transition-colors flex-shrink-0"
+                title="Tópicos Salvos"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-gray-600">
+                   <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z" />
+                 </svg>
+              </button>
+            )}
+          </div>
+        </div>
 
         <div className="flex items-center space-x-4">
           {user && (
@@ -289,17 +292,13 @@ export default function Header({ activeSection }: HeaderProps) {
               {/* Shop Icon */}
               <button
                 onClick={() => navigate("/shop")}
-                className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
                 title="Loja de Likes"
               >
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  className="text-gray-600"
-                >
-                  <path d="M19 7h-3V6a4 4 0 0 0-8 0v1H5a1 1 0 0 0-1 1v11a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V8a1 1 0 0 0-1-1zM10 6a2 2 0 0 1 4 0v1h-4V6zm8 15a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V9h2v1a1 1 0 0 0 2 0V9h4v1a1 1 0 0 0 2 0V9h2v12z" />
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-600">
+                  <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <path d="M16 10a4 4 0 0 1-8 0" />
                 </svg>
               </button>
 
@@ -333,7 +332,7 @@ export default function Header({ activeSection }: HeaderProps) {
                 </button>
 
                 {showNotifications && (
-                  <div className="absolute top-full right-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
                     <div className="p-4">
                       <div className="flex items-center justify-between mb-3">
                         <h3 className="font-semibold text-gray-900">

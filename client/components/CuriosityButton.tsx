@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/tooltip";
 import CuriosityModal from "./CuriosityModal";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCuriosityTexts } from "@/hooks/useCuriosityTexts";
 
 interface CuriosityText {
   id: string;
@@ -22,60 +23,17 @@ interface CuriosityButtonProps {
 
 const CuriosityButton: React.FC<CuriosityButtonProps> = ({ className = "" }) => {
   const { isAdmin } = useAuth();
-  const [curiosityTexts, setCuriosityTexts] = useState<CuriosityText[]>([]);
+  const { texts: curiosityTexts, updateAllTexts } = useCuriosityTexts();
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
 
-  // Carregar textos do localStorage na inicialização
+  // Ajustar índice quando os textos mudarem
   useEffect(() => {
-    const savedTexts = localStorage.getItem('curiosityTexts');
-    if (savedTexts) {
-      try {
-        const parsedTexts = JSON.parse(savedTexts).map((text: any) => ({
-          ...text,
-          createdAt: new Date(text.createdAt)
-        }));
-        setCuriosityTexts(parsedTexts);
-      } catch (error) {
-        console.error('Erro ao carregar textos de curiosidade:', error);
-        // Textos padrão caso haja erro
-        setDefaultTexts();
-      }
-    } else {
-      // Textos padrão se não houver nada salvo
-      setDefaultTexts();
+    if (curiosityTexts.length > 0 && currentTextIndex >= curiosityTexts.length) {
+      setCurrentTextIndex(0);
     }
-  }, []);
-
-  const setDefaultTexts = () => {
-    const defaultTexts: CuriosityText[] = [
-      {
-        id: '1',
-        content: '🤖 **Você sabia?** A primeira IA conversacional foi criada em 1966 e se chamava ELIZA!',
-        createdAt: new Date()
-      },
-      {
-        id: '2', 
-        content: '🧠 **Curiosidade:** O cérebro humano processa informações a cerca de 20 watts - menos que uma lâmpada!',
-        createdAt: new Date()
-      },
-      {
-        id: '3',
-        content: '⚡ **Fato interessante:** GPT-3 tem 175 bilhões de parâmetros, mas ainda não consegue *realmente* entender como você!',
-        createdAt: new Date()
-      }
-    ];
-    setCuriosityTexts(defaultTexts);
-    localStorage.setItem('curiosityTexts', JSON.stringify(defaultTexts));
-  };
-
-  // Salvar textos no localStorage sempre que mudarem
-  useEffect(() => {
-    if (curiosityTexts.length > 0) {
-      localStorage.setItem('curiosityTexts', JSON.stringify(curiosityTexts));
-    }
-  }, [curiosityTexts]);
+  }, [curiosityTexts, currentTextIndex]);
 
   const handleCuriosityClick = () => {
     if (curiosityTexts.length === 0) return;
@@ -92,13 +50,7 @@ const CuriosityButton: React.FC<CuriosityButtonProps> = ({ className = "" }) => 
     setShowTooltip(false);
   };
 
-  const updateTexts = (newTexts: CuriosityText[]) => {
-    setCuriosityTexts(newTexts);
-    // Ajustar índice se necessário
-    if (newTexts.length > 0 && currentTextIndex >= newTexts.length) {
-      setCurrentTextIndex(0);
-    }
-  };
+
 
   const renderTextWithFormatting = (text: string) => {
     // Converter **texto** para <strong>texto</strong>
@@ -169,8 +121,6 @@ const CuriosityButton: React.FC<CuriosityButtonProps> = ({ className = "" }) => 
       <CuriosityModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        texts={curiosityTexts}
-        onUpdateTexts={updateTexts}
       />
     </div>
   );

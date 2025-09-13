@@ -74,6 +74,13 @@ import {
   handleSecurityReport,
 } from "./routes/security-logs";
 import {
+  getCuriosityTexts,
+  createCuriosityText,
+  updateCuriosityText,
+  deleteCuriosityText,
+  updateAllCuriosityTexts,
+} from "./routes/curiosity";
+import {
   getFeaturedTopics,
   addFeaturedTopic,
   removeFeaturedTopic,
@@ -239,6 +246,13 @@ export function createServer() {
   app.get("/api/security/alerts", handleSecurityAlerts);
   app.get("/api/security/health", handleSecurityHealth);
   app.get("/api/security/report", handleSecurityReport);
+
+  // Curiosity texts routes
+  app.get("/api/curiosity-texts", getCuriosityTexts);
+  app.post("/api/curiosity-texts", authenticateToken, createCuriosityText);
+  app.put("/api/curiosity-texts/:id", authenticateToken, updateCuriosityText);
+  app.delete("/api/curiosity-texts/:id", authenticateToken, deleteCuriosityText);
+  app.put("/api/curiosity-texts", authenticateToken, updateAllCuriosityTexts);
 
   return app;
 }
