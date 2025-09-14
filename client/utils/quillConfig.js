@@ -1,9 +1,8 @@
 import ReactQuill from 'react-quill';
-import VideoBlot from './videoBlot.js';
+import './videoBlot.js'; // Importar para registrar o blot
 
-// Registrar o blot customizado de vídeo
+// O VideoBlot se registra automaticamente
 const Quill = ReactQuill.Quill;
-Quill.register(VideoBlot);
 
 // Handler customizado para o botão de upload
 function insertUpload() {

@@ -386,10 +386,19 @@
 
   /* Remover espaçamento extra do Quill para blots de vídeo */
   .ql-video-embed {
-    margin: 0 !important;
+    margin: 4px !important;
     padding: 0 !important;
     line-height: 0 !important;
     display: inline-block !important;
+    vertical-align: top !important;
+    width: 200px !important;
+    height: 150px !important;
+  }
+
+  /* Forçar comportamento inline no editor Quill */
+  .ql-editor .ql-video-embed {
+    display: inline-block !important;
+    margin: 4px !important;
     vertical-align: top !important;
   }
 

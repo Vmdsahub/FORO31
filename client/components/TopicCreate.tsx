@@ -223,6 +223,8 @@ export default function TopicCreate({ onSave, onCancel, image: externalImage, on
                     if (nextChar !== '\n') {
                       quill.insertText(insertIndex + 1, '\n');
                     }
+                    // Posicionar cursor após o embed e quebra de linha (padrão oficial Quill)
+                    quill.setSelection(insertIndex + 2, 0);
                   } else if (isVideo) {
                     // Para vídeos, inserir usando o blot customizado
                     const videoId = `video-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -236,6 +238,8 @@ export default function TopicCreate({ onSave, onCancel, image: externalImage, on
                     if (nextChar !== '\n') {
                       quill.insertText(insertIndex + 1, '\n');
                     }
+                    // Posicionar cursor após o embed e quebra de linha (padrão oficial Quill)
+                    quill.setSelection(insertIndex + 2, 0);
                   } else {
                     quill.insertText(insertIndex, `📎 `);
                     quill.insertText(insertIndex + 2, fileInfo.originalName, 'link', fileInfo.url);

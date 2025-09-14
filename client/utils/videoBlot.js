@@ -7,84 +7,54 @@ class VideoBlot extends Embed {
     const node = super.create();
     const { id, url, filename } = value;
     
+    // Configurar atributos
     node.setAttribute('data-video-id', id);
     node.setAttribute('data-video-url', url);
     node.setAttribute('data-video-filename', filename);
+    node.setAttribute('src', 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgdmlld0JveD0iMCAwIDIwMCAxNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMTUwIiBmaWxsPSIjMDAwIiByeD0iOCIvPgo8Y2lyY2xlIGN4PSIxMDAiIGN5PSI3NSIgcj0iMjQiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC45KSIvPgo8cGF0aCBkPSJNOTIgNjVMMTE2IDc1TDkyIDg1VjY1WiIgZmlsbD0iIzAwMCIvPgo8L3N2Zz4K');
+    node.setAttribute('alt', `Vídeo: ${filename}`);
     
-    // Aplicar estilos diretamente no node (sem container wrapper)
-    node.className = 'video-thumbnail-container';
+    // Aplicar estilos inline para comportamento de imagem
     node.style.cssText = `
-      position: relative;
-      display: inline-block;
-      vertical-align: top;
       width: 200px;
       height: 150px;
-      margin: 4px;
+      object-fit: cover;
       border-radius: 8px;
-      overflow: hidden;
+      border: 1px solid #e2e8f0;
       cursor: pointer;
-      border: 1px solid #e5e7eb;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      transition: all 0.2s ease;
+      margin: 4px;
+      display: inline-block;
+      vertical-align: top;
       background: #000;
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      line-height: 0;
     `;
     
-    // Criar elemento de vídeo oculto para gerar thumbnail
+    // Detectar orientação do vídeo e gerar thumbnail
     const video = document.createElement('video');
-    video.style.cssText = `
-      position: absolute;
-      top: -9999px;
-      left: -9999px;
-      width: 1px;
-      height: 1px;
-      opacity: 0;
-      pointer-events: none;
-    `;
+    video.style.cssText = 'position: absolute; top: -9999px; left: -9999px; opacity: 0;';
     video.setAttribute('preload', 'metadata');
     video.setAttribute('muted', 'true');
     video.src = url;
     
-    // Criar canvas oculto para capturar frame
     const canvas = document.createElement('canvas');
-    canvas.style.cssText = `
-      position: absolute;
-      top: -9999px;
-      left: -9999px;
-      opacity: 0;
-      pointer-events: none;
-    `;
+    canvas.style.cssText = 'position: absolute; top: -9999px; left: -9999px; opacity: 0;';
     
-    // Detectar orientação do vídeo e gerar thumbnail
     video.addEventListener('loadedmetadata', () => {
       const aspectRatio = video.videoWidth / video.videoHeight;
       const isVertical = aspectRatio < 1;
       
-      console.log('VideoBlot - Video orientation:', { aspectRatio, isVertical, videoWidth: video.videoWidth, videoHeight: video.videoHeight });
-      
-      // Altura fixa de 150px para todos os tipos de vídeo
+      // Altura fixa de 150px, largura proporcional
       const fixedHeight = 150;
-      let width;
+      const calculatedWidth = Math.round(fixedHeight * aspectRatio);
       
-      if (isVertical) {
-        // Vídeo vertical: calcular largura baseada na altura fixa
-        width = Math.round(fixedHeight * aspectRatio);
-      } else {
-        // Vídeo horizontal: calcular largura baseada na altura fixa
-        width = Math.round(fixedHeight * aspectRatio);
-      }
-      
-      node.style.width = width + 'px';
+      // Aplicar dimensões calculadas
+      node.style.width = calculatedWidth + 'px';
       node.style.height = fixedHeight + 'px';
       
-      // Configurar canvas com as dimensões do vídeo
+      // Configurar canvas com dimensões do vídeo
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
       
-      // Gerar frame aleatório
+      // Gerar frame aleatório (entre 10% e 90% da duração)
       if (video.duration && !isNaN(video.duration) && video.duration > 0) {
         const minTime = video.duration * 0.1;
         const maxTime = video.duration * 0.9;
@@ -93,9 +63,10 @@ class VideoBlot extends Embed {
       } else {
         video.currentTime = 1;
       }
+      
+      console.log(`Vídeo ${isVertical ? 'vertical' : 'horizontal'}: ${calculatedWidth}x${fixedHeight}`);
     });
     
-    // Capturar frame quando o vídeo for posicionado no tempo correto
     video.addEventListener('seeked', () => {
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
@@ -103,86 +74,22 @@ class VideoBlot extends Embed {
       // Desenhar frame do vídeo no canvas
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
       
-      // Converter canvas para data URL e definir como background
+      // Converter canvas para data URL e definir como src
       const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-      node.style.backgroundImage = `url(${dataUrl})`;
+      node.setAttribute('src', dataUrl);
       
-      console.log('VideoBlot - Thumbnail gerado com sucesso');
+      console.log('Thumbnail gerada com sucesso');
+      
+      // Limpar elementos temporários
+      document.body.removeChild(video);
+      document.body.removeChild(canvas);
     });
     
-    // Criar overlay com botão play
-    const overlay = document.createElement('div');
-    overlay.style.cssText = `
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0,0,0,0.3);
-      transition: background 0.2s ease;
-    `;
+    // Adicionar elementos temporários ao DOM
+    document.body.appendChild(video);
+    document.body.appendChild(canvas);
     
-    // Criar botão play
-    const playButton = document.createElement('div');
-    playButton.style.cssText = `
-      width: 48px;
-      height: 48px;
-      background: rgba(255,255,255,0.9);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s ease;
-    `;
-    
-    // Criar ícone play SVG
-    const playIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    playIcon.setAttribute('width', '20');
-    playIcon.setAttribute('height', '20');
-    playIcon.setAttribute('viewBox', '0 0 24 24');
-    playIcon.style.marginLeft = '2px';
-    
-    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    path.setAttribute('d', 'M8 5v14l11-7z');
-    path.setAttribute('fill', '#000');
-    
-    playIcon.appendChild(path);
-    playButton.appendChild(playIcon);
-    overlay.appendChild(playButton);
-    
-    // Montar estrutura diretamente no node
-    document.body.appendChild(video); // Adicionar vídeo oculto ao body
-    document.body.appendChild(canvas); // Adicionar canvas oculto ao body
-    node.appendChild(overlay);
-    
-    // Adicionar quebra de linha após o vídeo
-    const lineBreak = document.createElement('br');
-    lineBreak.className = 'video-line-break';
-    lineBreak.style.display = 'block';
-    lineBreak.style.width = '100%';
-    lineBreak.style.height = '1px';
-    lineBreak.style.clear = 'both';
-    node.appendChild(lineBreak);
-    
-    // Adicionar eventos de hover
-    node.addEventListener('mouseenter', () => {
-      node.style.transform = 'scale(1.05)';
-      node.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
-      overlay.style.background = 'rgba(0,0,0,0.5)';
-      playButton.style.transform = 'scale(1.1)';
-    });
-    
-    node.addEventListener('mouseleave', () => {
-      node.style.transform = 'scale(1)';
-      node.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
-      overlay.style.background = 'rgba(0,0,0,0.3)';
-      playButton.style.transform = 'scale(1)';
-    });
-    
-    // Adicionar evento de clique
+    // Evento de clique para abrir modal
     node.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -194,6 +101,17 @@ class VideoBlot extends Embed {
         // Fallback: abrir em nova aba
         window.open(url, '_blank');
       }
+    });
+    
+    // Efeito hover
+    node.addEventListener('mouseenter', () => {
+      node.style.transform = 'scale(1.05)';
+      node.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+    });
+    
+    node.addEventListener('mouseleave', () => {
+      node.style.transform = 'scale(1)';
+      node.style.boxShadow = 'none';
     });
     
     return node;
@@ -217,7 +135,9 @@ class VideoBlot extends Embed {
 }
 
 VideoBlot.blotName = 'video';
-VideoBlot.tagName = 'span';
+VideoBlot.tagName = 'img';
 VideoBlot.className = 'ql-video-embed';
+
+Quill.register(VideoBlot);
 
 export default VideoBlot;
