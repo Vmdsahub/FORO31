@@ -203,28 +203,59 @@ export default function TopicCreate({ onSave, onCancel, image: externalImage, on
                   const isVideo = fileInfo.mimeType?.startsWith('video/') || 
                                  /\.(mp4|webm|ogg|avi|mov|wmv|flv|mkv)$/i.test(fileInfo.originalName);
                   
-                  // Verificar se há texto na linha atual antes de inserir mídia
+                  // Verificar contexto da linha atual e adjacente
                   const currentLine = quill.getLine(index);
                   const lineText = currentLine && currentLine[0] ? currentLine[0].domNode.textContent : '';
                   const hasTextInLine = lineText && lineText.trim().length > 0;
                   
+                  // Verificar se há mídia na linha seguinte
+                  const nextLine = quill.getLine(index + 1);
+                  const hasMediaAfter = nextLine && nextLine[0] && 
+                    (nextLine[0].domNode.querySelector('img') || 
+                     nextLine[0].domNode.querySelector('.ql-video-embed'));
+                  
+                  // Verificar se há mídia na linha anterior
+                  const prevLine = quill.getLine(index - 1);
+                  const hasMediaBefore = prevLine && prevLine[0] && 
+                    (prevLine[0].domNode.querySelector('img') || 
+                     prevLine[0].domNode.querySelector('.ql-video-embed'));
+                  
                   let insertIndex = index;
+                  let shouldAddLineBreakBefore = false;
+                  let shouldAddLineBreakAfter = false;
                   
                   // Se há texto na linha atual, inserir quebra de linha antes da mídia
                   if (hasTextInLine) {
                     quill.insertText(index, '\n');
                     insertIndex = index + 1;
+                    shouldAddLineBreakBefore = true;
                   }
+                  
+                  // Determinar se deve adicionar quebra após baseado no contexto
+                  const nextChar = quill.getText(insertIndex + 1, 1);
+                  const hasTextAfter = nextChar && nextChar.trim() && nextChar !== '\n';
+                  
+                  // Só adicionar quebra de linha após se:
+                  // 1. Há texto depois OU
+                  // 2. Não há mídia adjacente
+                  shouldAddLineBreakAfter = hasTextAfter || (!hasMediaAfter && !hasMediaBefore);
                   
                   if (fileInfo.isImage) {
                     quill.insertEmbed(insertIndex, 'image', fileInfo.url);
-                    // Verificar se já existe quebra de linha após a posição atual
-                    const nextChar = quill.getText(insertIndex + 1, 1);
-                    if (nextChar !== '\n') {
-                      quill.insertText(insertIndex + 1, '\n');
+                    
+                    let cursorPosition = insertIndex + 1;
+                    
+                    // Adicionar quebra de linha apenas se necessário
+                    if (shouldAddLineBreakAfter) {
+                      const nextChar = quill.getText(insertIndex + 1, 1);
+                      if (nextChar !== '\n') {
+                        quill.insertText(insertIndex + 1, '\n');
+                        cursorPosition = insertIndex + 2;
+                      }
                     }
-                    // Posicionar cursor após o embed e quebra de linha (padrão oficial Quill)
-                    quill.setSelection(insertIndex + 2, 0);
+                    
+                    // Posicionar cursor após o embed (e quebra se houver)
+                    quill.setSelection(cursorPosition, 0);
                   } else if (isVideo) {
                     // Para vídeos, inserir usando o blot customizado
                     const videoId = `video-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -233,13 +264,20 @@ export default function TopicCreate({ onSave, onCancel, image: externalImage, on
                       url: fileInfo.url,
                       filename: fileInfo.originalName
                     });
-                    // Verificar se já existe quebra de linha após a posição atual
-                    const nextChar = quill.getText(insertIndex + 1, 1);
-                    if (nextChar !== '\n') {
-                      quill.insertText(insertIndex + 1, '\n');
+                    
+                    let cursorPosition = insertIndex + 1;
+                    
+                    // Adicionar quebra de linha apenas se necessário
+                    if (shouldAddLineBreakAfter) {
+                      const nextChar = quill.getText(insertIndex + 1, 1);
+                      if (nextChar !== '\n') {
+                        quill.insertText(insertIndex + 1, '\n');
+                        cursorPosition = insertIndex + 2;
+                      }
                     }
-                    // Posicionar cursor após o embed e quebra de linha (padrão oficial Quill)
-                    quill.setSelection(insertIndex + 2, 0);
+                    
+                    // Posicionar cursor após o embed (e quebra se houver)
+                    quill.setSelection(cursorPosition, 0);
                   } else {
                     quill.insertText(insertIndex, `📎 `);
                     quill.insertText(insertIndex + 2, fileInfo.originalName, 'link', fileInfo.url);
